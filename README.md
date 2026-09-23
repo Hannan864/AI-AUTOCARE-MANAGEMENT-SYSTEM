@@ -245,7 +245,7 @@ http://localhost:3000/frontend/ai-automation.html
 
 I am actively seeking full-time roles in **Full-Stack Software Engineering, AI Engineering, Backend Systems, and Cloud Architecture**.
 
-- **Name:** Hannan
+- **Name:** Abdul Hannan
 - **Email:** [iamhannanshahid@gmail.com](mailto:iamhannanshahid@gmail.com)
 - **GitHub:** [github.com/Hannan864](https://github.com/Hannan864)
 - **LinkedIn:** [linkedin.com/in/your-profile](https://linkedin.com/in/your-profile)
