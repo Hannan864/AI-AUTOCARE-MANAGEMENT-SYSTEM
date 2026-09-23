@@ -253,5 +253,11 @@ I am actively seeking full-time roles in **Full-Stack Software Engineering, AI E
 ---
 
 <div align="center">
-  <sub>MIT License • Engineered for Scale, Resilience, and Autonomous Intelligence.</sub>
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+**Engineered with architectural discipline, high-throughput reliability, and autonomous intelligence.**
+
+© 2026 AIITS Project • International Islamic University Islamabad
+
 </div>
