@@ -1,7 +1,3 @@
-AI-AUTOCARE-MANAGEMENT-SYSTEM
-
-⚡ Next-gen intelligent garage OS — AI triage, live voice telemetry, safety recall verification, and automated mechanic scheduling.
-
 <div align="center">
 
 # 🚗⚡ AutoCare AI Engine
