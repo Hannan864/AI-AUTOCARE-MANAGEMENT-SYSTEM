@@ -1,0 +1,685 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "uuid": "fc0170b7-fbd0-4236-ad02-a6f90102ece2",
+      "full_name": "Zahid Ali",
+      "email": "mechanic@gmail.com",
+      "phone_number": "0300-1234567",
+      "password_hash": "cbf06754df2f70dd1f853bdccaec98cc6d8ba861a2a91d357540b9d561b6ceb7",
+      "status": "ACTIVE",
+      "profile_image": "https://ui-avatars.com/api/?name=Zahid%20Ali&background=random&color=fff",
+      "address": "72-B, Gulberg III",
+      "city": "Lahore",
+      "created_at": "2026-06-25T09:28:03.841Z",
+      "updated_at": "2026-06-25T09:28:03.841Z",
+      "last_login": "2026-06-25T09:28:03.841Z",
+      "email_verified": true,
+      "phone_verified": true,
+      "failed_login_attempts": 0,
+      "account_locked": false,
+      "account_locked_until": null,
+      "password": "default123",
+      "role": "MECHANIC"
+    },
+    {
+      "id": 2,
+      "uuid": "f776915a-5934-4ca8-b4b5-ae83f645d6c4",
+      "full_name": "Ahmed Khan",
+      "email": "ahmed@example.com",
+      "phone_number": "0300-1234567",
+      "password_hash": "cbf06754df2f70dd1f853bdccaec98cc6d8ba861a2a91d357540b9d561b6ceb7",
+      "status": "ACTIVE",
+      "profile_image": "https://ui-avatars.com/api/?name=Ahmed%20Khan&background=random&color=fff",
+      "address": "72-B, Gulberg III",
+      "city": "Lahore",
+      "created_at": "2026-06-25T09:28:40.015Z",
+      "updated_at": "2026-06-25T09:28:40.015Z",
+      "last_login": "2026-06-25T09:28:40.015Z",
+      "email_verified": true,
+      "phone_verified": true,
+      "failed_login_attempts": 0,
+      "account_locked": false,
+      "account_locked_until": null,
+      "password": "default123",
+      "role": "VEHICLE_OWNER"
+    },
+    {
+      "id": 3,
+      "uuid": "admin-system-default-uuid-33333333333",
+      "full_name": "System Administrator",
+      "email": "admin@gmail.com",
+      "phone_number": "0300-1112223",
+      "password_hash": "cbf06754df2f70dd1f853bdccaec98cc6d8ba861a2a91d357540b9d561b6ceb7",
+      "status": "ACTIVE",
+      "profile_image": "https://ui-avatars.com/api/?name=System+Administrator&background=EF4444&color=fff",
+      "address": "AutoCare Central Headquarters",
+      "city": "Lahore",
+      "created_at": "2026-06-25T09:28:03.841Z",
+      "updated_at": "2026-06-25T09:28:03.841Z",
+      "last_login": "2026-06-25T09:28:03.841Z",
+      "email_verified": true,
+      "phone_verified": true,
+      "failed_login_attempts": 0,
+      "account_locked": false,
+      "account_locked_until": null,
+      "password": "default123",
+      "role": "ADMIN"
+    }
+  ],
+  "vehicles": [
+    {
+      "make": "honda",
+      "model": "200",
+      "year": 2021,
+      "registration_number": "W2",
+      "color": "white",
+      "mileage": "23",
+      "image": "/uploads/1782379661847-da2f6009-269a-4bcc-bab6-114f853ddeb9.jfif",
+      "id": 1,
+      "user_id": 2,
+      "license_plate": "W2",
+      "status": "Active",
+      "created_at": "2026-06-25T09:27:43.798Z",
+      "updated_at": "2026-06-25T09:27:43.798Z"
+    }
+  ],
+  "service_requests": [
+    {
+      "id": 3,
+      "tracking_code": "REQ-VOICE-1003",
+      "vehicle_id": 1,
+      "vehicle_summary": "2021 honda 200 (W2)",
+      "user_id": 1,
+      "request_type": "VOICE_WORK_ORDER",
+      "title": "Voice-Transcribed Work Order",
+      "description": "Mechanic audio log: replace front lower control arm bushings and sway bar links on 2021 Honda",
+      "status": "pending",
+      "priority": "HIGH",
+      "created_at": "2026-09-23T03:49:29.128Z"
+    },
+    {
+      "id": 2,
+      "tracking_code": "REQ-AI-1002",
+      "vehicle_id": 1,
+      "vehicle_summary": "2021 honda 200 (W2)",
+      "user_id": 1,
+      "request_type": "AI_AUTOMATED_DIAGNOSIS",
+      "title": "Auto-Triaged: Squeaking brakes when slowing down from 30 MP...",
+      "description": "Squeaking brakes when slowing down from 30 MPH",
+      "status": "assigned",
+      "priority": "MEDIUM",
+      "mechanic_id": 1,
+      "estimated_cost": "$120 - $220",
+      "ai_triage_notes": "1. Primary Fault: Brake Friction Drag & Seized Guide Pin\n2. Category: Brakes & Hydraulics\n3. Estimated Labor Hours: 1.5 - 2.0 Hours\n4. Estimated Parts Cost Range: $110 - $210 (Pads + Rotor)\n5. Urgency: HIGH",
+      "created_at": "2026-09-23T03:49:11.570Z"
+    },
+    {
+      "id": 1,
+      "vehicle_id": 2,
+      "user_id": 2,
+      "request_type": "maintenance",
+      "description": "Services requested: Oil Change. fefr",
+      "status": "assigned",
+      "created_at": "2026-06-25T11:28:14.715Z",
+      "mechanic_id": 2
+    }
+  ],
+  "messages": [
+    {
+      "id": 1,
+      "sender_id": 2,
+      "receiver_id": 1,
+      "content": "[SYSTEM OFFER] I proposed a price of Rs. 2300 for \"oil changer\"",
+      "created_at": "2026-06-25T09:29:06.422Z"
+    },
+    {
+      "id": 2,
+      "sender_id": 2,
+      "receiver_id": 1,
+      "content": "hi can you do it",
+      "created_at": "2026-06-25T09:29:19.358Z"
+    },
+    {
+      "id": 3,
+      "sender_id": 1,
+      "receiver_id": 2,
+      "content": "[SYSTEM COUNTER OFFER] I proposed a counter-offer of Rs. 2500 (original proposal was Rs. 2300) for \"oil changer\"",
+      "created_at": "2026-06-25T09:47:46.352Z"
+    },
+    {
+      "id": 4,
+      "sender_id": 1,
+      "receiver_id": 2,
+      "content": "what do you think",
+      "created_at": "2026-06-25T09:48:00.641Z"
+    },
+    {
+      "id": 5,
+      "sender_id": 2,
+      "receiver_id": 1,
+      "content": "[SYSTEM OFFER ACCEPT] I have accepted your proposal of Rs. 2500! Settle this invoice and let's get started on the job!",
+      "created_at": "2026-06-25T09:48:38.861Z"
+    },
+    {
+      "id": 6,
+      "sender_id": 2,
+      "receiver_id": 2,
+      "content": "[SYSTEM COUNTER OFFER] I would like to renegotiate the price. I proposed Rs. 2250 instead of Rs. 2500.\n\n💬 **Owner Note:** Hi, I would like to propose a renegotiated counter price for this service. Let me know if this works for you!",
+      "created_at": "2026-06-25T09:49:51.129Z"
+    },
+    {
+      "id": 7,
+      "sender_id": 2,
+      "receiver_id": 1,
+      "content": "[SYSTEM OFFER ACCEPT] I have accepted your proposal of Rs. 2250! Settle this invoice and let's get started on the job!",
+      "created_at": "2026-06-25T09:51:11.144Z"
+    },
+    {
+      "id": 8,
+      "sender_id": 2,
+      "receiver_id": 1,
+      "content": "[SYSTEM COUNTER OFFER] I would like to renegotiate the price. I proposed Rs. 2025 instead of Rs. 2250.\n\n💬 **Owner Note:** Hi, I would like to propose a renegotiated counter price for this service. Let me know if this works for you!",
+      "created_at": "2026-06-25T11:14:53.865Z"
+    },
+    {
+      "id": 9,
+      "sender_id": 1,
+      "receiver_id": 2,
+      "content": "[SYSTEM COUNTER OFFER] I proposed a counter-offer of Rs. 2100 (original proposal was Rs. 2025) for \"oil changer\"",
+      "created_at": "2026-06-25T11:15:34.085Z"
+    },
+    {
+      "id": 10,
+      "sender_id": 2,
+      "receiver_id": 1,
+      "content": "[SYSTEM OFFER ACCEPT] I have accepted your proposal of Rs. 2100! Settle this invoice and let's get started on the job!",
+      "created_at": "2026-06-25T11:16:21.690Z"
+    },
+    {
+      "id": 11,
+      "sender_id": 2,
+      "receiver_id": 2,
+      "content": "[SYSTEM HIRE] I have officially HIRED you for \"oil changer\" at the agreed price of Rs. 2100!",
+      "created_at": "2026-06-25T11:22:00.026Z"
+    }
+  ],
+  "invoices": [
+    {
+      "id": 1,
+      "user_id": 2,
+      "service_id": null,
+      "price_offer_id": 2,
+      "amount": 2500,
+      "status": "cancelled",
+      "description": "Invoice from Mechanic for \"oil changer\": Standard mechanic services and inspection (Est. Time: 1-2 hours)",
+      "created_at": "2026-06-25T09:48:38.860Z"
+    },
+    {
+      "id": 2,
+      "user_id": 2,
+      "service_id": null,
+      "price_offer_id": 2,
+      "amount": 2250,
+      "status": "cancelled",
+      "description": "Invoice from Mechanic for \"oil changer\": Standard mechanic services and inspection (Est. Time: 1-2 hours)",
+      "created_at": "2026-06-25T09:51:11.143Z"
+    },
+    {
+      "id": 3,
+      "user_id": 2,
+      "service_id": null,
+      "price_offer_id": 4,
+      "amount": 2100,
+      "status": "paid",
+      "description": "Invoice from Mechanic for \"oil changer\": Standard mechanic services and inspection (Est. Time: 1-2 hours)",
+      "created_at": "2026-06-25T11:16:21.690Z",
+      "paid_at": "2026-06-25T11:22:00.026Z",
+      "paid_via": "Cash",
+      "offline_reference": "3der3",
+      "offline_notes": "hgty"
+    }
+  ],
+  "payment_methods": [],
+  "audit_logs": [
+    {
+      "id": 1,
+      "user_id": 2,
+      "action_type": "vehicle_added",
+      "entity_type": "Vehicle",
+      "entity_id": 1,
+      "description": "Registered vehicle: honda 200 (W2)",
+      "status": "success",
+      "created_at": "2026-06-25T09:27:43.799Z"
+    },
+    {
+      "id": 2,
+      "user_id": 1,
+      "action_type": "gig_created",
+      "entity_type": "Gig",
+      "entity_id": 1,
+      "description": "Mechanic created service gig profile: oil changer",
+      "status": "success",
+      "created_at": "2026-06-25T09:28:27.299Z"
+    },
+    {
+      "id": 3,
+      "user_id": 2,
+      "action_type": "price_offer_created",
+      "entity_type": "PriceOffer",
+      "entity_id": 1,
+      "description": "User sent a price offer of Rs. 2300 to User #1.",
+      "status": "success",
+      "created_at": "2026-06-25T09:29:06.423Z"
+    },
+    {
+      "id": 4,
+      "user_id": 1,
+      "action_type": "price_offer_countered",
+      "entity_type": "PriceOffer",
+      "entity_id": 2,
+      "description": "User countered price offer #1: proposed Rs. 2500 instead of Rs. 2300.",
+      "status": "success",
+      "created_at": "2026-06-25T09:47:46.352Z"
+    },
+    {
+      "id": 5,
+      "user_id": 2,
+      "action_type": "price_offer_accepted",
+      "entity_type": "PriceOffer",
+      "entity_id": 2,
+      "description": "User accepted price offer #2.",
+      "status": "success",
+      "created_at": "2026-06-25T09:48:38.861Z"
+    },
+    {
+      "id": 6,
+      "user_id": 2,
+      "action_type": "price_renegotiated",
+      "entity_type": "Invoice",
+      "entity_id": 1,
+      "description": "Renegotiated invoice #1: Counter offer Rs. 2250 (was Rs. 2500)",
+      "status": "success",
+      "created_at": "2026-06-25T09:49:51.130Z"
+    },
+    {
+      "id": 7,
+      "user_id": 2,
+      "action_type": "price_offer_accepted",
+      "entity_type": "PriceOffer",
+      "entity_id": 2,
+      "description": "User accepted price offer #2.",
+      "status": "success",
+      "created_at": "2026-06-25T09:51:11.144Z"
+    },
+    {
+      "id": 8,
+      "user_id": 2,
+      "action_type": "price_renegotiated",
+      "entity_type": "Invoice",
+      "entity_id": 2,
+      "description": "Renegotiated invoice #2: Proposed counter-offer Rs. 2025 (was Rs. 2250)",
+      "status": "success",
+      "created_at": "2026-06-25T11:14:53.866Z"
+    },
+    {
+      "id": 9,
+      "user_id": 1,
+      "action_type": "price_offer_countered",
+      "entity_type": "PriceOffer",
+      "entity_id": 4,
+      "description": "User countered price offer #3: proposed Rs. 2100 instead of Rs. 2025.",
+      "status": "success",
+      "created_at": "2026-06-25T11:15:34.085Z"
+    },
+    {
+      "id": 10,
+      "user_id": 2,
+      "action_type": "price_offer_accepted",
+      "entity_type": "PriceOffer",
+      "entity_id": 4,
+      "description": "User accepted price offer #4.",
+      "status": "success",
+      "created_at": "2026-06-25T11:16:21.691Z"
+    },
+    {
+      "id": 11,
+      "user_id": 2,
+      "action_type": "payment_completed",
+      "entity_type": "Invoice",
+      "entity_id": 3,
+      "description": "Payment of Rs. 2100 completed for Invoice #3.",
+      "status": "success",
+      "created_at": "2026-06-25T11:22:00.027Z"
+    },
+    {
+      "id": 12,
+      "user_id": 2,
+      "action_type": "request_created",
+      "entity_type": "ServiceRequest",
+      "entity_id": 1,
+      "description": "Service request created: maintenance (Services requested: Oil Change. fefr).",
+      "status": "success",
+      "created_at": "2026-06-25T11:28:14.716Z"
+    },
+    {
+      "id": 13,
+      "user_id": {
+        "user_id": 1,
+        "user_name": "AI Autonomous Engine",
+        "action": "AUTO_TRIAGE_DISPATCH",
+        "target_type": "service_request",
+        "target_id": 2,
+        "details": "Autonomous pipeline triaged and dispatched request #2 to undefined"
+      },
+      "status": "success",
+      "created_at": "2026-09-23T03:49:11.572Z"
+    },
+    {
+      "id": 14,
+      "user_id": {
+        "user_id": 1,
+        "user_name": "Mechanic Voice AI",
+        "action": "CREATE_VOICE_REQUEST",
+        "target_type": "service_request",
+        "target_id": 3,
+        "details": "Created service request #3 directly from audio transcript via gemini-3.5-transcribe"
+      },
+      "status": "success",
+      "created_at": "2026-09-23T03:49:29.128Z"
+    }
+  ],
+  "workshops": [
+    {
+      "id": 1,
+      "workshop_name": "Lahore AutoCare Pro Center",
+      "address": "72-B, Gulberg III, Ferozepur Road",
+      "city": "Lahore",
+      "phone": "042-35876543",
+      "manager_id": 3
+    },
+    {
+      "id": 2,
+      "workshop_name": "Islamabad Sector G-10 Workshop",
+      "address": "Plot 19, Street 4, I-10 Industrial Area",
+      "city": "Islamabad",
+      "phone": "051-44332211",
+      "manager_id": 3
+    },
+    {
+      "id": 3,
+      "workshop_name": "Karachi Clifton Flagship Hub",
+      "address": "Block 4, Scheme 5, Clifton",
+      "city": "Karachi",
+      "phone": "021-35308822",
+      "manager_id": 3
+    }
+  ],
+  "mechanics": [
+    {
+      "id": 1,
+      "uuid": "320d7301-b4c9-49fd-a442-29c54362c4bc",
+      "user_id": 2,
+      "employee_code": "EMP-MCH-001",
+      "profile_image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200",
+      "full_name": "Tariq Mehmood",
+      "email": "mechanic@autocare.pk",
+      "phone_number": "0300-9876543",
+      "specialization": [
+        "Engine Repair",
+        "Maintenance",
+        "Brake Systems"
+      ],
+      "experience_years": 6,
+      "certifications": [
+        "ASE Master Automobile Technician",
+        "Toyota Certified Expert"
+      ],
+      "workshop_id": 1,
+      "current_status": "ACTIVE",
+      "current_location_lat": 31.5204,
+      "current_location_lng": 74.3587,
+      "availability_status": "AVAILABLE",
+      "rating": 4.8,
+      "total_jobs": 142,
+      "completed_jobs": 139,
+      "cancelled_jobs": 3,
+      "created_at": "2026-06-25T09:27:43.798Z",
+      "updated_at": "2026-06-25T09:27:43.798Z"
+    },
+    {
+      "id": 2,
+      "uuid": "366c512f-e929-456c-a0c8-183dd52ea4e9",
+      "user_id": 1,
+      "employee_code": "EMP-MCH-002",
+      "profile_image": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=200",
+      "full_name": "Zahid Ali",
+      "email": "mechanic@gmail.com",
+      "phone_number": "0321-7654321",
+      "specialization": [
+        "Electrical",
+        "AC Repair",
+        "Diagnostics"
+      ],
+      "experience_years": 4,
+      "certifications": [
+        "Automotive Electrical Certified Specialist"
+      ],
+      "workshop_id": 2,
+      "current_status": "ACTIVE",
+      "current_location_lat": 33.6844,
+      "current_location_lng": 73.0479,
+      "availability_status": "BUSY",
+      "rating": 4.5,
+      "total_jobs": 88,
+      "completed_jobs": 85,
+      "cancelled_jobs": 3,
+      "created_at": "2026-06-25T09:27:43.798Z",
+      "updated_at": "2026-06-25T09:27:43.798Z"
+    },
+    {
+      "id": 3,
+      "uuid": "98449942-b222-4f1b-a122-09614050d674",
+      "user_id": 1,
+      "employee_code": "EMP-MCH-003",
+      "profile_image": "https://ui-avatars.com/api/?name=Zahid%20Ali&background=random&color=fff",
+      "full_name": "Zahid Ali",
+      "email": "mechanic@gmail.com",
+      "phone_number": "0300-1234567",
+      "specialization": [
+        "Engine Repair",
+        "Diagnostics",
+        "Maintenance"
+      ],
+      "experience_years": 5,
+      "certifications": [
+        "AutoCare Standard Professional Certification"
+      ],
+      "workshop_id": 1,
+      "current_status": "ACTIVE",
+      "current_location_lat": 31.5204,
+      "current_location_lng": 74.3587,
+      "availability_status": "AVAILABLE",
+      "rating": 4.8,
+      "total_jobs": 0,
+      "completed_jobs": 0,
+      "cancelled_jobs": 0,
+      "created_at": "2026-06-25T09:28:03.842Z",
+      "updated_at": "2026-06-25T09:28:03.842Z"
+    }
+  ],
+  "gigs": [
+    {
+      "id": 1,
+      "mechanic_id": 3,
+      "mechanic_name": "Zahid Ali",
+      "email": "mechanic@gmail.com",
+      "title": "oil changer",
+      "description": "hy",
+      "category": "Maintenance",
+      "experience": "2",
+      "price_range": "3000",
+      "availability": "Available",
+      "created_at": "2026-06-25T09:28:27.298Z"
+    }
+  ],
+  "service_history": [],
+  "parts_used": [],
+  "uploads": [],
+  "vehicle_owners_db": [
+    {
+      "id": 2,
+      "uuid": "f776915a-5934-4ca8-b4b5-ae83f645d6c4",
+      "full_name": "Ahmed Khan",
+      "email": "ahmed@example.com",
+      "phone_number": "0300-1234567",
+      "password": "default123",
+      "password_hash": "cbf06754df2f70dd1f853bdccaec98cc6d8ba861a2a91d357540b9d561b6ceb7",
+      "role": "VEHICLE_OWNER",
+      "status": "ACTIVE",
+      "profile_image": "https://ui-avatars.com/api/?name=Ahmed%20Khan&background=random&color=fff",
+      "address": "72-B, Gulberg III",
+      "city": "Lahore",
+      "created_at": "2026-06-25T09:28:40.015Z",
+      "updated_at": "2026-06-25T09:28:40.015Z",
+      "last_login": "2026-06-25T09:28:40.015Z",
+      "email_verified": true,
+      "phone_verified": true,
+      "failed_login_attempts": 0,
+      "account_locked": false,
+      "account_locked_until": null
+    }
+  ],
+  "mechanics_db": [
+    {
+      "id": 1,
+      "uuid": "fc0170b7-fbd0-4236-ad02-a6f90102ece2",
+      "full_name": "Zahid Ali",
+      "email": "mechanic@gmail.com",
+      "phone_number": "0300-1234567",
+      "password": "default123",
+      "password_hash": "cbf06754df2f70dd1f853bdccaec98cc6d8ba861a2a91d357540b9d561b6ceb7",
+      "role": "MECHANIC",
+      "status": "ACTIVE",
+      "profile_image": "https://ui-avatars.com/api/?name=Zahid%20Ali&background=random&color=fff",
+      "address": "72-B, Gulberg III",
+      "city": "Lahore",
+      "created_at": "2026-06-25T09:28:03.841Z",
+      "updated_at": "2026-06-25T09:28:03.841Z",
+      "last_login": "2026-06-25T09:28:03.841Z",
+      "email_verified": true,
+      "phone_verified": true,
+      "failed_login_attempts": 0,
+      "account_locked": false,
+      "account_locked_until": null
+    }
+  ],
+  "admins_db": [
+    {
+      "id": 3,
+      "uuid": "admin-system-default-uuid-33333333333",
+      "full_name": "System Administrator",
+      "email": "admin@gmail.com",
+      "phone_number": "0300-1112223",
+      "password_hash": "cbf06754df2f70dd1f853bdccaec98cc6d8ba861a2a91d357540b9d561b6ceb7",
+      "status": "ACTIVE",
+      "profile_image": "https://ui-avatars.com/api/?name=System+Administrator&background=EF4444&color=fff",
+      "address": "AutoCare Central Headquarters",
+      "city": "Lahore",
+      "created_at": "2026-06-25T09:28:03.841Z",
+      "updated_at": "2026-06-25T09:28:03.841Z",
+      "last_login": "2026-06-25T09:28:03.841Z",
+      "email_verified": true,
+      "phone_verified": true,
+      "failed_login_attempts": 0,
+      "account_locked": false,
+      "account_locked_until": null,
+      "password": "default123",
+      "role": "ADMIN"
+    }
+  ],
+  "price_offers": [
+    {
+      "id": 1,
+      "sender_id": 2,
+      "receiver_id": 1,
+      "amount": 2300,
+      "status": "declined",
+      "gig_title": "oil changer",
+      "gig_id": 1,
+      "created_at": "2026-06-25T09:29:06.422Z"
+    },
+    {
+      "id": 2,
+      "sender_id": 1,
+      "receiver_id": 2,
+      "amount": 2250,
+      "status": "declined",
+      "gig_title": "oil changer",
+      "gig_id": 1,
+      "created_at": "2026-06-25T09:47:46.352Z",
+      "invoice_details": "Standard mechanic services and inspection",
+      "estimated_time": "1-2 hours"
+    },
+    {
+      "id": 3,
+      "sender_id": 2,
+      "receiver_id": 1,
+      "amount": 2025,
+      "status": "declined",
+      "gig_title": "oil changer",
+      "gig_id": 1,
+      "created_at": "2026-06-25T11:14:53.865Z"
+    },
+    {
+      "id": 4,
+      "sender_id": 1,
+      "receiver_id": 2,
+      "amount": 2100,
+      "status": "hired",
+      "gig_title": "oil changer",
+      "gig_id": 1,
+      "created_at": "2026-06-25T11:15:34.085Z",
+      "invoice_details": "Standard mechanic services and inspection",
+      "estimated_time": "1-2 hours"
+    }
+  ],
+  "hired_mechanics": [
+    {
+      "id": 1,
+      "user_id": 2,
+      "mechanic_id": 2,
+      "mechanic_name": "Ahmed Khan",
+      "agreed_price": 2100,
+      "gig_title": "oil changer",
+      "gig_id": 1,
+      "created_at": "2026-06-25T11:22:00.026Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": 3001,
+      "user_id": 2,
+      "title": "Welcome to AutoCare!",
+      "content": "Your account is active. Register your vehicles under 'My Vehicles' to book fast maintenance sessions.",
+      "read": false,
+      "created_at": "2026-07-09T08:00:46.551Z"
+    },
+    {
+      "id": 3002,
+      "user_id": 2,
+      "title": "Vehicle Registered Successfully",
+      "content": "Your honda 200 is configured. You can now book expert mechanic gigs.",
+      "read": false,
+      "created_at": "2026-07-09T08:10:46.551Z"
+    },
+    {
+      "id": 3003,
+      "user_id": 2,
+      "title": "Service Request Status Update",
+      "content": "Your request for maintenance has been successfully registered on the secure network.",
+      "read": false,
+      "created_at": "2026-07-09T08:25:46.552Z"
+    }
+  ]
+}
