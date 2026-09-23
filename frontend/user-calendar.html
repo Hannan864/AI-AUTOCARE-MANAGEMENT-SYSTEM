@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .stat-info h3 { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .stat-info p { color: var(--text-muted); font-size: 0.875rem; font-weight: 500; }
+        
+        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+        @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        
+        .activity-item { display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border); }
+        .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .activity-icon { width: 36px; height: 36px; border-radius: 50%; background: rgba(99, 102, 241, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .activity-details h4 { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .activity-details p { font-size: 0.875rem; color: var(--text-muted); }
+        .activity-time { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+    </style>
+</head>
+<body>
+    <!-- Role: User -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="wrench" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">AutoCare</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="user-dashboard.html" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="user-vehicles.html" class="nav-item">
+                    <i data-lucide="car"></i> <span class="nav-text">My Vehicles</span>
+                </a>
+                <a href="user-new-request.html" class="nav-item">
+                    <i data-lucide="plus-circle"></i> <span class="nav-text">New Request</span>
+                </a>
+                <a href="user-my-requests.html" class="nav-item">
+                    <i data-lucide="clipboard-list"></i> <span class="nav-text">My Requests</span>
+                </a>
+                <a href="user-service-history.html" class="nav-item">
+                    <i data-lucide="history"></i> <span class="nav-text">Service History</span>
+                </a>
+                <a href="user-map.html" class="nav-item">
+                    <i data-lucide="map"></i> <span class="nav-text">Live Map & Pins</span>
+                </a>
+                <a href="user-messages.html" class="nav-item">
+                    <i data-lucide="message-square"></i> <span class="nav-text">Messages</span>
+                </a>
+                <a href="user-calendar.html" class="nav-item active">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Appointments</span>
+                </a>
+                <a href="user-payments.html" class="nav-item">
+                    <i data-lucide="credit-card"></i> <span class="nav-text">Payments</span>
+                </a>
+                <a href="user-profile.html" class="nav-item">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div style="position: relative; display: none;" class="desktop-search">
+                        <i data-lucide="search" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 18px; height: 18px;"></i>
+                        <input type="text" placeholder="Search..." style="padding-left: 2.5rem; width: 300px; border-radius: 9999px; background: var(--bg);">
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Mark all as read</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border); background: rgba(99, 102, 241, 0.05);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">Service Update</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Your vehicle Honda Civic is ready for pickup.</p>
+                                    <p style="font-size: 0.7rem; color: var(--primary); margin-top: 0.25rem;">Just now</p>
+                                </div>
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">New Message</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Mechanic Name sent you a message.</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">2 hours ago</p>
+                                </div>
+                                <div style="padding: 1rem;">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">Payment Successful</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Invoice #INV-2045 has been paid.</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">Yesterday</p>
+                                </div>
+                            </div>
+                            <div style="padding: 0.75rem; border-top: 1px solid var(--border); text-align: center;">
+                                <a href="#" style="font-size: 0.875rem; color: var(--primary); font-weight: 500;">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem;">
+                            <img src="https://ui-avatars.com/api/?name=Ahmed+Khan&background=6366F1&color=fff" alt="User" style="width: 36px; height: 36px; border-radius: 50%;">
+                            <div style="text-align: left; display: none;" class="desktop-user-info">
+                                <p style="font-size: 0.875rem; font-weight: 600;">User Name</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Vehicle Owner</p>
+                            </div>
+                            <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: var(--text-muted);"></i>
+                        </button>
+                        <div id="user-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 200px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                <p style="font-weight: 600;">User Name</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">user@example.com</p>
+                            </div>
+                            <div style="padding: 0.5rem;">
+                                <a href="#" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--text); border-radius: 4px;"><i data-lucide="user" style="width: 16px; height: 16px;"></i> Profile</a>
+                                <a href="#" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--text); border-radius: 4px;"><i data-lucide="settings" style="width: 16px; height: 16px;"></i> Settings</a>
+                                <a href="index.html" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--danger); border-radius: 4px; margin-top: 0.25rem;"><i data-lucide="log-out" style="width: 16px; height: 16px;"></i> Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div>
+                        <h1 style="font-size: 1.25rem; font-weight: 700;">Appointments</h1>
+                    </div>
+                    <button class="btn btn-primary" onclick="openNoteModalForToday()"><i data-lucide="plus"></i> Schedule New</button>
+                </div>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2 class="card-title">...</h2>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem;" id="prev-month-btn"><i data-lucide="chevron-left"></i></button>
+                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem;" id="next-month-btn"><i data-lucide="chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <!-- Calendar Legend -->
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; padding: 0.5rem; background: var(--bg); border-radius: 8px; font-size: 0.75rem;">
+                        <span style="display: flex; align-items: center; gap: 0.25rem;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444;"></span> Payment Issue</span>
+                        <span style="display: flex; align-items: center; gap: 0.25rem;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #22c55e;"></span> Maintenance</span>
+                        <span style="display: flex; align-items: center; gap: 0.25rem;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #3b82f6;"></span> Repair</span>
+                        <span style="display: flex; align-items: center; gap: 0.25rem;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #eab308;"></span> Note</span>
+                    </div>
+                    <div id="calendar-grid-container" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+                        <div style="background: var(--bg-card); padding: 0.75rem; text-align: center; font-weight: 600; font-size: 0.875rem;">Sun</div>
+                        <div style="background: var(--bg-card); padding: 0.75rem; text-align: center; font-weight: 600; font-size: 0.875rem;">Mon</div>
+                        <div style="background: var(--bg-card); padding: 0.75rem; text-align: center; font-weight: 600; font-size: 0.875rem;">Tue</div>
+                        <div style="background: var(--bg-card); padding: 0.75rem; text-align: center; font-weight: 600; font-size: 0.875rem;">Wed</div>
+                        <div style="background: var(--bg-card); padding: 0.75rem; text-align: center; font-weight: 600; font-size: 0.875rem;">Thu</div>
+                        <div style="background: var(--bg-card); padding: 0.75rem; text-align: center; font-weight: 600; font-size: 0.875rem;">Fri</div>
+                        <div style="background: var(--bg-card); padding: 0.75rem; text-align: center; font-weight: 600; font-size: 0.875rem;">Sat</div>
+                    </div>
+                </div>
+                
+                <!-- Note Modal -->
+                <div id="note-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center;">
+                    <div class="card" style="width: 400px;">
+                        <h3 id="modal-date" style="margin-bottom: 1rem;">Add Note</h3>
+                        <textarea id="note-textarea" style="width: 100%; height: 100px; margin-bottom: 1rem; border-radius: 8px; padding: 0.5rem;"></textarea>
+                        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                            <button class="btn btn-outline" id="close-modal">Cancel</button>
+                            <button class="btn btn-danger" id="delete-note" style="display: none;">Delete</button>
+                            <button class="btn btn-primary" id="save-note">Save</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let currentDate = new Date();
+        let serviceRequests = [];
+        let vehiclesMap = {};
+        let calendarNotes = JSON.parse(localStorage.getItem('calendar_notes')) || {};
+
+        // Modal listeners
+        document.getElementById('close-modal').addEventListener('click', () => {
+            document.getElementById('note-modal').style.display = 'none';
+        });
+
+        document.getElementById('delete-note').addEventListener('click', () => {
+            const date = document.getElementById('modal-date').getAttribute('data-date');
+            delete calendarNotes[date];
+            localStorage.setItem('calendar_notes', JSON.stringify(calendarNotes));
+            document.getElementById('note-modal').style.display = 'none';
+            renderCalendar();
+        });
+        
+        document.getElementById('save-note').addEventListener('click', () => {
+            const date = document.getElementById('modal-date').getAttribute('data-date');
+            const note = document.getElementById('note-textarea').value;
+            if (note.trim() === '') {
+                delete calendarNotes[date];
+            } else {
+                calendarNotes[date] = note;
+            }
+            localStorage.setItem('calendar_notes', JSON.stringify(calendarNotes));
+            document.getElementById('note-modal').style.display = 'none';
+            renderCalendar();
+        });
+
+        function openNoteModalForToday() {
+            const today = new Date();
+            const dateKey = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+            openNoteModal(dateKey);
+        }
+
+        function openNoteModal(dateKey) {
+            document.getElementById('modal-date').textContent = `Note for ${dateKey}`;
+            document.getElementById('modal-date').setAttribute('data-date', dateKey);
+            document.getElementById('note-textarea').value = calendarNotes[dateKey] || '';
+            const deleteBtn = document.getElementById('delete-note');
+            deleteBtn.style.display = calendarNotes[dateKey] ? 'block' : 'none';
+            document.getElementById('note-modal').style.display = 'flex';
+        }
+
+        // Initialize Lucide icons
+        window.addEventListener('load', () => {
+            lucide.createIcons();
+        });
+
+        async function initCalendar() {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                // 1. Fetch vehicles map
+                const vehicleRs = await fetch('/api/v1/vehicles', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const vehicleRes = await vehicleRs.json();
+                if (vehicleRes.success && vehicleRes.data) {
+                    vehicleRes.data.forEach(v => {
+                        vehiclesMap[v.id] = {
+                            name: `${v.make} ${v.model}`,
+                            plate: v.license_plate || v.registration_number
+                        };
+                    });
+                }
+
+                // 2. Fetch requests (maintenance/repair)
+                const reqRs = await fetch('/api/service_requests/my_requests', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const reqRes = await reqRs.json();
+
+                // 3. Fetch recovery requests
+                const recRs = await fetch('/api/service_requests/my_recoveries', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const recRes = await recRs.json();
+
+                if (reqRes.success && reqRes.data) {
+                    serviceRequests = serviceRequests.concat(reqRes.data);
+                }
+                if (recRes.success && recRes.data) {
+                    serviceRequests = serviceRequests.concat(recRes.data);
+                }
+
+                renderCalendar();
+            } catch (err) {
+                console.error("Error setting up calendar:", err);
+            }
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const headerTitle = document.querySelector('.card-title');
+            if (headerTitle) {
+                headerTitle.textContent = `${monthNames[month]} ${year}`;
+            }
+
+            const gridContainer = document.getElementById('calendar-grid-container');
+            if (!gridContainer) return;
+
+            const headers = Array.from(gridContainer.children).slice(0, 7);
+            gridContainer.innerHTML = '';
+            headers.forEach(h => gridContainer.appendChild(h));
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                const spacer = document.createElement('div');
+                spacer.style.cssText = "background: var(--bg); padding: 3rem 0.5rem; min-height: 100px;";
+                gridContainer.appendChild(spacer);
+            }
+
+            for (let day = 1; day <= totalDays; day++) {
+                const dateKey = `${year}-${month + 1}-${day}`;
+                const dayCell = document.createElement('div');
+                dayCell.style.cssText = "background: var(--bg-card); padding: 0.5rem; min-height: 100px; position: relative; border-top: 1px solid var(--border); cursor: pointer;";
+                dayCell.onclick = () => {
+                    openNoteModal(dateKey);
+                };
+
+                dayCell.onmouseenter = (e) => {
+                    const dayReqs = serviceRequests.filter(r => {
+                        const d = new Date(r.created_at);
+                        return d.getDate() === day && d.getMonth() === month && d.getFullYear() === year;
+                    });
+                    
+                    if (dayReqs.length === 0 && !calendarNotes[dateKey]) return;
+
+                    const tooltip = document.createElement('div');
+                    tooltip.id = 'calendar-tooltip';
+                    tooltip.style.cssText = "position: absolute; z-index: 1000; background: #1f2937; color: #fff; padding: 0.5rem; border-radius: 8px; font-size: 0.75rem; pointer-events: none; top: -40px; left: 10px; width: 150px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);";
+                    
+                    let content = [];
+                    if(calendarNotes[dateKey]) content.push(`<b>Note:</b> ${calendarNotes[dateKey]}`);
+                    dayReqs.forEach(req => {
+                        content.push(`${req.request_type || 'Service'} (${req.status || 'Pending'})`);
+                    });
+                    
+                    tooltip.innerHTML = content.join('<br>');
+                    dayCell.appendChild(tooltip);
+                };
+
+                dayCell.onmouseleave = () => {
+                    const tooltip = document.getElementById('calendar-tooltip');
+                    if(tooltip) tooltip.remove();
+                };
+                
+                const today = new Date();
+                const isToday = (today.getDate() === day && today.getMonth() === month && today.getFullYear() === year);
+                
+                dayCell.innerHTML = `<span style="font-weight: ${isToday ? '600' : '500'}; font-size: 0.8rem; color: ${isToday ? 'var(--primary)' : 'var(--text)'};">${day}</span>`;
+                
+                // Markers
+                const dayReqs = serviceRequests.filter(r => {
+                    const d = new Date(r.created_at);
+                    return d.getDate() === day && d.getMonth() === month && d.getFullYear() === year;
+                });
+                dayReqs.forEach(req => {
+                    let color = '#3b82f6'; // Repair
+                    if(req.request_type === 'maintenance') color = '#22c55e';
+                    if(req.status === 'payment_issue') color = '#ef4444';
+                    
+                    const marker = document.createElement('div');
+                    marker.style.cssText = `width: 8px; height: 8px; border-radius: 50%; background: ${color}; display: inline-block; margin-right: 4px;`;
+                    dayCell.appendChild(marker);
+                });
+                
+                if (calendarNotes[dateKey]) {
+                    const noteMarker = document.createElement('div');
+                    noteMarker.style.cssText = `width: 8px; height: 8px; border-radius: 50%; background: #eab308; display: inline-block;`;
+                    dayCell.appendChild(noteMarker);
+                }
+
+                gridContainer.appendChild(dayCell);
+            }
+            lucide.createIcons();
+        }
+
+        document.getElementById('prev-month-btn').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        document.getElementById('next-month-btn').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        // Initialize loading
+        initCalendar();
+
+        if (window.innerWidth > 768) {
+            const searchNode = document.querySelector('.desktop-search');
+            if(searchNode) searchNode.style.display = 'block';
+            const infoNode = document.querySelector('.desktop-user-info');
+            if(infoNode) infoNode.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

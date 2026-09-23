@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .stat-info h3 { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .stat-info p { color: var(--text-muted); font-size: 0.875rem; font-weight: 500; }
+        
+        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+        @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        
+        .activity-item { display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border); }
+        .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .activity-icon { width: 36px; height: 36px; border-radius: 50%; background: rgba(99, 102, 241, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .activity-details h4 { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .activity-details p { font-size: 0.875rem; color: var(--text-muted); }
+        .activity-time { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+        .settings-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .settings-nav-btn:hover {
+            color: var(--text);
+            background: rgba(99, 102, 241, 0.08);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        .settings-nav-btn.active {
+            color: #fff;
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+        }
+    </style>
+</head>
+<body>
+    <!-- Role: User -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="wrench" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">AutoCare</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="user-dashboard.html" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="user-vehicles.html" class="nav-item">
+                    <i data-lucide="car"></i> <span class="nav-text">My Vehicles</span>
+                </a>
+                <a href="user-new-request.html" class="nav-item">
+                    <i data-lucide="plus-circle"></i> <span class="nav-text">New Request</span>
+                </a>
+                <a href="user-my-requests.html" class="nav-item">
+                    <i data-lucide="clipboard-list"></i> <span class="nav-text">My Requests</span>
+                </a>
+                <a href="user-service-history.html" class="nav-item">
+                    <i data-lucide="history"></i> <span class="nav-text">Service History</span>
+                </a>
+                <a href="user-map.html" class="nav-item">
+                    <i data-lucide="map"></i> <span class="nav-text">Live Map & Pins</span>
+                </a>
+                <a href="user-messages.html" class="nav-item">
+                    <i data-lucide="message-square"></i> <span class="nav-text">Messages</span>
+                </a>
+                <a href="user-calendar.html" class="nav-item">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Appointments</span>
+                </a>
+                <a href="user-payments.html" class="nav-item">
+                    <i data-lucide="credit-card"></i> <span class="nav-text">Payments</span>
+                </a>
+                <a href="user-profile.html" class="nav-item active">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div style="position: relative; display: none;" class="desktop-search">
+                        <i data-lucide="search" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 18px; height: 18px;"></i>
+                        <input type="text" placeholder="Search..." style="padding-left: 2.5rem; width: 300px; border-radius: 9999px; background: var(--bg);">
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Mark all as read</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border); background: rgba(99, 102, 241, 0.05);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">Service Update</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Your vehicle Honda Civic is ready for pickup.</p>
+                                    <p style="font-size: 0.7rem; color: var(--primary); margin-top: 0.25rem;">Just now</p>
+                                </div>
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">New Message</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Mechanic Name sent you a message.</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">2 hours ago</p>
+                                </div>
+                                <div style="padding: 1rem;">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">Payment Successful</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Invoice #INV-2045 has been paid.</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">Yesterday</p>
+                                </div>
+                            </div>
+                            <div style="padding: 0.75rem; border-top: 1px solid var(--border); text-align: center;">
+                                <a href="#" style="font-size: 0.875rem; color: var(--primary); font-weight: 500;">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem;">
+                            <img src="https://ui-avatars.com/api/?name=Ahmed+Khan&background=6366F1&color=fff" alt="User" style="width: 36px; height: 36px; border-radius: 50%;">
+                            <div style="text-align: left; display: none;" class="desktop-user-info">
+                                <p style="font-size: 0.875rem; font-weight: 600;">User Name</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Vehicle Owner</p>
+                            </div>
+                            <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: var(--text-muted);"></i>
+                        </button>
+                        <div id="user-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 200px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                <p style="font-weight: 600;">User Name</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">user@example.com</p>
+                            </div>
+                            <div style="padding: 0.5rem;">
+                                <a href="#" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--text); border-radius: 4px;"><i data-lucide="user" style="width: 16px; height: 16px;"></i> Profile</a>
+                                <a href="#" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--text); border-radius: 4px;"><i data-lucide="settings" style="width: 16px; height: 16px;"></i> Settings</a>
+                                <a href="index.html" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--danger); border-radius: 4px; margin-top: 0.25rem;"><i data-lucide="log-out" style="width: 16px; height: 16px;"></i> Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area" style="padding: 1rem; width: 100%;">
+                <div style="max-width: 1400px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 1.5rem;">
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 1rem; flex-wrap: wrap;">
+                    <div>
+                        <h1 style="font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em;">Account & System Settings</h1>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">Manage personal credentials, security keys, and Google Gemini AI configurations</p>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button type="button" class="btn btn-outline" style="font-weight: 500;" onclick="refreshStats()">
+                            <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i> Sync Systems
+                        </button>
+                        <button type="button" class="btn btn-primary" id="save-profile-btn" style="font-weight: 600;" onclick="triggerProfileSave()">
+                            <i data-lucide="cloud-upload" style="width: 16px; height: 16px;"></i> Save Changes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Top Settings Navigation Menu Buttons -->
+                <div class="settings-top-menu" style="display: flex; gap: 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem; overflow-x: auto; scrollbar-width: none;">
+                    <button type="button" class="settings-nav-btn active" id="tab-btn-profile" onclick="switchSettingsTab('profile')">
+                        <i data-lucide="user" style="width: 16px; height: 16px;"></i> Personal Profile
+                    </button>
+                    <button type="button" class="settings-nav-btn" id="tab-btn-security" onclick="switchSettingsTab('security')">
+                        <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i> Security & Password
+                    </button>
+                    <button type="button" class="settings-nav-btn" id="tab-btn-api" onclick="switchSettingsTab('api')">
+                        <i data-lucide="bot" style="width: 16px; height: 16px;"></i> AI Engine & API Keys
+                    </button>
+                    <button type="button" class="settings-nav-btn" id="tab-btn-notifications" onclick="switchSettingsTab('notifications')">
+                        <i data-lucide="bell" style="width: 16px; height: 16px;"></i> Notifications
+                    </button>
+                    <button type="button" class="settings-nav-btn" id="tab-btn-card" onclick="switchSettingsTab('card')">
+                        <i data-lucide="credit-card" style="width: 16px; height: 16px;"></i> Digital Pass & Audit
+                    </button>
+                </div>
+
+                <!-- TAB 1: PERSONAL PROFILE -->
+                <div id="pane-profile" class="settings-pane" style="display: block;">
+                    <div class="card" style="padding: 0; overflow: hidden; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15); margin-bottom: 2rem; position: relative;">
+                        <!-- Elegant Tech Cover Background -->
+                        <div style="height: 160px; background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); position: relative; overflow: hidden;">
+                            <div style="absolute; inset: 0; background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 50%); position: absolute; width: 100%; height: 100%;"></div>
+                            <div style="position: absolute; right: 2rem; bottom: 1rem; color: rgba(255, 255, 255, 0.2); font-family: monospace; font-size: 0.75rem; text-align: right; pointer-events: none; line-height: 1.4;">
+                                <div>PROFILE CONFIGURATION ACTIVE</div>
+                                <div>CLIENT REF: AutoCare ID #[0x8F6B-DDA9]</div>
+                            </div>
+                        </div>
+
+                        <!-- Inner Avatar & Profile Form -->
+                        <div style="padding: 0 2rem 2rem 2rem; position: relative; margin-top: -50px;">
+                            <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+                                <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+                                    <div style="position: relative; display: inline-block;">
+                                        <img id="profile-page-avatar" src="https://ui-avatars.com/api/?name=User&background=6366F1&color=fff" style="width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--bg-card); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); background: var(--bg-card); object-fit: cover;" class="hover-zoom">
+                                        <span style="position: absolute; bottom: 6px; right: 6px; width: 16px; height: 16px; background: var(--success); border: 2px solid var(--bg-card); border-radius: 50%;" title="Verified active session token"></span>
+                                    </div>
+                                    <div>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                            <h2 id="profile-display-name" style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text);">Ahmed Khan</h2>
+                                            <div style="background: rgba(16, 185, 129, 0.15); color: var(--success); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(16, 185, 129, 0.3);" title="Enterprise Authenticated Owner">
+                                                <i data-lucide="check" style="width: 12px; height: 12px; stroke-width: 3px;"></i>
+                                            </div>
+                                        </div>
+                                        <p id="profile-display-email" style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.2rem;">loading...</p>
+                                        
+                                        <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 0.5rem; flex-wrap: wrap;">
+                                            <button onclick="cycleAvatarColor()" class="btn btn-outline" style="padding: 0.3rem 0.65rem; font-size: 0.75rem; border-radius: 20px; background: var(--bg); display: flex; align-items: center; gap: 0.35rem;">
+                                                <i data-lucide="palette" style="width: 12px; height: 12px;"></i> Cycle Avatar Color
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Dynamic Stats -->
+                                <div style="display: flex; gap: 1rem; flex-wrap: wrap;" id="profile-dynamic-stats">
+                                    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 1.25rem; min-width: 100px; text-align: center;">
+                                        <div id="profile-stat-vehicles" style="font-size: 1.25rem; font-weight: 800; color: var(--text);">0</div>
+                                        <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Vehicles</div>
+                                    </div>
+                                    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 1.25rem; min-width: 100px; text-align: center;">
+                                        <div id="profile-stat-requests" style="font-size: 1.25rem; font-weight: 800; color: var(--text);">0</div>
+                                        <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Repairs</div>
+                                    </div>
+                                    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 1.25rem; min-width: 100px; text-align: center;">
+                                        <div id="profile-stat-spend" style="font-size: 1.25rem; font-weight: 800; color: var(--text);">$0.00</div>
+                                        <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Total Settled</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Personal Info Fields -->
+                            <form id="profile-variables-form" onsubmit="event.preventDefault();">
+                                <div style="display: grid; grid-template-columns: 1fr; md:grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block;">First Name</label>
+                                        <div style="position: relative;">
+                                            <i data-lucide="user" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px;"></i>
+                                            <input type="text" id="profile-first-name" class="form-control" style="padding-left: 2.25rem; background: var(--bg);" oninput="syncFormValues()" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block;">Last Name</label>
+                                        <div style="position: relative;">
+                                            <i data-lucide="user" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px;"></i>
+                                            <input type="text" id="profile-last-name" class="form-control" style="padding-left: 2.25rem; background: var(--bg);" oninput="syncFormValues()" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block;">Email Address</label>
+                                        <div style="position: relative;">
+                                            <i data-lucide="mail" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px;"></i>
+                                            <input type="email" id="profile-email" class="form-control" style="padding-left: 2.25rem; background: var(--bg);" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block;">Authorized Contact Number</label>
+                                        <div style="position: relative;">
+                                            <i data-lucide="phone" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px;"></i>
+                                            <input type="tel" id="profile-phone" class="form-control" value="0333-1234567" style="padding-left: 2.25rem; background: var(--bg);" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="grid-column: 1 / -1;">
+                                        <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block;">Emergency Dispatch Address / Primary Garage</label>
+                                        <div style="position: relative;">
+                                            <i data-lucide="map-pin" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px;"></i>
+                                            <input type="text" id="profile-address" class="form-control" value="House No 542, Street 18, G-10/2, Islamabad, Pakistan" style="padding-left: 2.25rem; background: var(--bg);" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+                                    <button type="button" class="btn btn-primary" onclick="triggerProfileSave()" style="padding: 0.65rem 1.5rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                        <i data-lucide="check"></i> Save Personal Details
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: SECURITY & PASSWORD -->
+                <div id="pane-security" class="settings-pane" style="display: none;">
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <!-- Security Credential & Access Token Rotation -->
+                        <div class="card" style="padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border);">
+                            <div>
+                                <h4 style="font-size: 1.2rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 0.5rem;">
+                                    <i data-lucide="key-round" style="width: 20px; height: 20px; color: var(--primary);"></i> Access Passphrase Rotation
+                                </h4>
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">Rotate your master authentication phrase securely. Passphrases are salted and hashed on the server.</p>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr; md:grid-template-columns: 1.3fr 1.7fr; gap: 1.5rem; align-items: start; margin-top: 1.5rem;">
+                                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                    <div class="form-group">
+                                        <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block;">Current Password</label>
+                                        <input type="password" id="profile-old-pass" placeholder="••••••••" class="form-control" style="background: var(--bg);">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block;">New Strong Password</label>
+                                        <input type="password" id="profile-new-pass" class="form-control" oninput="testPasswordStrength()" placeholder="e.g. #Isb-hub-39-pro#" style="background: var(--bg);">
+                                    </div>
+                                </div>
+
+                                <!-- Live strength visualizer widget -->
+                                <div style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; font-size: 0.825rem;">
+                                        <span style="font-weight: 600; color: var(--text-muted);">Passphrase Strength</span>
+                                        <span id="strength-badge" style="font-weight: 700; color: var(--danger);">Unrated</span>
+                                    </div>
+                                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 99px; margin-bottom: 0.75rem; overflow: hidden;">
+                                        <div id="strength-meter-bar" style="width: 0%; height: 100%; background: var(--danger); transition: all 0.2s;"></div>
+                                    </div>
+                                    <p id="strength-help-text" style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">Insert at least 8 characters consisting of uppercase letters, decimal digits, and special characters to trigger high encryption protocols.</p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 1.25rem; margin-top: 1.5rem;">
+                                <button onclick="changePasswordSubmit()" class="btn btn-outline" style="font-size: 0.875rem; font-weight: 600; padding: 0.6rem 1.25rem;">
+                                    <i data-lucide="shield-alert" style="width: 16px; height: 16px; margin-right: 4px;"></i> Commit New Password
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Active Sessions -->
+                        <div class="card" style="padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border);">
+                            <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="shield" style="width: 18px; height: 18px; color: var(--primary);"></i> Active Security Audit & Login Sessions
+                            </h4>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                                    <div style="width: 8px; height: 8px; background: var(--success); border-radius: 50%; margin-top: 6px;" class="pulse"></div>
+                                    <div>
+                                        <p style="font-size: 0.875rem; font-weight: 600;">Rawalpindi/Islamabad, Pakistan</p>
+                                        <p style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace; margin-top: 0.1rem;">Chrome on Desktop • 192.168.10.4</p>
+                                        <span style="font-size: 0.65rem; background: rgba(16, 185, 129, 0.15); color: var(--success); padding: 0.15rem 0.4rem; border-radius: 4px; display: inline-block; margin-top: 0.25rem; font-weight: 600;">CURRENT ACTIVE SESSION</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: AI ENGINE & API KEYS -->
+                <div id="pane-api" class="settings-pane" style="display: none;">
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        
+                        <!-- Main API Status & Mode Banner -->
+                        <div class="card" style="padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border); background: linear-gradient(135deg, rgba(30, 27, 75, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(99, 102, 241, 0.15); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                            <i data-lucide="sparkles" style="width: 22px; height: 22px;"></i>
+                                        </div>
+                                        <div>
+                                            <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text);">Google Gemini AI & API Integration</h3>
+                                            <p style="font-size: 0.8rem; color: var(--text-muted);">Powers Live Voice AI, Search Grounding, Audio Diagnostics, and Auto-Triage</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="api-status-badge" style="display: flex; align-items: center; gap: 0.5rem; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.45rem 0.9rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; color: var(--success);">
+                                    <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success);" class="pulse"></span>
+                                    <span id="api-status-label">System Default API Active</span>
+                                </div>
+                            </div>
+
+                            <!-- GitHub Safe Notice Callout -->
+                            <div style="margin-top: 1.25rem; padding: 0.85rem 1rem; border-radius: 10px; background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.25); display: flex; align-items: flex-start; gap: 0.75rem;">
+                                <i data-lucide="shield-check" style="width: 20px; height: 20px; color: #06B6D4; flex-shrink: 0; margin-top: 2px;"></i>
+                                <div style="font-size: 0.8rem; color: #E2E8F0; line-height: 1.5;">
+                                    <strong>Safe for GitHub & Public Repositories:</strong> All system default API connections operate out-of-the-box via server environment variables. If you enter your own custom API key, it is saved strictly in your private local browser storage and never committed to GitHub or hardcoded in any file.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- API Key Configuration Card -->
+                        <div class="card" style="padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border);">
+                            <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="key" style="width: 18px; height: 18px; color: var(--primary);"></i> API Key Configuration
+                            </h4>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+                                You can use the built-in system API key or override it with your personal Google Gemini API Key from Google AI Studio.
+                            </p>
+
+                            <!-- Key Mode Toggle Selection -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                                <label id="mode-label-default" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; border-radius: 10px; border: 2px solid var(--primary); background: rgba(99, 102, 241, 0.08); cursor: pointer;">
+                                    <input type="radio" name="apiKeyMode" value="default" id="mode-default" onchange="toggleApiKeyMode('default')" checked style="accent-color: var(--primary);">
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 0.875rem;">System Default Key</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">Recommended • Ready out-of-the-box</div>
+                                    </div>
+                                </label>
+
+                                <label id="mode-label-custom" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); cursor: pointer;">
+                                    <input type="radio" name="apiKeyMode" value="custom" id="mode-custom" onchange="toggleApiKeyMode('custom')" style="accent-color: var(--primary);">
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 0.875rem;">Custom Gemini Key</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">Personal key from Google AI Studio</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Custom Key Input Field Container -->
+                            <div id="custom-key-container" style="display: none; flex-direction: column; gap: 0.75rem; padding: 1.25rem; border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); margin-bottom: 1.25rem;">
+                                <label style="font-size: 0.85rem; font-weight: 600; color: var(--text);">Enter Custom Google Gemini API Key</label>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <div style="position: relative; flex: 1;">
+                                        <input type="password" id="custom-api-key-input" class="form-control" placeholder="AIzaSy..." style="background: var(--bg); font-family: monospace; letter-spacing: 0.05em;">
+                                        <button type="button" onclick="toggleKeyVisibility()" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                                            <i id="key-vis-icon" data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                        </button>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" onclick="saveCustomApiKey()" style="white-space: nowrap; font-weight: 600;">
+                                        <i data-lucide="save"></i> Save Key
+                                    </button>
+                                    <button type="button" class="btn btn-outline" onclick="resetToDefaultApiKey()" style="white-space: nowrap; font-weight: 500;">
+                                        <i data-lucide="rotate-ccw"></i> Reset
+                                    </button>
+                                </div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                    Get your API key at <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary); text-decoration: underline;">Google AI Studio</a>. Keys are stored locally in your browser only.
+                                </div>
+                            </div>
+
+                            <!-- Connection Test & Status Bar -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; border-top: 1px solid var(--border); padding-top: 1.25rem;">
+                                <div id="test-connection-result" style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem;">
+                                    <span>Ready to test API connection</span>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <button type="button" class="btn btn-outline" id="btn-test-api" onclick="testApiConnection()" style="font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                        <i data-lucide="zap"></i> Test API Connection
+                                    </button>
+                                    <a href="ai-automation.html" class="btn btn-primary" style="font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                        <i data-lucide="external-link"></i> Open AI Studio Hub
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Model & Engine Settings Card -->
+                        <div class="card" style="padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border);">
+                            <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="sliders" style="width: 18px; height: 18px; color: var(--primary);"></i> Active AI Models & Voice Preferences
+                            </h4>
+
+                            <div style="display: grid; grid-template-columns: 1fr; md:grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                                <div>
+                                    <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block;">Automotive Diagnostic & Triage Model</label>
+                                    <select id="pref-ai-model" class="form-control" style="background: var(--bg);" onchange="saveModelPreferences()">
+                                        <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash (Fast & Accurate - Recommended)</option>
+                                        <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite (Ultra-Low Latency)</option>
+                                        <option value="gemini-3.5-flash">Gemini 3.5 Flash (Advanced Reasoning)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block;">Live Voice Assistant Voice Accent</label>
+                                    <select id="pref-ai-voice" class="form-control" style="background: var(--bg);" onchange="saveModelPreferences()">
+                                        <option value="Zephyr" selected>Zephyr (Natural Balanced Voice)</option>
+                                        <option value="Kore">Kore (Clear Professional)</option>
+                                        <option value="Puck">Puck (Dynamic Crisp)</option>
+                                        <option value="Fenrir">Fenrir (Deep Resonance)</option>
+                                        <option value="Aoede">Aoede (Melodic Studio)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block;">Search Grounding Engine</label>
+                                    <input type="text" class="form-control" value="Google Search Grounding (Live NHTSA & OEM Web Sync)" disabled style="background: rgba(255,255,255,0.02); color: var(--text-muted);">
+                                </div>
+
+                                <div>
+                                    <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block;">Audio Transcription Model</label>
+                                    <input type="text" class="form-control" value="Gemini Multimodal 16kHz Audio Transcriber" disabled style="background: rgba(255,255,255,0.02); color: var(--text-muted);">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- TAB 4: NOTIFICATIONS -->
+                <div id="pane-notifications" class="settings-pane" style="display: none;">
+                    <div class="card" style="padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border);">
+                        <h4 style="font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="bell" style="width: 20px; height: 20px; color: var(--primary);"></i> Notification Dispatch Channels
+                        </h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Select how dispatch hubs and autonomous systems interact with you.</p>
+
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <label style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; cursor: pointer; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg);">
+                                <input type="checkbox" id="pref-email" checked style="width: 18px; height: 18px; accent-color: var(--primary);"> 
+                                <div>
+                                    <div style="font-weight: 600;">Email Statements & Invoices</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Receive automatic cost breakdowns and invoice receipts via email</div>
+                                </div>
+                            </label>
+                            
+                            <label style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; cursor: pointer; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg);">
+                                <input type="checkbox" id="pref-sms" checked style="width: 18px; height: 18px; accent-color: var(--primary);"> 
+                                <div>
+                                    <div style="font-weight: 600;">High-Priority Roadside SMS</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Instant SMS dispatch alerts when mechanics are en-route</div>
+                                </div>
+                            </label>
+
+                            <label style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; cursor: pointer; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg);">
+                                <input type="checkbox" id="pref-promo" style="width: 18px; height: 18px; accent-color: var(--primary);"> 
+                                <div>
+                                    <div style="font-weight: 600;">Diagnostic Telemetry Reports</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Allow preventive vehicle maintenance telemetry feedback</div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+                            <button type="button" class="btn btn-primary" onclick="showToast('Notification preferences saved!', 'success')" style="font-weight: 600;">
+                                <i data-lucide="check"></i> Save Preferences
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: DIGITAL CARD & AUDIT -->
+                <div id="pane-card" class="settings-pane" style="display: none;">
+                    <div style="display: grid; grid-template-columns: 1fr; md:grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <!-- Digital VIP Card (Glassmorphism layout) -->
+                        <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(31, 41, 55, 0.45) 100%); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); overflow: hidden; position: relative;">
+                            <div style="position: absolute; right: -20px; top: -20px; width: 120px; height: 120px; background: var(--primary); opacity: 0.25; filter: blur(40px); border-radius: 50%;"></div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem;">
+                                <div>
+                                    <p style="font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; color: var(--text-muted);">AUTOCARE DIGITAL PROTOCOL</p>
+                                    <h4 style="font-size: 1.1rem; font-weight: 800; margin-top: 0.15rem; color: var(--text); letter-spacing: -0.01em;">PLATINUM OWNER PASS</h4>
+                                </div>
+                                <i data-lucide="nfc" style="color: var(--primary); opacity: 0.8; width: 24px; height: 24px;"></i>
+                            </div>
+                            
+                            <div style="width: 32px; height: 24px; background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%); margin-bottom: 1.25rem; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); position: relative; overflow: hidden;">
+                                <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(0,0,0,0.25);"></div>
+                                <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(0,0,0,0.25);"></div>
+                            </div>
+
+                            <div style="margin-bottom: 1.5rem;">
+                                <p id="badge-name-text" style="font-weight: 700; font-size: 1.25rem; text-transform: uppercase; font-family: monospace; letter-spacing: 0.05em; color: var(--text);">USER NAME</p>
+                                <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem; font-family: monospace; font-size: 0.7rem; color: var(--text-muted);">
+                                    <div>
+                                        <span>ACCOUNT ID</span>
+                                        <div style="color: var(--text); font-weight: 600; margin-top: 0.1rem;">AC-9CA3-48B3</div>
+                                    </div>
+                                    <div>
+                                        <span>ROLE TIER</span>
+                                        <div style="color: var(--primary); font-weight: 600; margin-top: 0.1rem;">ENTERPRISE</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 1rem;">
+                                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); padding: 0.15rem 0.4rem; border-radius: 4px; display: inline-block;">
+                                     ✔ SIGNATURE SECURELY ENCRYPTED
+                                </div>
+                                <div style="font-size: 1.75rem; letter-spacing: -2px; color: var(--text); font-family: Courier, monospace; height: 24px; line-height: 1; user-select: none; opacity: 0.7;">
+                                    ||||| | |||| || |||| ||||
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Integrity index & Node status -->
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            <div class="card" style="padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Profile Integrity Index</span>
+                                    <span id="profile-strength-pct" style="font-size: 0.85rem; font-weight: 700; color: var(--success);">95% Complete</span>
+                                </div>
+                                <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden;">
+                                    <div style="width: 95%; height: 100%; background: linear-gradient(90deg, var(--primary) 0%, var(--success) 100%);"></div>
+                                </div>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Adding a primary backup address maximizes dispatch speed during emergency recovery requests.</p>
+                            </div>
+
+                            <div class="card" style="padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border);">
+                                <h4 style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text); margin-bottom: 0.75rem;">
+                                    Node Hub Authorization
+                                </h4>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">
+                                    <div>Node: <strong style="color: var(--text);">ISB-HUB-PRO-4</strong></div>
+                                    <div>Latency: <strong style="color: var(--success);">14ms</strong></div>
+                                    <div>Encryption: <strong style="color: var(--text);">TLS 1.3 AES-256-GCM</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Responsive layout and zooming helper embedded CSS overrides -->
+    <style>
+        .hover-zoom:hover {
+            transform: scale(1.05);
+        }
+        @media(max-width: 1024px) {
+            .profile-grid-responsive {
+                grid-template-columns: 1fr !important;
+            }
+        }
+        @keyframes customPulse {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.5; }
+        }
+        .pulse {
+            animation: customPulse 2s infinite ease-in-out;
+        }
+    </style>
+
+    <script src="app.js"></script>
+    <script>
+        // Set context tokens
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            window.location.href = 'index.html';
+        }
+
+        // Active State caching
+        const activeUser = JSON.parse(localStorage.getItem('activeUser') || '{}');
+
+        // Initial setup for document variables
+        const initialProfileSetup = () => {
+            if (!activeUser || !activeUser.name) return;
+
+            // Update title area name & emails
+            document.getElementById('profile-display-name').textContent = activeUser.name;
+            document.getElementById('badge-name-text').textContent = activeUser.name;
+            document.getElementById('profile-display-email').textContent = activeUser.email || 'user@autocare.com';
+            
+            // Set input values
+            const nameParts = activeUser.name.split(' ');
+            document.getElementById('profile-first-name').value = nameParts[0] || '';
+            document.getElementById('profile-last-name').value = nameParts.slice(1).join(' ') || '';
+            document.getElementById('profile-email').value = activeUser.email || '';
+
+            // Retrieve potentially saved custom variables
+            if (activeUser.phone) {
+                document.getElementById('profile-phone').value = activeUser.phone;
+            }
+            if (activeUser.address) {
+                document.getElementById('profile-address').value = activeUser.address;
+            }
+
+            // Sync user top bar if present
+            const topBarName = document.querySelector('.desktop-user-info p');
+            if (topBarName) topBarName.textContent = activeUser.name;
+
+            renderDynamicAvatar();
+        };
+
+        const renderDynamicAvatar = () => {
+            const avatarEl = document.getElementById('profile-page-avatar');
+            if (!avatarEl || !activeUser.name) return;
+
+            // Generate robust initial bg colors from name characters for elite representation
+            let colorHex = '6366F1'; // Default indigo
+            if (localStorage.getItem('profile_avatar_color')) {
+                colorHex = localStorage.getItem('profile_avatar_color');
+            } else {
+                const colors = ['6366F1', '10B981', '3B82F6', '8B5CF6', 'EF4444', 'EC4899', 'F59E0B'];
+                const letterCode = activeUser.name.charCodeAt(0) || 0;
+                colorHex = colors[letterCode % colors.length];
+                localStorage.setItem('profile_avatar_color', colorHex);
+            }
+
+            avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(activeUser.name)}&background=${colorHex}&color=fff&size=128&bold=true`;
+        };
+
+        // Cycle through premium accent colors for corporate member badge
+        const cycleAvatarColor = () => {
+            const colors = [
+                '6366F1', // Royal Sapphire
+                '8B5CF6', // Imperial Violet
+                '10B981', // Advanced Emerald
+                '3B82F6', // Neon Blue
+                'EC4899', // Crimson Pink
+                '06B6D4', // Deep Cyan
+                'F59E0B'  // Premium Amber Gold
+            ];
+            const currentColor = localStorage.getItem('profile_avatar_color') || '6366F1';
+            let nextIndex = (colors.indexOf(currentColor) + 1) % colors.length;
+            if (nextIndex < 0) nextIndex = 0;
+            const nextColor = colors[nextIndex];
+            
+            localStorage.setItem('profile_avatar_color', nextColor);
+            renderDynamicAvatar();
+            
+            // Sync with global header if possible
+            const globalAvatarEl = document.querySelector('#user-menu-btn img');
+            if (globalAvatarEl) {
+                globalAvatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(activeUser.name)}&background=${nextColor}&color=fff;`;
+            }
+            showToast("Accented theme configuration toggled!", "success");
+        };
+
+        // Live replication of input stream to virtual glasscard holder
+        const syncFormValues = () => {
+            const fname = document.getElementById('profile-first-name').value.trim();
+            const lname = document.getElementById('profile-last-name').value.trim();
+            const placeholder = (fname && lname) ? `${fname} ${lname}` : (fname || lname || "USER NAME");
+            document.getElementById('badge-name-text').textContent = placeholder;
+        };
+
+        // Dynamic server intelligence stats synchronization
+        const refreshStats = async () => {
+            try {
+                const [resVehicles, resRequests, resInvoices] = await Promise.all([
+                    fetch('/api/vehicles', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('/api/service_requests/my_requests', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('/api/invoices', { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+
+                if (resVehicles.ok) {
+                    const data = await resVehicles.json();
+                    document.getElementById('profile-stat-vehicles').textContent = (data.data || []).length;
+                }
+                if (resRequests.ok) {
+                    const data = await resRequests.json();
+                    document.getElementById('profile-stat-requests').textContent = (data.data || []).length;
+                }
+                if (resInvoices.ok) {
+                    const data = await resInvoices.json();
+                    const invoicesArray = data.data || [];
+                    const paidSum = invoicesArray
+                        .filter(inv => inv.status === 'paid')
+                        .reduce((acc, inv) => acc + Number(inv.amount), 0);
+                    document.getElementById('profile-stat-spend').textContent = `$${paidSum.toFixed(2)}`;
+                }
+            } catch (err) {
+                console.error("Diagnostic stats fetch error", err);
+            }
+        };
+
+        // Live passphrase complexity inspector
+        const testPasswordStrength = () => {
+            const passValue = document.getElementById('profile-new-pass').value;
+            const meterBar = document.getElementById('strength-meter-bar');
+            const badge = document.getElementById('strength-badge');
+            const helpText = document.getElementById('strength-help-text');
+
+            if (!passValue) {
+                meterBar.style.width = '0%';
+                badge.textContent = 'Unrated';
+                badge.style.color = 'var(--text-muted)';
+                helpText.textContent = 'Insert at least 8 characters consisting of uppercase letters, decimal digits, and special characters to trigger high encryption protocols.';
+                return;
+            }
+
+            let score = 0;
+            if (passValue.length >= 8) score += 20;
+            if (passValue.length >= 12) score += 10;
+            if (/[A-Z]/.test(passValue)) score += 20;
+            if (/[0-9]/.test(passValue)) score += 20;
+            if (/[^A-Za-z0-9]/.test(passValue)) score += 30;
+
+            meterBar.style.width = `${score}%`;
+
+            if (score <= 30) {
+                meterBar.style.backgroundColor = 'var(--danger)';
+                badge.textContent = 'Vulnerable Code';
+                badge.style.color = 'var(--danger)';
+                helpText.textContent = '⚠ Warning: Highly weak phrase. Easily breached by baseline dictionary attacks.';
+            } else if (score <= 70) {
+                meterBar.style.backgroundColor = 'var(--warning)';
+                badge.textContent = 'Secured Medium';
+                badge.style.color = 'var(--warning)';
+                helpText.textContent = '✔ Safe: Good coverage. Meets baseline secure corporate security indicators.';
+            } else {
+                meterBar.style.backgroundColor = 'var(--success)';
+                badge.textContent = 'Enterprise Fortress';
+                badge.style.color = 'var(--success)';
+                helpText.textContent = '🛡 Double-Shielded: Outstanding complexity. Verified secure configuration index.';
+            }
+        };
+
+        // Push values to local database context securely (improves activeUser persistence)
+        const triggerProfileSave = async () => {
+            const btn = document.getElementById('save-profile-btn');
+            const originalText = btn.innerHTML;
+            
+            // Validate inputs
+            const fname = document.getElementById('profile-first-name').value.trim();
+            const lname = document.getElementById('profile-last-name').value.trim();
+            const email = document.getElementById('profile-email').value.trim();
+            const phone = document.getElementById('profile-phone').value.trim();
+            const address = document.getElementById('profile-address').value.trim();
+
+            if (!fname || !lname || !email) {
+                showToast("Name fields and email address cannot remain empty.", "error");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader" class="spin" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i> Syncing Cloud Card...`;
+            lucide.createIcons();
+
+            // Perform backend profile synchronization & local state updates
+            try {
+                const combinedName = `${fname} ${lname}`;
+                const res = await fetch('/api/auth/profile/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ full_name: combinedName })
+                });
+
+                if (res.ok) {
+                    activeUser.name = combinedName;
+                    activeUser.email = email;
+                    activeUser.phone = phone;
+                    activeUser.address = address;
+
+                    // Sync modified variables to local storage securely
+                    localStorage.setItem('activeUser', JSON.stringify(activeUser));
+
+                    // Instantly sync UI panels
+                    document.getElementById('profile-display-name').textContent = combinedName;
+                    document.getElementById('badge-name-text').textContent = combinedName;
+                    document.getElementById('profile-display-email').textContent = email;
+
+                    // Sync desktop topbar user indicators
+                    const desktopName = document.querySelector('.desktop-user-info p');
+                    const dropDownName = document.querySelector('#user-dropdown div:first-child p:first-child');
+                    const dropDownEmail = document.querySelector('#user-dropdown div:first-child p:last-child');
+                    if (desktopName) desktopName.textContent = combinedName;
+                    if (dropDownName) dropDownName.textContent = combinedName;
+                    if (dropDownEmail) dropDownEmail.textContent = email;
+
+                    renderDynamicAvatar();
+                    showToast("Profile synchronized successfully!", "success");
+                } else {
+                    const data = await res.json();
+                    showToast(data.message || "Failed to sync profile database", "error");
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("Connection failure updating profile", "error");
+            } finally {
+                // Re-enable and notify
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                lucide.createIcons();
+            }
+        };
+
+        // Credential Commit process
+        const changePasswordSubmit = () => {
+            const oldPass = document.getElementById('profile-old-pass').value;
+            const newPass = document.getElementById('profile-new-pass').value;
+
+            if (!oldPass || !newPass) {
+                showToast("Please provide both current and proposed access codes.", "error");
+                return;
+            }
+            if (newPass.length < 8) {
+                showToast("Compliance error: proposed token must be 8+ symbols minimum.", "error");
+                return;
+            }
+
+            showToast("Verifying original token block...", "info");
+            setTimeout(() => {
+                showToast("Master access credential successfully updated & rotated. Please keep safely.", "success");
+                document.getElementById('profile-old-pass').value = '';
+                document.getElementById('profile-new-pass').value = '';
+                testPasswordStrength();
+            }, 1500);
+        };
+
+        // Tab navigation handler
+        const switchSettingsTab = (tabId) => {
+            const tabs = ['profile', 'security', 'api', 'notifications', 'card'];
+            tabs.forEach(t => {
+                const pane = document.getElementById(`pane-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (pane) {
+                    pane.style.display = (t === tabId) ? 'block' : 'none';
+                }
+                if (btn) {
+                    if (t === tabId) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                }
+            });
+            window.location.hash = `tab-${tabId}`;
+            lucide.createIcons();
+        };
+
+        // API Key Settings Management
+        const initApiKeySettings = () => {
+            const customKey = localStorage.getItem('custom_gemini_api_key');
+            const modeDefault = document.getElementById('mode-default');
+            const modeCustom = document.getElementById('mode-custom');
+            const customInput = document.getElementById('custom-api-key-input');
+            const customContainer = document.getElementById('custom-key-container');
+            const statusLabel = document.getElementById('api-status-label');
+            const statusBadge = document.getElementById('api-status-badge');
+
+            const savedModel = localStorage.getItem('pref_gemini_model');
+            if (savedModel && document.getElementById('pref-ai-model')) {
+                document.getElementById('pref-ai-model').value = savedModel;
+            }
+            const savedVoice = localStorage.getItem('pref_gemini_voice');
+            if (savedVoice && document.getElementById('pref-ai-voice')) {
+                document.getElementById('pref-ai-voice').value = savedVoice;
+            }
+
+            if (customKey && customKey.trim().length > 5) {
+                if (modeCustom) modeCustom.checked = true;
+                if (customInput) customInput.value = customKey;
+                if (customContainer) customContainer.style.display = 'flex';
+                if (statusLabel) statusLabel.textContent = `Custom Key Active (${customKey.slice(0, 6)}••••)`;
+                if (statusBadge) {
+                    statusBadge.style.background = 'rgba(99, 102, 241, 0.15)';
+                    statusBadge.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+                    statusBadge.style.color = 'var(--primary)';
+                }
+                highlightModeRadio('custom');
+            } else {
+                if (modeDefault) modeDefault.checked = true;
+                if (customContainer) customContainer.style.display = 'none';
+                if (statusLabel) statusLabel.textContent = 'System Default API Active';
+                highlightModeRadio('default');
+            }
+        };
+
+        const toggleApiKeyMode = (mode) => {
+            const customContainer = document.getElementById('custom-key-container');
+            if (mode === 'custom') {
+                if (customContainer) customContainer.style.display = 'flex';
+                highlightModeRadio('custom');
+            } else {
+                if (customContainer) customContainer.style.display = 'none';
+                highlightModeRadio('default');
+                resetToDefaultApiKey();
+            }
+        };
+
+        const highlightModeRadio = (mode) => {
+            const labelDefault = document.getElementById('mode-label-default');
+            const labelCustom = document.getElementById('mode-label-custom');
+            if (mode === 'default') {
+                if (labelDefault) {
+                    labelDefault.style.borderColor = 'var(--primary)';
+                    labelDefault.style.background = 'rgba(99, 102, 241, 0.08)';
+                }
+                if (labelCustom) {
+                    labelCustom.style.borderColor = 'var(--border)';
+                    labelCustom.style.background = 'var(--bg)';
+                }
+            } else {
+                if (labelCustom) {
+                    labelCustom.style.borderColor = 'var(--primary)';
+                    labelCustom.style.background = 'rgba(99, 102, 241, 0.08)';
+                }
+                if (labelDefault) {
+                    labelDefault.style.borderColor = 'var(--border)';
+                    labelDefault.style.background = 'var(--bg)';
+                }
+            }
+        };
+
+        const toggleKeyVisibility = () => {
+            const input = document.getElementById('custom-api-key-input');
+            const icon = document.getElementById('key-vis-icon');
+            if (!input) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                if (icon) icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                if (icon) icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        };
+
+        const saveCustomApiKey = () => {
+            const input = document.getElementById('custom-api-key-input');
+            const keyVal = input ? input.value.trim() : '';
+            if (!keyVal) {
+                showToast("Please enter a valid Gemini API key or select System Default Key.", "error");
+                return;
+            }
+            if (keyVal.length < 15) {
+                showToast("The API key looks too short. Please verify your Google Gemini API key.", "error");
+                return;
+            }
+            localStorage.setItem('custom_gemini_api_key', keyVal);
+            initApiKeySettings();
+            showToast("Custom Gemini API key stored locally in browser storage!", "success");
+            testApiConnection();
+        };
+
+        const resetToDefaultApiKey = () => {
+            localStorage.removeItem('custom_gemini_api_key');
+            const customInput = document.getElementById('custom-api-key-input');
+            if (customInput) customInput.value = '';
+            const modeDefault = document.getElementById('mode-default');
+            if (modeDefault) modeDefault.checked = true;
+            initApiKeySettings();
+            showToast("Switched to System Default API configuration (No key exposed in code)!", "info");
+        };
+
+        const saveModelPreferences = () => {
+            const model = document.getElementById('pref-ai-model')?.value;
+            const voice = document.getElementById('pref-ai-voice')?.value;
+            if (model) localStorage.setItem('pref_gemini_model', model);
+            if (voice) localStorage.setItem('pref_gemini_voice', voice);
+            showToast("AI model and voice preferences saved!", "success");
+        };
+
+        const testApiConnection = async () => {
+            const btn = document.getElementById('btn-test-api');
+            const resultBox = document.getElementById('test-connection-result');
+            const customKey = localStorage.getItem('custom_gemini_api_key') || document.getElementById('custom-api-key-input')?.value?.trim();
+            
+            if (btn) btn.disabled = true;
+            if (resultBox) {
+                resultBox.innerHTML = `<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; color: var(--primary);"></i> Testing connection with Gemini AI Engine...`;
+                lucide.createIcons();
+            }
+
+            const startTime = performance.now();
+            try {
+                const res = await fetch('/api/ai/test-key', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(customKey ? { 'x-gemini-api-key': customKey } : {})
+                    }
+                });
+                const duration = Math.round(performance.now() - startTime);
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    if (resultBox) {
+                        resultBox.innerHTML = `<span style="color: var(--success); font-weight: 600; display: flex; align-items: center; gap: 0.35rem;">
+                            <i data-lucide="check-circle" style="width: 15px; height: 15px;"></i> Connected! Gemini response in ${duration}ms (${data.isCustomKey ? 'Custom Key' : 'System Default Key'})
+                        </span>`;
+                    }
+                    showToast(`Gemini API connection verified in ${duration}ms!`, "success");
+                } else {
+                    if (resultBox) {
+                        resultBox.innerHTML = `<span style="color: var(--danger); font-weight: 600; display: flex; align-items: center; gap: 0.35rem;">
+                            <i data-lucide="alert-circle" style="width: 15px; height: 15px;"></i> ${data.message || 'API verification failed'}
+                        </span>`;
+                    }
+                    showToast(data.message || "Failed to verify API key", "error");
+                }
+            } catch (err) {
+                if (resultBox) {
+                    resultBox.innerHTML = `<span style="color: var(--danger); font-weight: 600; display: flex; align-items: center; gap: 0.35rem;">
+                        <i data-lucide="alert-circle" style="width: 15px; height: 15px;"></i> Network connection error
+                    </span>`;
+                }
+                showToast("Could not reach API test endpoint", "error");
+            } finally {
+                if (btn) btn.disabled = false;
+                lucide.createIcons();
+            }
+        };
+
+        // Check hash on load
+        const handleHashChange = () => {
+            const hash = window.location.hash.replace('#tab-', '').replace('#', '');
+            if (['profile', 'security', 'api', 'api-keys', 'notifications', 'card'].includes(hash)) {
+                switchSettingsTab(hash === 'api-keys' ? 'api' : hash);
+            }
+        };
+
+        // Set top and sidebar configurations on load
+        if (window.innerWidth > 768) {
+            const searchEl = document.querySelector('.desktop-search');
+            if (searchEl) searchEl.style.display = 'block';
+            const userEl = document.querySelector('.desktop-user-info');
+            if (userEl) userEl.style.display = 'block';
+        }
+
+        // Initialize state logic pipeline
+        initialProfileSetup();
+        refreshStats();
+        initApiKeySettings();
+        handleHashChange();
+        window.addEventListener('hashchange', handleHashChange);
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaints & Chat Hub - Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest" crossorigin="anonymous"></script>
+    <style>
+        .admin-support-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1.9fr;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        @media (max-width: 1200px) {
+            .admin-support-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Dual Column Layout inside Left Section */
+        .chat-hub-layout {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            height: 560px;
+            overflow: hidden;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+        }
+        @media (max-width: 600px) {
+            .chat-hub-layout {
+                grid-template-columns: 1fr;
+            }
+            .contacts-panel {
+                display: none;
+            }
+        }
+
+        .contacts-panel {
+            border-right: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+        }
+        .contacts-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .contacts-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        .contact-item {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        .contact-item:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+        .contact-item.active {
+            background: rgba(99, 102, 241, 0.1);
+            border-left: 3px solid var(--primary);
+        }
+
+        /* Chat panel inside dual layout */
+        .admin-chat-pane {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-card);
+        }
+        .admin-chat-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(99, 102, 241, 0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .admin-chat-messages {
+            flex: 1;
+            padding: 1.25rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            background: rgba(0, 0, 0, 0.01);
+        }
+
+        /* Modal Overlay for resolving complaints */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease-out;
+        }
+        .modal-body-custom {
+            width: 100%;
+            max-width: 550px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Styling for complaints list */
+        .admin-complaint-row {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        .admin-complaint-row:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .meta-tag {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+        }
+        .meta-tag-blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+        .meta-tag-amber { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .meta-tag-emerald { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="shield-alert" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.15rem; font-family: 'Outfit', sans-serif;">Admin Support Hub</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <!-- Built dynamically by app.js -->
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div>
+                        <h1 style="font-size: 1.15rem; font-weight: 700; margin: 0; font-family: 'Outfit', sans-serif;">System Support Operations Desk</h1>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem;">
+                            <img src="https://ui-avatars.com/api/?name=System+Admin&background=EF4444&color=fff" alt="Admin" style="width: 36px; height: 36px; border-radius: 50%;">
+                            <div style="text-align: left; display: none;" class="desktop-user-info">
+                                <p style="font-size: 0.875rem; font-weight: 600;">System Administrator</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Root Operator</p>
+                            </div>
+                            <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: var(--text-muted);"></i>
+                        </button>
+                        <div id="user-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 200px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                <p style="font-weight: 600; font-size: 0.9rem;">Operations Admin</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">admin@autocare.com</p>
+                            </div>
+                            <div style="padding: 0.5rem;">
+                                <a href="admin-profile.html" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--text); border-radius: 4px; font-size: 0.85rem;"><i data-lucide="user" style="width: 16px; height: 16px;"></i> Profile settings</a>
+                                <a href="index.html" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--danger); border-radius: 4px; margin-top: 0.25rem; font-size: 0.85rem;"><i data-lucide="log-out" style="width: 16px; height: 16px;"></i> Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="content-area">
+                <div class="admin-support-grid">
+                    <!-- Section A: Live Customer Chats -->
+                    <div>
+                        <div class="card" style="padding: 1rem; margin-bottom: 1rem;">
+                            <h3 style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1rem; margin: 0 0 0.5rem 0;">Support Chat Dispatch</h3>
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">Select a user to begin high-priority operations desk messaging.</p>
+                        </div>
+
+                        <div class="chat-hub-layout">
+                            <!-- Contacts panel -->
+                            <div class="contacts-panel">
+                                <div class="contacts-header">Active Users</div>
+                                <div class="contacts-list" id="chat-contacts-box">
+                                    <!-- Contacts loaded dynamically -->
+                                    <p style="color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 1.5rem 0.5rem;">Syncing active directory...</p>
+                                </div>
+                            </div>
+
+                            <!-- Live chat area -->
+                            <div class="admin-chat-pane">
+                                <div class="admin-chat-header">
+                                    <div>
+                                        <p id="active-chat-user" style="font-weight: 700; font-size: 0.9rem; margin: 0; color: var(--text);">No User Selected</p>
+                                        <span id="active-chat-user-email" style="font-size: 0.75rem; color: var(--text-muted);">Select contact thread on the left</span>
+                                    </div>
+                                    <button id="admin-refresh-chat-btn" class="btn btn-outline" style="padding: 0.35rem;" disabled>
+                                        <i data-lucide="refresh-cw" style="width: 13px; height: 13px;"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Messages Box -->
+                                <div class="admin-chat-messages" id="admin-chat-messages-box">
+                                    <div style="display: flex; justify-content: center; align-items: center; height: 100%; color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1rem;">
+                                        <span>Select an active customer contact on the left rail to view communication archives.</span>
+                                    </div>
+                                </div>
+
+                                <!-- Input Box -->
+                                <form id="admin-chat-form" style="padding: 0.75rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem; align-items: center; background: var(--bg-card);">
+                                    <input id="admin-chat-input" type="text" placeholder="Type response to user..." style="flex: 1; padding: 0.65rem 0.8rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 0.9rem;" disabled required autocomplete="off">
+                                    <button id="admin-chat-submit" type="submit" class="btn btn-primary" style="padding: 0.65rem 1rem; border-radius: 8px;" disabled>
+                                        <i data-lucide="send" style="width: 16px; height: 16px;"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section B: Customer Complaints Panel -->
+                    <div>
+                        <div class="card" style="padding: 1.5rem; max-height: 700px; overflow-y: auto;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <div>
+                                    <h3 style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.15rem; margin: 0;">Unresolved Customer Complaints</h3>
+                                    <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0.15rem 0 0 0;">Review, audit, investigate, and reply to client dispute declarations.</p>
+                                </div>
+                                <button id="admin-reload-complaints" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; display: flex; align-items: center; gap: 0.25rem;">
+                                    <i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i> Reload Logs
+                                </button>
+                            </div>
+
+                            <div id="admin-complaints-box">
+                                <!-- Complaints will render dynamically -->
+                                <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 3rem 0;">No registered customer complaints found.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- RESPOND MODAL -->
+    <div id="resolve-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-body-custom">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;">
+                <h3 id="modal-title-subject" style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.1rem; margin: 0; color: var(--text);">Filing Complaint Review</h3>
+                <button onclick="closeModal()" class="btn btn-outline" style="padding: 0.25rem; border-radius: 50%;">
+                    <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                </button>
+            </div>
+            
+            <div style="margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem; background: rgba(0,0,0,0.02); padding: 0.75rem; border-radius: 6px;">
+                <p style="font-size: 0.8rem; margin: 0; color: var(--text-muted);">Complainant Name: <strong id="modal-comp-user" style="color: var(--text);">User</strong></p>
+                <p style="font-size: 0.8rem; margin: 0; color: var(--text-muted);">Accused Mechanic: <strong id="modal-comp-mech" style="color: var(--text);">N/A</strong></p>
+                <p style="font-size: 0.8rem; margin: 0; color: var(--text-muted);">Service Job ID: <strong id="modal-comp-req" style="color: var(--text);">None</strong></p>
+            </div>
+
+            <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.25rem;">Complaint description:</label>
+                <p id="modal-comp-desc" style="font-size: 0.875rem; line-height: 1.4; color: var(--text); background: var(--bg); border: 1px solid var(--border); padding: 0.75rem; border-radius: 6px; white-space: pre-wrap; max-height: 120px; overflow-y: auto;">Details of the user's issue...</p>
+            </div>
+
+            <form id="modal-respond-form">
+                <input type="hidden" id="modal-comp-id">
+                
+                <div style="margin-bottom: 1rem;">
+                    <label for="modal-status-select" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem;">Update Status</label>
+                    <select id="modal-status-select" class="form-control" style="width: 100%; padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text);" required>
+                        <option value="INVESTIGATING">INVESTIGATING - Admin evaluating facts</option>
+                        <option value="RESOLVED">RESOLVED - Refund/Disciplinary action finalized</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 1.25rem;">
+                    <label for="modal-response-text" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem;">Official Resolution Response</label>
+                    <textarea id="modal-response-text" class="form-control" rows="4" style="width: 100%; border-radius: 6px; padding: 0.6rem 0.75rem; border: 1px solid var(--border); background: var(--bg); color: var(--text);" placeholder="Type the investigation outcome or message to the client..." required></textarea>
+                </div>
+
+                <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                    <button type="button" onclick="closeModal()" class="btn btn-outline" style="padding: 0.6rem 1.25rem; font-weight: 600;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.25rem; font-weight: 600;">Submit Resolution</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom success toast notification -->
+    <div id="success-toast" style="display: none; position: fixed; bottom: 2rem; right: 2rem; background: var(--success); color: #ffffff; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); z-index: 1100; align-items: center; gap: 0.75rem; animation: slideIn 0.3s ease;">
+        <i data-lucide="check-circle" style="width: 22px; height: 22px;"></i>
+        <div>
+            <p id="toast-title" style="font-weight: 700; margin: 0; font-size: 0.95rem;">Success!</p>
+            <p id="toast-message" style="margin: 0.1rem 0 0 0; font-size: 0.8rem; opacity: 0.9;">Resolution has been recorded.</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const token = localStorage.getItem('access_token');
+        const activeUser = JSON.parse(localStorage.getItem('activeUser') || '{}');
+        if (!token || !activeUser || activeUser.role !== 'admin') {
+            window.location.href = 'index.html';
+        }
+
+        // Dropdown settings
+        const userMenuBtn = document.getElementById('user-menu-btn');
+        const userDropdown = document.getElementById('user-dropdown');
+        if (userMenuBtn && userDropdown) {
+            userMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
+            });
+            document.addEventListener('click', () => {
+                userDropdown.style.display = 'none';
+            });
+        }
+
+        let selectedContactId = null;
+
+        // Fetch contacts/users who chatted
+        const loadContacts = async () => {
+            const box = document.getElementById('chat-contacts-box');
+            try {
+                const res = await fetch('/api/messages/contacts', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                if (result.success && result.data) {
+                    const contacts = result.data;
+                    if (contacts.length === 0) {
+                        box.innerHTML = '<p style="color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 1rem 0.5rem;">No active user sessions.</p>';
+                    } else {
+                        box.innerHTML = contacts.map(c => `
+                            <div onclick="selectContact(${c.id}, '${escapeHTML(c.full_name)}', '${escapeHTML(c.email)}')" class="contact-item ${selectedContactId === c.id ? 'active' : ''}">
+                                <div style="width: 8px; height: 8px; border-radius: 50%; background: ${c.role === 'mechanic' ? 'var(--success)' : 'var(--primary)'};"></div>
+                                <div style="text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+                                    <p style="margin: 0; font-size: 0.85rem; font-weight: 600; color: var(--text);">${c.full_name}</p>
+                                    <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: capitalize;">${c.role}</span>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (err) {
+                console.error("Error loading chat contact directory", err);
+            }
+        };
+
+        // Select specific user contact
+        const selectContact = async (id, name, email) => {
+            selectedContactId = id;
+            document.getElementById('active-chat-user').textContent = name;
+            document.getElementById('active-chat-user-email').textContent = email;
+
+            // Enable inputs
+            document.getElementById('admin-chat-input').disabled = false;
+            document.getElementById('admin-chat-submit').disabled = false;
+            document.getElementById('admin-refresh-chat-btn').disabled = false;
+
+            // Highlight in contact rail
+            document.querySelectorAll('.contact-item').forEach(item => item.classList.remove('active'));
+            loadContacts(); // reload to show active highlight state correctly
+
+            await loadChatMessages();
+        };
+
+        // Load chat messages
+        const loadChatMessages = async () => {
+            if (!selectedContactId) return;
+            const msgBox = document.getElementById('admin-chat-messages-box');
+            try {
+                const res = await fetch(`/api/messages?contact_id=${selectedContactId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                if (result.success && result.data) {
+                    const messages = result.data;
+                    if (messages.length === 0) {
+                        msgBox.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 2rem 0;">No conversation history found.</p>';
+                    } else {
+                        msgBox.innerHTML = messages.map(msg => {
+                            const isMe = msg.sender_id === activeUser.id;
+                            const timeStr = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            return `
+                                <div style="max-width: 80%; padding: 0.65rem 0.9rem; border-radius: 10px; font-size: 0.85rem; line-height: 1.4; position: relative; ${isMe ? 'align-self: flex-end; background: var(--primary); color: #ffffff; border-bottom-right-radius: 2px;' : 'align-self: flex-start; background: var(--border); color: var(--text); border-bottom-left-radius: 2px;'}; margin-bottom: 0.5rem;">
+                                    <p style="margin: 0; white-space: pre-wrap;">${msg.content}</p>
+                                    <div style="font-size: 0.65rem; opacity: 0.7; margin-top: 0.25rem; text-align: right;">${timeStr}</div>
+                                </div>
+                            `;
+                        }).join('');
+                        msgBox.scrollTop = msgBox.scrollHeight;
+                    }
+                }
+                lucide.createIcons();
+            } catch (err) {
+                console.error("Error retrieving active chat thread", err);
+            }
+        };
+
+        // Send direct admin message
+        const chatForm = document.getElementById('admin-chat-form');
+        const chatInput = document.getElementById('admin-chat-input');
+        if (chatForm) {
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const content = chatInput.value.trim();
+                if (!content || !selectedContactId) return;
+
+                try {
+                    const res = await fetch('/api/messages', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            receiver_id: selectedContactId,
+                            content: content
+                        })
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        chatInput.value = '';
+                        await loadChatMessages();
+                    }
+                } catch (err) {
+                    console.error("Error sending chat dispatch", err);
+                }
+            });
+        }
+
+        // Refresh single chat button
+        const refreshChatBtn = document.getElementById('admin-refresh-chat-btn');
+        if (refreshChatBtn) {
+            refreshChatBtn.addEventListener('click', async () => {
+                const icon = refreshChatBtn.querySelector('i');
+                if (icon) icon.classList.add('spin');
+                await loadChatMessages();
+                setTimeout(() => {
+                    if (icon) icon.classList.remove('spin');
+                }, 800);
+            });
+        }
+
+        // Complaints logic
+        const loadComplaints = async () => {
+            const compBox = document.getElementById('admin-complaints-box');
+            try {
+                const res = await fetch('/api/v1/complaints', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                if (result.success && result.data) {
+                    const complaints = result.data;
+                    if (complaints.length === 0) {
+                        compBox.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 3rem 0;">No active complaints registered.</p>';
+                    } else {
+                        compBox.innerHTML = complaints.map(c => {
+                            let badgeStyle = 'meta-tag-amber';
+                            if (c.status === 'RESOLVED') badgeStyle = 'meta-tag-emerald';
+                            if (c.status === 'INVESTIGATING') badgeStyle = 'meta-tag-blue';
+
+                            const responseCard = c.admin_response ? `
+                                <div style="margin-top: 0.75rem; padding: 0.75rem; background: rgba(16, 185, 129, 0.04); border-left: 3px solid var(--success); border-radius: 4px; font-size: 0.85rem;">
+                                    <p style="font-weight: 700; color: var(--success); margin: 0 0 0.15rem 0; font-size: 0.75rem;">Recorded Resolution:</p>
+                                    <p style="margin: 0; color: var(--text);">${c.admin_response}</p>
+                                </div>
+                            ` : `
+                                <div style="margin-top: 0.75rem; color: var(--text-muted); font-size: 0.8rem; font-style: italic;">
+                                    Awaiting action from Central Admin operations desk.
+                                </div>
+                            `;
+
+                            const formattedDate = new Date(c.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+
+                            return `
+                                <div class="admin-complaint-row">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        <h4 style="margin: 0; font-weight: 700; font-size: 1rem; color: var(--text); font-family: 'Outfit', sans-serif;">${c.subject}</h4>
+                                        <span class="meta-tag ${badgeStyle}">${c.status}</span>
+                                    </div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.4;">
+                                        Filer: <strong>${c.user_name || 'Anonymous Owner'}</strong> | Target Mechanic: <strong>${c.mechanic_name || 'N/A'}</strong> | Job Ref: <strong>#REQ-${c.service_request_id || 'N/A'}</strong> | Filed: <strong>${formattedDate}</strong>
+                                    </div>
+                                    <p style="font-size: 0.875rem; color: var(--text); background: rgba(0,0,0,0.01); border-left: 3px solid var(--border); padding-left: 0.75rem; margin: 0.5rem 0; white-space: pre-wrap; line-height: 1.4;">${c.description}</p>
+                                    
+                                    ${responseCard}
+
+                                    <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 0.75rem;">
+                                        <button onclick="openResolveModal(${c.id}, '${escapeHTML(c.subject)}', '${escapeHTML(c.description)}', '${escapeHTML(c.user_name || 'User')}', '${escapeHTML(c.mechanic_name || 'N/A')}', '${c.service_request_id || 'None'}', '${escapeHTML(c.admin_response || '')}', '${c.status}')" class="btn btn-primary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 0.25rem; border-radius: 4px;">
+                                            <i data-lucide="edit-3" style="width: 12px; height: 12px;"></i> Review & Respond
+                                        </button>
+                                        <button onclick="dismissComplaint(${c.id})" class="btn" style="background: rgba(239, 68, 68, 0.1); color: var(--danger); padding: 0.35rem 0.75rem; font-size: 0.75rem; font-weight: 600; border: none; border-radius: 4px; display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                                            <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i> Dismiss Case
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                        lucide.createIcons();
+                    }
+                }
+            } catch (err) {
+                console.error("Error loading system complaints list", err);
+            }
+        };
+
+        // Dismiss complaint
+        const dismissComplaint = async (id) => {
+            if (!confirm("Are you sure you want to permanently delete/dismiss this complaint? This cannot be undone.")) return;
+            try {
+                const res = await fetch(`/api/v1/complaints/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showToast("Complaint Dismissed", "The complaint has been permanently purged from records.");
+                    loadComplaints();
+                }
+            } catch (err) {
+                console.error("Error dismissing complaint record", err);
+            }
+        };
+
+        // Open Respond Modal
+        const openResolveModal = (id, subject, desc, userName, mechName, reqId, responseText, currentStatus) => {
+            document.getElementById('modal-comp-id').value = id;
+            document.getElementById('modal-title-subject').textContent = `Review: ${subject}`;
+            document.getElementById('modal-comp-user').textContent = userName;
+            document.getElementById('modal-comp-mech').textContent = mechName;
+            document.getElementById('modal-comp-req').textContent = reqId !== 'null' ? `#REQ-${reqId}` : 'None';
+            document.getElementById('modal-comp-desc').textContent = desc;
+            document.getElementById('modal-response-text').value = responseText;
+            document.getElementById('modal-status-select').value = currentStatus === 'RESOLVED' ? 'RESOLVED' : 'INVESTIGATING';
+
+            document.getElementById('resolve-modal').style.display = 'flex';
+        };
+
+        // Close Modal
+        const closeModal = () => {
+            document.getElementById('resolve-modal').style.display = 'none';
+        };
+
+        // Submit Resolution Form
+        const modalForm = document.getElementById('modal-respond-form');
+        if (modalForm) {
+            modalForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('modal-comp-id').value;
+                const status = document.getElementById('modal-status-select').value;
+                const response = document.getElementById('modal-response-text').value.trim();
+
+                try {
+                    const res = await fetch(`/api/v1/complaints/${id}/respond`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ status, response })
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        closeModal();
+                        showToast("Complaint Updated", `Status updated to ${status} with official resolution log.`);
+                        loadComplaints();
+                    } else {
+                        alert(result.message || "Failed to submit resolution");
+                    }
+                } catch (err) {
+                    console.error("Error resolving complaint", err);
+                }
+            });
+        }
+
+        // Show Toast
+        const showToast = (title, message) => {
+            const toast = document.getElementById('success-toast');
+            document.getElementById('toast-title').textContent = title;
+            document.getElementById('toast-message').textContent = message;
+            toast.style.display = 'flex';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 4000);
+        };
+
+        // Escape helper to prevent HTML injection
+        const escapeHTML = (str) => {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        };
+
+        // Reload complaints button
+        document.getElementById('admin-reload-complaints').addEventListener('click', async () => {
+            const icon = document.getElementById('admin-reload-complaints').querySelector('i');
+            if (icon) icon.classList.add('spin');
+            await loadComplaints();
+            setTimeout(() => {
+                if (icon) icon.classList.remove('spin');
+            }, 800);
+        });
+
+        // Initialize Admin page
+        const initAdminPage = async () => {
+            await loadContacts();
+            await loadComplaints();
+
+            // Poll chats and contact directories every 5 seconds
+            setInterval(async () => {
+                await loadContacts();
+                if (selectedContactId) {
+                    await loadChatMessages();
+                }
+            }, 5000);
+        };
+
+        initAdminPage();
+    </script>
+</body>
+</html>

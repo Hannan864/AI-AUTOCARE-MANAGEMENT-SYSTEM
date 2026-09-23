@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Requests - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest" crossorigin="anonymous"></script>
+    <style>
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { background: var(--bg-card); border-radius: 8px; width: 100%; max-width: 500px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); transform: scale(0.95); transition: transform 0.3s; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer { padding: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 1rem; }
+    </style>
+</head>
+<body>
+    <!-- Role: Admin -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="shield-check" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">Admin Panel</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <p class="nav-category" style="padding: 1rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Dashboard</p>
+                <a href="admin-dashboard.html" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                
+                <p class="nav-category" style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Service Center</p>
+                <a href="admin-all-requests.html" class="nav-item active">
+                    <i data-lucide="clipboard-list"></i> <span class="nav-text">All Requests</span>
+                </a>
+                <a href="admin-users.html" class="nav-item">
+                    <i data-lucide="users"></i> <span class="nav-text">Manage Users</span>
+                </a>
+                <a href="admin-mechanics.html" class="nav-item">
+                    <i data-lucide="wrench"></i> <span class="nav-text">Manage Mechanics</span>
+                </a>
+                <a href="admin-gigs-prices.html" class="nav-item">
+                    <i data-lucide="gavel"></i> <span class="nav-text">Gigs & Prices</span>
+                </a>
+
+                <p class="nav-category" style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Analytics</p>
+                <a href="admin-analytics.html" class="nav-item">
+                    <i data-lucide="bar-chart-2"></i> <span class="nav-text">System Analytics</span>
+                </a>
+
+                <p class="nav-category" style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Settings</p>
+                <a href="admin-profile.html" class="nav-item">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h2 style="font-size: 1.125rem; font-weight: 600; margin-left: 0.5rem;">All Service Requests</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Mark all as read</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border); background: rgba(99, 102, 241, 0.05);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">Service Update</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">New job assigned: Honda Civic (ABC-1234).</p>
+                                    <p style="font-size: 0.7rem; color: var(--primary); margin-top: 0.25rem;">Just now</p>
+                                </div>
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">New Message</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">User Name sent you a message.</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">2 hours ago</p>
+                                </div>
+                            </div>
+                            <div style="padding: 0.75rem; border-top: 1px solid var(--border); text-align: center;">
+                                <a href="#" style="font-size: 0.875rem; color: var(--primary); font-weight: 500;">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem;">
+                            <img src="https://ui-avatars.com/api/?name=System+Admin&background=EF4444&color=fff" alt="Admin" style="width: 36px; height: 36px; border-radius: 50%;">
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Request Management</h2>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <select class="form-control" style="width: 150px; padding: 0.25rem 0.5rem;">
+                                <option value="all">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                            <input type="text" class="form-control" placeholder="Search ID or User..." style="width: 200px; padding: 0.25rem 0.75rem;">
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-sortable>Request ID <i data-lucide="arrow-up-down" style="width: 12px; height: 12px; display: inline-block;"></i></th>
+                                    <th data-sortable>Request Type <i data-lucide="arrow-up-down" style="width: 12px; height: 12px; display: inline-block;"></i></th>
+                                    <th data-sortable>Vehicle <i data-lucide="arrow-up-down" style="width: 12px; height: 12px; display: inline-block;"></i></th>
+                                    <th data-sortable>Owner Name <i data-lucide="arrow-up-down" style="width: 12px; height: 12px; display: inline-block;"></i></th>
+                                    <th>Owner Phone</th>
+                                    <th>Assigned Mechanic</th>
+                                    <th data-sortable>Priority <i data-lucide="arrow-up-down" style="width: 12px; height: 12px; display: inline-block;"></i></th>
+                                    <th>Current Status</th>
+                                    <th>Final Cost</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="10" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                        <i data-lucide="loader" class="spin" style="width:24px; height:24px; margin: 0 auto 0.5rem auto;"></i>
+                                        Loading administrative request lists...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Assign Mechanic Modal -->
+    <div class="modal-overlay" id="assignModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="assignModalTitle" style="font-size: 1.25rem; font-weight: 600;">Assign Mechanic</h3>
+                <button class="btn btn-outline" style="padding: 0.25rem; border: none;" onclick="closeModal('assignModal')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="assignForm">
+                <div class="modal-body">
+                    <input type="hidden" id="assignReqId">
+                    <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Configure assigned personnel for service request <strong id="displayReqId" style="color: var(--text);"></strong>.</p>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Select Mechanic</label>
+                        <select class="form-control mechanic-select" required>
+                            <!-- Populated Dynamically -->
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem; display: none;" id="reassignReasonContainer">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Reassignment Reason</label>
+                        <input type="text" id="reassignReason" class="form-control" placeholder="Specify reassignment grounds...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('assignModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Dispatch</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Request Details Enterprise Modal -->
+    <div class="modal-overlay" id="detailsModal">
+        <div class="modal-content" style="max-width: 900px; width: 95%;">
+            <div class="modal-header">
+                <h3 style="font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="clipboard-list" style="color: var(--primary);"></i>
+                    Enterprise Request Management Center
+                </h3>
+                <button class="btn btn-outline" style="padding: 0.25rem; border: none;" onclick="closeModal('detailsModal')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="detailsModalBody" style="padding: 1.5rem;">
+                <!-- Filled Dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('detailsModal')">Close Request Center</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="admin-requests-controller.js"></script>
+    <script>
+        lucide.createIcons();
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    </script>
+    <style>
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</body>
+</html>

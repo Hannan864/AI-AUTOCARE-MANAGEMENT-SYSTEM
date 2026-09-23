@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gigs & Price Management - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="admin-dashboard.css">
+    <style>
+        .tabs-header {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+        .tab-trigger {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .tab-trigger.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .tab-trigger.active::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+        .badge-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        .badge-pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .badge-accepted { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .badge-declined { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .badge-hired { background: rgba(59, 130, 246, 0.1); color: var(--info); }
+        .badge-category {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="shield-check" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">Admin Panel</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <p class="nav-category" style="padding: 1rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Dashboard</p>
+                <a href="admin-dashboard.html" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                
+                <p class="nav-category" style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Service Center</p>
+                <a href="admin-all-requests.html" class="nav-item">
+                    <i data-lucide="clipboard-list"></i> <span class="nav-text">All Requests</span>
+                </a>
+                <a href="admin-users.html" class="nav-item">
+                    <i data-lucide="users"></i> <span class="nav-text">Manage Users</span>
+                </a>
+                <a href="admin-mechanics.html" class="nav-item">
+                    <i data-lucide="wrench"></i> <span class="nav-text">Manage Mechanics</span>
+                </a>
+                <a href="admin-gigs-prices.html" class="nav-item active">
+                    <i data-lucide="gavel"></i> <span class="nav-text">Gigs & Prices</span>
+                </a>
+
+                <p class="nav-category" style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Analytics</p>
+                <a href="admin-analytics.html" class="nav-item">
+                    <i data-lucide="bar-chart-2"></i> <span class="nav-text">System Analytics</span>
+                </a>
+
+                <p class="nav-category" style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Settings</p>
+                <a href="admin-profile.html" class="nav-item">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h2 style="font-size: 1.125rem; font-weight: 600; margin-left: 0.5rem;">Gigs & Price Management</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Mark all as read</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <div style="padding: 1rem; text-align: center; color: var(--text-muted);">Syncing admin alerts...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem; background: none; border: none; cursor: pointer;">
+                            <img src="https://ui-avatars.com/api/?name=System+Admin&background=EF4444&color=fff" id="user-avatar-top" alt="Admin" style="width: 36px; height: 36px; border-radius: 50%;">
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- Summary statistics cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="stat-gigs-count">-</h3>
+                            <p>Total Service Gigs</p>
+                        </div>
+                        <div class="stat-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">
+                            <i data-lucide="briefcase"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="stat-offers-count">-</h3>
+                            <p>Negotiation Offers</p>
+                        </div>
+                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i data-lucide="gavel"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs header -->
+                <div class="tabs-header">
+                    <button class="tab-trigger active" onclick="switchTab('gigs-pane')">Active Mechanic Gigs</button>
+                    <button class="tab-trigger" onclick="switchTab('offers-pane')">Price Negotiations & Invoices</button>
+                </div>
+
+                <!-- Gigs Management Pane -->
+                <div id="gigs-pane" class="tab-pane active">
+                    <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem;">
+                        <input type="text" id="gigs-search" class="form-control" placeholder="Search gigs by title or mechanic..." oninput="filterGigs()" style="max-width: 400px;">
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Gig Title</th>
+                                        <th>Category</th>
+                                        <th>Mechanic</th>
+                                        <th>Experience</th>
+                                        <th>Price Range</th>
+                                        <th>Availability</th>
+                                        <th style="text-align: right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gigs-tbody">
+                                    <tr>
+                                        <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                                            <i data-lucide="loader" class="spin" style="width: 24px; height: 24px; margin-bottom: 0.5rem; display: block; margin-left: auto; margin-right: auto;"></i>
+                                            Loading active service gigs...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Negotiations Pane -->
+                <div id="offers-pane" class="tab-pane">
+                    <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem;">
+                        <input type="text" id="offers-search" class="form-control" placeholder="Search offers by sender, receiver, or gig title..." oninput="filterOffers()" style="max-width: 400px;">
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Sender (Owner)</th>
+                                        <th>Receiver (Mechanic)</th>
+                                        <th>Gig Description</th>
+                                        <th>Offered Price</th>
+                                        <th>Status</th>
+                                        <th>Created Date</th>
+                                        <th style="text-align: right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="offers-tbody">
+                                    <tr>
+                                        <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                                            <i data-lucide="loader" class="spin" style="width: 24px; height: 24px; margin-bottom: 0.5rem; display: block; margin-left: auto; margin-right: auto;"></i>
+                                            Loading price negotiations...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let allGigs = [];
+        let allOffers = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            loadGigsData();
+            loadOffersData();
+        });
+
+        const switchTab = (paneId) => {
+            document.querySelectorAll('.tab-trigger').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+            const triggeredBtn = Array.from(document.querySelectorAll('.tab-trigger')).find(btn => 
+                (paneId === 'gigs-pane' && btn.textContent.includes('Gigs')) ||
+                (paneId === 'offers-pane' && btn.textContent.includes('Negotiation'))
+            );
+            if (triggeredBtn) triggeredBtn.classList.add('active');
+
+            const pane = document.getElementById(paneId);
+            if (pane) pane.classList.add('active');
+        };
+
+        const loadGigsData = async () => {
+            const token = localStorage.getItem('access_token');
+            if (!token) return;
+            try {
+                const res = await fetch('/api/v1/admin/gigs', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const payload = await res.json();
+                if (payload.success) {
+                    allGigs = payload.data || [];
+                    document.getElementById('stat-gigs-count').textContent = allGigs.length;
+                    renderGigs(allGigs);
+                }
+            } catch (err) {
+                console.error("Error loading admin gigs:", err);
+            }
+        };
+
+        const loadOffersData = async () => {
+            const token = localStorage.getItem('access_token');
+            if (!token) return;
+            try {
+                const res = await fetch('/api/v1/admin/price_offers', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const payload = await res.json();
+                if (payload.success) {
+                    allOffers = payload.data || [];
+                    document.getElementById('stat-offers-count').textContent = allOffers.length;
+                    renderOffers(allOffers);
+                }
+            } catch (err) {
+                console.error("Error loading admin price offers:", err);
+            }
+        };
+
+        const renderGigs = (gigs) => {
+            const tbody = document.getElementById('gigs-tbody');
+            if (gigs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 3rem;">No service gigs found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = gigs.map(g => `
+                <tr>
+                    <td><strong>#${g.id}</strong></td>
+                    <td><div style="font-weight: 600;">${g.title}</div><div style="font-size: 0.75rem; color: var(--text-muted); max-width: 250px;" class="text-truncate">${g.description || ''}</div></td>
+                    <td><span class="badge-category">${g.category || 'Repair'}</span></td>
+                    <td>${g.mechanic_name || 'Mechanic'}</td>
+                    <td>${g.experience || 'Not Specified'}</td>
+                    <td><strong>${g.price_range || 'N/A'}</strong></td>
+                    <td><span style="color: ${g.availability === 'Available' ? 'var(--success)' : 'var(--text-muted)'}; font-weight: 500;">● ${g.availability || 'Available'}</span></td>
+                    <td style="text-align: right;">
+                        <button class="btn btn-outline" style="border-color: var(--danger); color: var(--danger); padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="deleteGig(${g.id})">
+                            <i data-lucide="trash-2" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        };
+
+        const renderOffers = (offers) => {
+            const tbody = document.getElementById('offers-tbody');
+            if (offers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 3rem;">No price offers or invoices found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = offers.map(o => `
+                <tr>
+                    <td><strong>#${o.id}</strong></td>
+                    <td><div style="font-weight: 500;">${o.sender_name}</div></td>
+                    <td><div style="font-weight: 500;">${o.receiver_name}</div></td>
+                    <td><div style="font-weight: 600;">${o.gig_title || 'Custom Repair'}</div></td>
+                    <td><strong style="color: var(--success);">Rs. ${o.amount}</strong></td>
+                    <td><span class="badge-status badge-${o.status || 'pending'}">${o.status || 'pending'}</span></td>
+                    <td><span style="font-size: 0.8rem; color: var(--text-muted);">${new Date(o.created_at).toLocaleDateString()}</span></td>
+                    <td style="text-align: right;">
+                        <button class="btn btn-outline" style="border-color: var(--danger); color: var(--danger); padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="deleteOffer(${o.id})">
+                            <i data-lucide="trash-2" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        };
+
+        const filterGigs = () => {
+            const val = document.getElementById('gigs-search').value.toLowerCase();
+            const filtered = allGigs.filter(g => 
+                g.title.toLowerCase().includes(val) || 
+                (g.description || '').toLowerCase().includes(val) ||
+                (g.mechanic_name || '').toLowerCase().includes(val) ||
+                (g.category || '').toLowerCase().includes(val)
+            );
+            renderGigs(filtered);
+        };
+
+        const filterOffers = () => {
+            const val = document.getElementById('offers-search').value.toLowerCase();
+            const filtered = allOffers.filter(o => 
+                (o.sender_name || '').toLowerCase().includes(val) ||
+                (o.receiver_name || '').toLowerCase().includes(val) ||
+                (o.gig_title || '').toLowerCase().includes(val) ||
+                (o.status || '').toLowerCase().includes(val)
+            );
+            renderOffers(filtered);
+        };
+
+        const deleteGig = async (id) => {
+            if (!confirm('Are you absolutely sure you want to delete this service gig from the system?')) return;
+            const token = localStorage.getItem('access_token');
+            try {
+                const res = await fetch(`/api/v1/admin/gigs/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const payload = await res.json();
+                if (payload.success) {
+                    window.showToast('Gig deleted successfully', 'success');
+                    loadGigsData();
+                } else {
+                    window.showToast(payload.message || 'Error deleting gig', 'error');
+                }
+            } catch (err) {
+                console.error("Error deleting gig:", err);
+            }
+        };
+
+        const deleteOffer = async (id) => {
+            if (!confirm('Are you absolutely sure you want to delete this price negotiation proposal?')) return;
+            const token = localStorage.getItem('access_token');
+            try {
+                const res = await fetch(`/api/v1/admin/price_offers/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const payload = await res.json();
+                if (payload.success) {
+                    window.showToast('Price offer deleted successfully', 'success');
+                    loadOffersData();
+                } else {
+                    window.showToast(payload.message || 'Error deleting price offer', 'error');
+                }
+            } catch (err) {
+                console.error("Error deleting price offer:", err);
+            }
+        };
+    </script>
+</body>
+</html>

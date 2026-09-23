@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .stat-info h3 { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .stat-info p { color: var(--text-muted); font-size: 0.875rem; font-weight: 500; }
+        
+        .job-card { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; transition: transform 0.2s; }
+        .job-card:hover { transform: translateX(4px); }
+        .job-card.emergency { border-left-color: var(--danger); }
+        .job-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+        .job-details { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.875rem; margin-bottom: 1.5rem; }
+        .job-details span { color: var(--text-muted); }
+        .job-details strong { color: var(--text); font-weight: 500; }
+    </style>
+</head>
+<body>
+    <!-- Role: Mechanic -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="wrench" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">AutoCare</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="mechanic-dashboard.html" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="mechanic-assigned-jobs.html" class="nav-item">
+                    <i data-lucide="briefcase"></i> <span class="nav-text">Assigned Jobs</span>
+                </a>
+                <a href="mechanic-map.html" class="nav-item">
+                    <i data-lucide="map"></i> <span class="nav-text">Live Map & Pins</span>
+                </a>
+                <a href="mechanic-messages.html" class="nav-item">
+                    <i data-lucide="message-square"></i> <span class="nav-text">Messages</span>
+                </a>
+                <a href="mechanic-calendar.html" class="nav-item active">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Schedule</span>
+                </a>
+                <a href="mechanic-profile.html" class="nav-item">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h2 style="font-size: 1.125rem; font-weight: 600; margin-left: 0.5rem;">Mechanic Portal</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Mark all as read</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border); background: rgba(99, 102, 241, 0.05);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">Service Update</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">New job assigned: Honda Civic (ABC-1234).</p>
+                                    <p style="font-size: 0.7rem; color: var(--primary); margin-top: 0.25rem;">Just now</p>
+                                </div>
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">New Message</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">User Name sent you a message.</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">2 hours ago</p>
+                                </div>
+                            </div>
+                            <div style="padding: 0.75rem; border-top: 1px solid var(--border); text-align: center;">
+                                <a href="#" style="font-size: 0.875rem; color: var(--primary); font-weight: 500;">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem;">
+                            <img src="https://ui-avatars.com/api/?name=Tariq+Mehmood&background=10B981&color=fff" alt="Mechanic" style="width: 36px; height: 36px; border-radius: 50%;">
+                            <div style="text-align: left; display: none;" class="desktop-user-info">
+                                <p style="font-size: 0.875rem; font-weight: 600;">Mechanic Name</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Senior Mechanic</p>
+                            </div>
+                            <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: var(--text-muted);"></i>
+                        </button>
+                        <div id="user-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 200px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                <p style="font-weight: 600;">Mechanic Name</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">mechanic@autocare.com</p>
+                            </div>
+                            <div style="padding: 0.5rem;">
+                                <a href="index.html" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--danger); border-radius: 4px;"><i data-lucide="log-out" style="width: 16px; height: 16px;"></i> Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h1 style="font-size: 1.5rem; font-weight: 700;">Schedule</h1>
+                        <p style="color: var(--text-muted); margin-top: 0.25rem;">Manage your assigned jobs and availability.</p>
+                    </div>
+                </div>
+                <!-- Same calendar structure as user, just different events -->
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2 class="card-title">...</h2>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem;" id="prev-month-btn"><i data-lucide="chevron-left"></i></button>
+                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem;" id="next-month-btn"><i data-lucide="chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div id="calendar-grid-container" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+                        <div style="background: var(--bg-card); padding: 0.75rem; text-align: center; font-weight: 600; font-size: 0.875rem;">Sun</div>
+                        <div style="background: var(--bg-card); padding: 0.75rem; text-align: center; font-weight: 600; font-size: 0.875rem;">Mon</div>
+                        <div style="background: var(--bg-card); padding: 0.75rem; text-align: center; font-weight: 600; font-size: 0.875rem;">Tue</div>
+                        <div style="background: var(--bg-card); padding: 0.75rem; text-align: center; font-weight: 600; font-size: 0.875rem;">Wed</div>
+                        <div style="background: var(--bg-card); padding: 0.75rem; text-align: center; font-weight: 600; font-size: 0.875rem;">Thu</div>
+                        <div style="background: var(--bg-card); padding: 0.75rem; text-align: center; font-weight: 600; font-size: 0.875rem;">Fri</div>
+                        <div style="background: var(--bg-card); padding: 0.75rem; text-align: center; font-weight: 600; font-size: 0.875rem;">Sat</div>
+                    </div>
+                </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let currentDate = new Date();
+        let assignedJobs = [];
+
+        async function initCalendar() {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                // Fetch assigned jobs
+                const response = await fetch('/api/v1/mechanic/jobs', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    assignedJobs = result.data;
+                }
+
+                renderCalendar();
+            } catch (err) {
+                console.error("Error setting up calendar:", err);
+            }
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const headerTitle = document.querySelector('.card-title');
+            if (headerTitle) {
+                headerTitle.textContent = `${monthNames[month]} ${year}`;
+            }
+
+            const gridContainer = document.getElementById('calendar-grid-container');
+            if (!gridContainer) return;
+
+            // Retain only header cells
+            const headers = Array.from(gridContainer.children).slice(0, 7);
+            gridContainer.innerHTML = '';
+            headers.forEach(h => gridContainer.appendChild(h));
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+
+            // Empty spacer slots
+            for (let i = 0; i < firstDayIndex; i++) {
+                const spacer = document.createElement('div');
+                spacer.style.cssText = "background: var(--bg); padding: 3rem 0.5rem; min-height: 100px;";
+                gridContainer.appendChild(spacer);
+            }
+
+            // Days rendering
+            for (let day = 1; day <= totalDays; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.style.cssText = "background: var(--bg-card); padding: 0.5rem; min-height: 100px; position: relative; border-top: 1px solid var(--border);";
+                
+                const today = new Date();
+                const isToday = (today.getDate() === day && today.getMonth() === month && today.getFullYear() === year);
+                
+                const label = isToday 
+                    ? `<span style="font-weight: 600; display: inline-block; background: var(--primary); color: white; width: 22px; height: 22px; text-align: center; border-radius: 50%; line-height: 22px; font-size: 0.8rem;">${day}</span>`
+                    : `<span style="font-weight: 500; font-size: 0.8rem; color: var(--text);">${day}</span>`;
+                
+                dayCell.innerHTML = label;
+
+                // Filter items scheduled for this date
+                const dayJobs = assignedJobs.filter(job => {
+                    const d = new Date(job.created_at);
+                    return d.getDate() === day && d.getMonth() === month && d.getFullYear() === year;
+                });
+
+                dayJobs.forEach(job => {
+                    const vehicleName = job.vehicle ? `${job.vehicle.make} ${job.vehicle.model}` : "Vehicle";
+                    let actionLabel = job.request_type ? job.request_type.toUpperCase() : 'JOB';
+                    let isCompleted = (job.status || '').toLowerCase() === 'completed';
+                    let bg = isCompleted ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)';
+                    let color = isCompleted ? 'var(--success)' : 'var(--warning)';
+
+                    const item = document.createElement('div');
+                    item.style.cssText = `background: ${bg}; color: ${color}; font-size: 0.7rem; padding: 0.25rem; border-radius: 4px; margin-top: 0.25rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;`;
+                    item.textContent = `${actionLabel} - ${vehicleName}`;
+                    item.title = `REQ-${job.id}: ${job.description || actionLabel}`;
+                    dayCell.appendChild(item);
+                });
+
+                gridContainer.appendChild(dayCell);
+            }
+
+            lucide.createIcons();
+        }
+
+        document.getElementById('prev-month-btn').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        document.getElementById('next-month-btn').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        // Initialize loading
+        initCalendar();
+
+        if (window.innerWidth > 768) {
+            const infoNode = document.querySelector('.desktop-user-info');
+            if (infoNode) infoNode.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

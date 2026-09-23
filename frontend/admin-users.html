@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise User Management - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="admin-users.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="shield-check" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">Admin Panel</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <p class="nav-category" style="padding: 1rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Dashboard</p>
+                <a href="admin-dashboard.html" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                
+                <p class="nav-category" style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Service Center</p>
+                <a href="admin-all-requests.html" class="nav-item">
+                    <i data-lucide="clipboard-list"></i> <span class="nav-text">All Requests</span>
+                </a>
+                <a href="admin-users.html" class="nav-item active">
+                    <i data-lucide="users"></i> <span class="nav-text">Manage Users</span>
+                </a>
+                <a href="admin-mechanics.html" class="nav-item">
+                    <i data-lucide="wrench"></i> <span class="nav-text">Manage Mechanics</span>
+                </a>
+                <a href="admin-gigs-prices.html" class="nav-item">
+                    <i data-lucide="gavel"></i> <span class="nav-text">Gigs & Prices</span>
+                </a>
+
+                <p class="nav-category" style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Analytics</p>
+                <a href="admin-analytics.html" class="nav-item">
+                    <i data-lucide="bar-chart-2"></i> <span class="nav-text">System Analytics</span>
+                </a>
+
+                <p class="nav-category" style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Settings</p>
+                <a href="admin-profile.html" class="nav-item">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h2 style="font-size: 1.125rem; font-weight: 600; margin-left: 0.5rem;" id="page-title">Enterprise User Registry</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Mark all as read</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <div style="padding: 1rem; text-align: center; color: var(--text-muted);">Syncing admin alerts...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem; background: none; border: none; cursor: pointer;">
+                            <img src="" id="user-avatar-top" alt="Admin" style="width: 36px; height: 36px; border-radius: 50%;">
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Enterprise Metrics Headers -->
+                <div class="stats-grid">
+                    <div class="stat-card primary">
+                        <div class="stat-info">
+                            <h3 id="stat-total">0</h3>
+                            <p>Total Registered</p>
+                        </div>
+                        <div class="stat-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">
+                            <i data-lucide="users"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-info">
+                            <h3 id="stat-active">0</h3>
+                            <p>Active Profiles</p>
+                        </div>
+                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i data-lucide="user-check"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-info">
+                            <h3 id="stat-suspended">0</h3>
+                            <p>Suspended Profiles</p>
+                        </div>
+                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i data-lucide="user-x"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-info">
+                            <h3 id="stat-blocked">0</h3>
+                            <p>Blocked Profiles</p>
+                        </div>
+                        <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);">
+                            <i data-lucide="user-minus"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Query Control Panel -->
+                <div class="control-bar">
+                    <div class="form-group-filter" style="grid-column: span 2;">
+                        <label>Search user credentials</label>
+                        <input type="text" id="filter-search" class="form-filter-control" placeholder="Search by name, email, phone number...">
+                    </div>
+                    <div class="form-group-filter">
+                        <label>System Role</label>
+                        <select id="filter-role" class="form-filter-control">
+                            <option value="">All Roles</option>
+                            <option value="ADMIN">ADMIN</option>
+                            <option value="MECHANIC">MECHANIC</option>
+                            <option value="VEHICLE_OWNER">VEHICLE OWNER</option>
+                            <option value="WORKSHOP_MANAGER">WORKSHOP MANAGER</option>
+                        </select>
+                    </div>
+                    <div class="form-group-filter">
+                        <label>Profile Status</label>
+                        <select id="filter-status" class="form-filter-control">
+                            <option value="">All Statuses</option>
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="INACTIVE">INACTIVE</option>
+                            <option value="SUSPENDED">SUSPENDED</option>
+                            <option value="BLOCKED">BLOCKED</option>
+                            <option value="PENDING_VERIFICATION">PENDING VERIFICATION</option>
+                        </select>
+                    </div>
+                    <div class="form-group-filter">
+                        <label>Assigned City</label>
+                        <input type="text" id="filter-city" class="form-filter-control" placeholder="e.g. Islamabad">
+                    </div>
+                </div>
+
+                <div class="control-bar" style="margin-top: -1rem; margin-bottom: 2rem; grid-template-columns: repeat(3, 1fr);">
+                    <div class="form-group-filter">
+                        <label>Registration Date From</label>
+                        <input type="date" id="filter-start-date" class="form-filter-control">
+                    </div>
+                    <div class="form-group-filter">
+                        <label>Registration Date To</label>
+                        <input type="date" id="filter-end-date" class="form-filter-control">
+                    </div>
+                    <div class="form-group-filter" style="display: flex; flex-direction: row; gap: 0.5rem;">
+                        <button class="btn btn-outline" style="flex: 1;" id="btn-reset-filters">
+                            <i data-lucide="rotate-ccw" style="width: 14px; height: 14px; display: inline-block; margin-right: 0.25rem;"></i> Clear
+                        </button>
+                        <button class="btn btn-primary" style="flex: 1;" id="btn-apply-filters">
+                            <i data-lucide="sliders" style="width: 14px; height: 14px; display: inline-block; margin-right: 0.25rem;"></i> Filter
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Export & Creation Controls -->
+                <div class="actions-header">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button onclick="triggerExport('csv')" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+                            <i data-lucide="download" style="width: 16px; height: 16px;"></i> Export CSV
+                        </button>
+                    </div>
+                    <button onclick="openAddUserModal()" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i> Create Registry Entry
+                    </button>
+                </div>
+
+                <!-- Users Master Log Card -->
+                <div class="card">
+                    <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Profile</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Phone Number</th>
+                                <th>Role</th>
+                                <th style="text-align: center;">Vehicles</th>
+                                <th style="text-align: center;">Repairs</th>
+                                <th style="text-align: center;">Recoveries</th>
+                                <th>Status</th>
+                                <th>Created Date</th>
+                                <th>Last Login</th>
+                                <th style="text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-tbody"></tbody>
+                    </table>
+                </div>
+
+                    <!-- Client-Side Rendered Dynamic Pagination -->
+                    <div class="pagination-container">
+                        <div class="pagination-info" id="pagination-info">Showing users 0 to 0 of 0 entries</div>
+                        <div class="pagination-btns" id="pagination-btns"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modular Modals Injection Target -->
+    <div id="modals-placeholder"></div>
+
+    <script src="app.js"></script>
+    <script>
+        fetch('admin-users-modals.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('modals-placeholder').innerHTML = html;
+                
+                const loadScript = (src) => {
+                    return new Promise((resolve, reject) => {
+                        const s = document.createElement('script');
+                        s.src = src;
+                        s.onload = resolve;
+                        s.onerror = reject;
+                        document.body.appendChild(s);
+                    });
+                };
+                
+                loadScript('admin-users-utils.js')
+                    .then(() => loadScript('admin-users-controller.js'))
+                    .then(() => loadScript('admin-users-operations.js'))
+                    .catch(e => console.error("Could not load scripts:", e));
+            })
+            .catch(err => console.error("Could not inject modals:", err));
+    </script>
+</body>
+</html>

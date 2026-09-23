@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Mechanics - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin-mechanics.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="shield-check" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">Admin Panel</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <p class="nav-category" style="padding: 1rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Dashboard</p>
+                <a href="admin-dashboard.html" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                
+                <p class="nav-category" style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Service Center</p>
+                <a href="admin-all-requests.html" class="nav-item">
+                    <i data-lucide="clipboard-list"></i> <span class="nav-text">All Requests</span>
+                </a>
+                <a href="admin-users.html" class="nav-item">
+                    <i data-lucide="users"></i> <span class="nav-text">Manage Users</span>
+                </a>
+                <a href="admin-mechanics.html" class="nav-item active">
+                    <i data-lucide="wrench"></i> <span class="nav-text">Manage Mechanics</span>
+                </a>
+                <a href="admin-gigs-prices.html" class="nav-item">
+                    <i data-lucide="gavel"></i> <span class="nav-text">Gigs & Prices</span>
+                </a>
+
+                <p class="nav-category" style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Analytics</p>
+                <a href="admin-analytics.html" class="nav-item">
+                    <i data-lucide="bar-chart-2"></i> <span class="nav-text">System Analytics</span>
+                </a>
+
+                <p class="nav-category" style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Settings</p>
+                <a href="admin-profile.html" class="nav-item">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h2 style="font-size: 1.125rem; font-weight: 600; margin-left: 0.5rem;">Manage Mechanics</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Mark all as read</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border); background: rgba(99, 102, 241, 0.05);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">Service Update</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">New job assigned: Honda Civic (ABC-1234).</p>
+                                    <p style="font-size: 0.7rem; color: var(--primary); margin-top: 0.25rem;">Just now</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem; background:none; border:none; cursor:pointer;">
+                            <img id="user-avatar-top" src="https://ui-avatars.com/api/?name=System+Admin&background=EF4444&color=fff" alt="Admin" style="width: 36px; height: 36px; border-radius: 50%;">
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Live Statistics Sync Panel -->
+                <div class="stats-grid">
+                    <div class="stat-card primary">
+                        <div class="stat-info">
+                            <h3 id="stat-active-count">0</h3>
+                            <p>Active Staff</p>
+                        </div>
+                        <div class="stat-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">
+                            <i data-lucide="wrench"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-info">
+                            <h3 id="stat-available-count">0</h3>
+                            <p>Available Ready</p>
+                        </div>
+                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i data-lucide="check-circle-2"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-info">
+                            <h3 id="stat-busy-count">0</h3>
+                            <p>Busy On Site</p>
+                        </div>
+                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i data-lucide="activity"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card info">
+                        <div class="stat-info">
+                            <h3 id="stat-assigned-jobs-count">0</h3>
+                            <p>Jobs Assigned</p>
+                        </div>
+                        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--info);">
+                            <i data-lucide="clipboard-list"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-info">
+                            <h3 id="stat-completed-jobs-count">0</h3>
+                            <p>Jobs Completed</p>
+                        </div>
+                        <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);">
+                            <i data-lucide="check-square"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Backend Filters Toolbar -->
+                <div class="control-bar">
+                    <div class="form-group-filter">
+                        <label>Search Directory</label>
+                        <input id="filter-search" type="text" class="form-filter-control" placeholder="Name, code, phone...">
+                    </div>
+                    <div class="form-group-filter">
+                        <label>Specialization</label>
+                        <select id="filter-specialization" class="form-filter-control">
+                            <option value="">All Specialties</option>
+                            <option value="Engine Repair">Engine Repair</option>
+                            <option value="Electrical">Electrical</option>
+                            <option value="AC Repair">AC Repair</option>
+                            <option value="Brake Systems">Brake Systems</option>
+                            <option value="Diagnostics">Diagnostics</option>
+                            <option value="Maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                    <div class="form-group-filter">
+                        <label>Availability</label>
+                        <select id="filter-availability" class="form-filter-control">
+                            <option value="">All States</option>
+                            <option value="AVAILABLE">Available</option>
+                            <option value="BUSY">Busy</option>
+                            <option value="ON_JOB">On Job</option>
+                            <option value="OFFLINE">Offline</option>
+                            <option value="ON_LEAVE">On Leave</option>
+                        </select>
+                    </div>
+                    <div class="form-group-filter">
+                        <label>Status</label>
+                        <select id="filter-status" class="form-filter-control">
+                            <option value="">All Statuses</option>
+                            <option value="ACTIVE">Active Staff</option>
+                            <option value="INACTIVE">Inactive</option>
+                            <option value="SUSPENDED">Suspended</option>
+                            <option value="BLOCKED">Blocked</option>
+                        </select>
+                    </div>
+                    <div class="form-group-filter">
+                        <label>Workshop Unit</label>
+                        <select id="filter-workshop" class="form-filter-control">
+                            <option value="">All Workshops</option>
+                            <option value="1">Lahore Center</option>
+                            <option value="2">Islamabad Sector G-10</option>
+                            <option value="3">Karachi Clifton Hub</option>
+                        </select>
+                    </div>
+                    <div class="form-group-filter">
+                        <label>Rating Threshold</label>
+                        <select id="filter-rating" class="form-filter-control">
+                            <option value="">Any Rating</option>
+                            <option value="4.5">4.5+ Stars</option>
+                            <option value="4.0">4.0+ Stars</option>
+                            <option value="3.5">3.5+ Stars</option>
+                        </select>
+                    </div>
+                    <div class="form-group-filter">
+                        <label>Min Experience</label>
+                        <input id="filter-experience" type="number" class="form-filter-control" placeholder="Years (e.g. 3)" min="0">
+                    </div>
+                </div>
+
+                <!-- Live Registry Table Grid Card -->
+                <div class="card">
+                    <div class="card-header actions-header">
+                        <h2 class="card-title">Professional Maintenance Team</h2>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button onclick="clearQueryFilters()" class="btn btn-outline" style="padding: 0.45rem 1rem;"><i data-lucide="filter-x" style="width: 16px; height: 16px; vertical-align:middle; margin-right: 0.25rem;"></i> Clear</button>
+                            <button onclick="triggerExport()" class="btn btn-outline" style="padding: 0.45rem 1rem;"><i data-lucide="download" style="width: 16px; height: 16px; vertical-align:middle; margin-right: 0.25rem;"></i> Export CSV</button>
+                            <button onclick="openAddModal()" class="btn btn-primary" style="padding: 0.45rem 1.25rem;"><i data-lucide="plus" style="width: 16px; height: 16px; vertical-align:middle; margin-right: 0.25rem;"></i> Add Mechanic</button>
+                            <button onclick="deleteAllMechanics()" class="btn btn-outline" style="padding: 0.45rem 1rem; color: var(--danger); border-color: var(--danger);"><i data-lucide="trash-2" style="width: 16px; height: 16px; vertical-align:middle; margin-right: 0.25rem;"></i> Delete All</button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-sortable>Mechanic Name <i data-lucide="arrow-up-down" style="width: 12px; height: 12px; display: inline-block;"></i></th>
+                                    <th data-sortable>Employee Code <i data-lucide="arrow-up-down" style="width: 12px; height: 12px; display: inline-block;"></i></th>
+                                    <th>Phone Number</th>
+                                    <th>Specializations</th>
+                                    <th data-sortable style="text-align: center;">Experience <i data-lucide="arrow-up-down" style="width: 12px; height: 12px; display: inline-block;"></i></th>
+                                    <th style="text-align: center;">Current Jobs</th>
+                                    <th style="text-align: center;">Completed Jobs</th>
+                                    <th data-sortable>Rating <i data-lucide="arrow-up-down" style="width: 12px; height: 12px; display: inline-block;"></i></th>
+                                    <th>Availability</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mechanic-table-body">
+                                <!-- Dynamic database payload inserts here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Dynamic Pagination grid -->
+                    <div class="pagination-container">
+                        <div id="pagination-info" class="pagination-info">Showing details...</div>
+                        <div id="pagination-btns" class="pagination-btns">
+                            <!-- Prev/Next buttons -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Sliding performance details drawer overlay -->
+    <div class="drawer-overlay" id="drawer-overlay" onclick="closeDetailDrawer()"></div>
+    <div class="drawer" id="mechanics-detail-drawer">
+        <div class="modal-header">
+            <h3 style="display:flex; align-items:center; gap:0.5rem;"><i data-lucide="user-check" class="text-primary"></i> Performance & Activity profile</h3>
+            <button onclick="closeDetailDrawer()" class="btn btn-outline" style="padding: 0.25rem; border:none; background:none; cursor:pointer;"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body" id="detail-drawer-body" style="background: var(--bg);">
+            <!-- Dynamic compilation profile inside operations script -->
+        </div>
+    </div>
+
+    <!-- Add Mechanic Modal -->
+    <div class="modal" id="add-mechanic-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Authorize & Register New Mechanic</h3>
+                <button onclick="closeModal('add-mechanic-modal')" class="btn btn-outline" style="padding: 0.25rem; border:none; background:none; cursor:pointer;"><i data-lucide="x"></i></button>
+            </div>
+            <form id="add-mechanic-form">
+                <div class="modal-body">
+                    <div class="form-grid-2">
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; font-size: 0.825rem; font-weight:600;">Full Name</label>
+                            <input id="add-full-name" type="text" class="form-control" placeholder="E.g. Tariq Mehmood" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; font-size: 0.825rem; font-weight:600;">Email Address</label>
+                            <input id="add-email" type="email" class="form-control" placeholder="E.g. tariq@autocare.pk" required>
+                        </div>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; font-size: 0.825rem; font-weight:600;">Phone Number</label>
+                            <input id="add-phone" type="text" class="form-control" placeholder="E.g. 0300-1234567" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; font-size: 0.825rem; font-weight:600;">Login Code / Password</label>
+                            <input id="add-password" type="password" class="form-control" placeholder="Keep empty for default (mech123)">
+                        </div>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; font-size: 0.825rem; font-weight:600;">Years of Experience</label>
+                            <input id="add-experience" type="number" class="form-control" value="3" min="0" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; font-size: 0.825rem; font-weight:600;">Primary Workshop Association</label>
+                            <select id="add-workshop" class="form-control" required>
+                                <option value="1">Lahore Center - Gulberg III</option>
+                                <option value="2">Islamabad Sector G-10 Workshop</option>
+                                <option value="3">Karachi Clifton Flagship Hub</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label style="display:block; margin-bottom: 0.4rem; font-size: 0.825rem; font-weight:600;">City</label>
+                        <select id="add-city" class="form-control">
+                            <option value="Lahore">Lahore</option>
+                            <option value="Karachi">Karachi</option>
+                            <option value="Islamabad">Islamabad</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label style="display:block; margin-bottom: 0.4rem; font-size: 0.825rem; font-weight:600;">Certifications (Comma Separated)</label>
+                        <input id="add-certifications" type="text" class="form-control" placeholder="E.g. Toyota Expert Certified, ASE Master Automobile Technician">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.825rem; font-weight:600;">Specializations (Select Multiple)</label>
+                        <div id="add-specs-container" style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; background:rgba(0,0,0,0.02); padding:0.75rem; border-radius:6px; border:1px solid var(--border);">
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Engine Repair" checked> Engine Repair</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Electrical" checked> Electrical</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="AC Repair"> AC Repair</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Tire Service"> Tire Service</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Battery Service"> Battery Service</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Recovery Service"> Recovery Service</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Diagnostics" checked> Diagnostics</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Maintenance" checked> General Maintenance</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Transmission"> Transmission</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Brake Systems" checked> Brake Systems</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('add-mechanic-modal')">Cancel</button>
+                    <button type="submit" id="add-mechanic-submit-btn" class="btn btn-primary">Confirm & Dispatch Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Mechanic Modal -->
+    <div class="modal" id="edit-mechanic-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Modify Mechanic Registry Profile</h3>
+                <button onclick="closeModal('edit-mechanic-modal')" class="btn btn-outline" style="padding: 0.25rem; border:none; background:none; cursor:pointer;"><i data-lucide="x"></i></button>
+            </div>
+            <form id="edit-mechanic-form">
+                <input type="hidden" id="edit-mechanic-id">
+                <div class="modal-body">
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label style="display:block; margin-bottom: 0.4rem; font-size: 0.825rem; font-weight:600;">Full Name</label>
+                        <input id="edit-full-name" type="text" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-grid-2">
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; font-size: 0.825rem; font-weight:600;">Specialist Experience (Years)</label>
+                            <input id="edit-experience" type="number" class="form-control" required min="0">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; font-size: 0.825rem; font-weight:600;">Workshop Assignment</label>
+                            <select id="edit-workshop" class="form-control" required>
+                                <option value="1">Lahore Center - Gulberg III</option>
+                                <option value="2">Islamabad Sector G-10 Workshop</option>
+                                <option value="3">Karachi Clifton Flagship Hub</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; font-size: 0.825rem; font-weight:600;">Current Status</label>
+                            <select id="edit-status" class="form-control" required>
+                                <option value="ACTIVE">ACTIVE</option>
+                                <option value="INACTIVE">INACTIVE</option>
+                                <option value="SUSPENDED">SUSPENDED</option>
+                                <option value="BLOCKED">BLOCKED</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; font-size: 0.825rem; font-weight:600;">Availability Status</label>
+                            <select id="edit-availability" class="form-control" required>
+                                <option value="AVAILABLE">AVAILABLE</option>
+                                <option value="BUSY">BUSY</option>
+                                <option value="ON_JOB">ON JOB</option>
+                                <option value="OFFLINE">OFFLINE</option>
+                                <option value="ON_LEAVE">ON LEAVE</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label style="display:block; margin-bottom: 0.4rem; font-size: 0.825rem; font-weight:600;">Certifications</label>
+                        <input id="edit-certifications" type="text" class="form-control">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.825rem; font-weight:600;">Specializations (Select Multiple)</label>
+                        <div id="edit-specs-container" style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; background:rgba(0,0,0,0.02); padding:0.75rem; border-radius:6px; border:1px solid var(--border);">
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Engine Repair"> Engine Repair</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Electrical"> Electrical</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="AC Repair"> AC Repair</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Tire Service"> Tire Service</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Battery Service"> Battery Service</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Recovery Service"> Recovery Service</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Diagnostics"> Diagnostics</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Maintenance"> General Maintenance</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Transmission"> Transmission</label>
+                            <label style="font-size:0.8rem; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" value="Brake Systems"> Brake Systems</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('edit-mechanic-modal')">Discard</button>
+                    <button type="submit" id="edit-mechanic-submit-btn" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dispatch Assign Modal -->
+    <div class="modal" id="assign-job-modal">
+        <div class="modal-container" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>Dispatch Auto Care Job Request</h3>
+                <button onclick="closeModal('assign-job-modal')" class="btn btn-outline" style="padding: 0.25rem; border:none; background:none; cursor:pointer;"><i data-lucide="x"></i></button>
+            </div>
+            <form id="assign-job-form">
+                <input type="hidden" id="assign-mechanic-id">
+                <div class="modal-body">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Dispatch a pending auto care service request to: <strong id="assign-mechanic-display-name" class="text-primary"></strong></p>
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label style="display:block; margin-bottom:0.4rem; font-size: 0.825rem; font-weight:600;">Select Outstanding Request</label>
+                        <select id="assign-request-selection" class="form-control" required>
+                            <!-- Pending request nodes populated on load -->
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('assign-job-modal')">Cancel</button>
+                    <button type="submit" id="assign-job-submit-btn" class="btn btn-primary">Dispatch Mechanic</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Container for dynamic toast anchors -->
+    <div class="toast-system" id="toast-anchoring-grid"></div>
+
+    <script src="app.js"></script>
+    <script src="admin-mechanics-utils.js"></script>
+    <script src="admin-mechanics-operations.js"></script>
+    <script src="admin-mechanics-controller.js"></script>
+</body>
+</html>

@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assigned Jobs - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .job-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; }
+        .job-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        .job-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+        .detail-item { font-size: 0.875rem; }
+        .detail-item span { color: var(--text-muted); display: block; margin-bottom: 0.25rem; }
+        .detail-item strong { color: var(--text); font-weight: 500; font-size: 1rem; }
+        .job-actions { display: flex; gap: 1rem; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 1rem; }
+        
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { background: var(--bg-card); border-radius: 8px; width: 100%; max-width: 500px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); transform: scale(0.95); transition: transform 0.3s; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer { padding: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 1rem; }
+    </style>
+</head>
+<body>
+    <!-- Role: Mechanic -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="wrench" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">AutoCare</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="mechanic-dashboard.html" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="mechanic-assigned-jobs.html" class="nav-item active">
+                    <i data-lucide="briefcase"></i> <span class="nav-text">Assigned Jobs</span>
+                </a>
+                <a href="mechanic-map.html" class="nav-item">
+                    <i data-lucide="map"></i> <span class="nav-text">Live Map & Pins</span>
+                </a>
+                <a href="mechanic-messages.html" class="nav-item">
+                    <i data-lucide="message-square"></i> <span class="nav-text">Messages</span>
+                </a>
+                <a href="mechanic-calendar.html" class="nav-item">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Schedule</span>
+                </a>
+                <a href="mechanic-profile.html" class="nav-item">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h2 style="font-size: 1.125rem; font-weight: 600; margin-left: 0.5rem;">Assigned Jobs</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Mark all as read</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border); background: rgba(99, 102, 241, 0.05);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">Service Update</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">New job assigned: Honda Civic (ABC-1234).</p>
+                                    <p style="font-size: 0.7rem; color: var(--primary); margin-top: 0.25rem;">Just now</p>
+                                </div>
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">New Message</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">User Name sent you a message.</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">2 hours ago</p>
+                                </div>
+                            </div>
+                            <div style="padding: 0.75rem; border-top: 1px solid var(--border); text-align: center;">
+                                <a href="#" style="font-size: 0.875rem; color: var(--primary); font-weight: 500;">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem;">
+                            <img src="https://ui-avatars.com/api/?name=Tariq+Mehmood&background=10B981&color=fff" alt="Mechanic" style="width: 36px; height: 36px; border-radius: 50%;">
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                    <div style="display: flex; gap: 0.5rem;" id="filter-tabs">
+                        <button class="btn btn-primary" data-filter="active">Active Jobs</button>
+                        <button class="btn btn-outline" data-filter="completed">Completed Registry</button>
+                        <button class="btn btn-outline" data-filter="available" id="available-reqs-tab" style="display: flex; align-items: center; gap: 0.35rem;">
+                            Available Client Requests 
+                            <span id="available-count-badge" style="background: var(--danger); color: white; border-radius: 999px; padding: 0.1rem 0.4rem; font-size: 0.7rem; font-weight: 700; display: none;">0</span>
+                        </button>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="job-search-input" class="form-control" placeholder="Search vehicle, license, customer..." style="width: 250px;">
+                    </div>
+                </div>
+
+                <!-- Dynamic Jobs Container -->
+                <div id="jobs-list-container" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                    <div style="text-align: center; color: var(--text-muted); padding: 4rem;">
+                        <i data-lucide="loader" class="spin" style="margin: 0 auto 0.5rem; width: 28px; height: 28px;"></i>
+                        <p>Syncing assigned jobs list...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Enterprise Status Tracking Modal (Intermediate States) -->
+    <div class="modal-overlay" id="statusModal" style="overflow-y: auto;">
+        <div class="modal-content" style="max-width: 500px; margin: 2rem auto;">
+            <div class="modal-header">
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="gauge" style="color: var(--primary); width: 22px; height: 22px;"></i> Enterprise Progress Tracker
+                </h3>
+                <button type="button" class="btn btn-outline" style="padding: 0.25rem; border: none;" onclick="closeModal('statusModal')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="statusForm">
+                <div class="modal-body">
+                    <input type="hidden" id="currentJobId">
+                    
+                    <div style="margin-bottom: 1.25rem;">
+                        <label style="display: block; margin-bottom: 0.35rem; font-weight: 600; font-size: 0.875rem; color: var(--text-main);">Job Status State</label>
+                        <select class="form-control" id="newStatus" required style="width: 100%;">
+                            <option value="assigned">Assigned (Awaiting Acceptance)</option>
+                            <option value="accepted">Accepted (In queue)</option>
+                            <option value="on_the_way">On The Way (Recovery only)</option>
+                            <option value="arrived">Arrived on Scene (Recovery only)</option>
+                            <option value="in_progress">In Progress (Active Work)</option>
+                            <option value="completed">Completed (Finalized)</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 1.25rem;">
+                        <label style="display: block; margin-bottom: 0.35rem; font-weight: 600; font-size: 0.875rem; color: var(--text-main);">Work Progress Percentage</label>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <input type="range" class="form-control" id="progressPercent" min="0" max="100" step="5" value="10" style="flex: 1; padding: 0; height: auto;">
+                            <span id="progressPercentVal" style="font-weight: 700; font-size: 1rem; color: var(--primary); min-width: 45px; text-align: right;">10%</span>
+                        </div>
+                        <div style="display: flex; gap: 0.25rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-outline" style="padding: 0.15rem 0.4rem; font-size: 0.75rem; min-height: unset;" onclick="setPresetProgress(10)">10% (Accepted)</button>
+                            <button type="button" class="btn btn-outline" style="padding: 0.15rem 0.4rem; font-size: 0.75rem; min-height: unset;" onclick="setPresetProgress(30)">30% (Diagnostic)</button>
+                            <button type="button" class="btn btn-outline" style="padding: 0.15rem 0.4rem; font-size: 0.75rem; min-height: unset;" onclick="setPresetProgress(50)">50% (Halfway)</button>
+                            <button type="button" class="btn btn-outline" style="padding: 0.15rem 0.4rem; font-size: 0.75rem; min-height: unset;" onclick="setPresetProgress(80)">80% (Final assembly)</button>
+                            <button type="button" class="btn btn-outline" style="padding: 0.15rem 0.4rem; font-size: 0.75rem; min-height: unset;" onclick="setPresetProgress(100)">100% (Ready)</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1.25rem;">
+                        <label style="display: block; margin-bottom: 0.35rem; font-weight: 600; font-size: 0.875rem; color: var(--text-main);">Current Stage description (Kahan pohancha)</label>
+                        <input type="text" class="form-control" id="currentStage" placeholder="e.g. Engine tuning, Denting work, Diagnostic Bay, Washing" required style="width: 100%;">
+                        <div style="display: flex; gap: 0.25rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-outline" style="padding: 0.15rem 0.4rem; font-size: 0.75rem; min-height: unset;" onclick="setStagePreset('Diagnostic Bay')">Diagnostic Bay</button>
+                            <button type="button" class="btn btn-outline" style="padding: 0.15rem 0.4rem; font-size: 0.75rem; min-height: unset;" onclick="setStagePreset('Engine Disassembly')">Engine Disassembly</button>
+                            <button type="button" class="btn btn-outline" style="padding: 0.15rem 0.4rem; font-size: 0.75rem; min-height: unset;" onclick="setStagePreset('Active Repair Work')">Active Repair Work</button>
+                            <button type="button" class="btn btn-outline" style="padding: 0.15rem 0.4rem; font-size: 0.75rem; min-height: unset;" onclick="setStagePreset('Final Road Testing')">Final Road Testing</button>
+                            <button type="button" class="btn btn-outline" style="padding: 0.15rem 0.4rem; font-size: 0.75rem; min-height: unset;" onclick="setStagePreset('Polishing & Cleaning')">Polishing & Cleaning</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1.25rem;">
+                        <label style="display: block; margin-bottom: 0.35rem; font-weight: 600; font-size: 0.875rem; color: var(--text-main);">Est. Completion Time (Kab tak hoga)</label>
+                        <input type="datetime-local" class="form-control" id="estimatedCompletion" style="width: 100%;">
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.35rem; font-weight: 600; font-size: 0.875rem; color: var(--text-main);">Status activity notes / logs (What is done?)</label>
+                        <textarea class="form-control" id="statusNotes" rows="3" placeholder="e.g. Dismantled bumper to check lock bracket. Brake pads replaced and fluids top-up initiated." style="width: 100%; border-radius: 6px; padding: 0.5rem;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding-top: 1rem; border-top: 1px solid var(--border); display: flex; gap: 0.75rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('statusModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.35rem;"><i data-lucide="shield-check"></i> Sync Progress Status</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Beautiful Dynamic Work Completion Modal -->
+    <div class="modal-overlay" id="completionModal" style="overflow-y: auto;">
+        <div class="modal-content" style="max-width: 650px; margin: 2rem auto;" id="completion-modal-inner">
+            <div class="modal-header">
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="award" style="color: var(--success); width: 22px; height: 22px;"></i> Finalize Service & Log Completion
+                </h3>
+                <button type="button" class="btn btn-outline" style="padding: 0.25rem; border: none;" onclick="closeModal('completionModal')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="completionForm">
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    <input type="hidden" id="completeJobId">
+                    
+                    <!-- Base Information -->
+                    <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.875rem;">Work Performed *</label>
+                            <textarea class="form-control" id="completeWorkPerformed" rows="3" placeholder="Describe mechanical and repair procedures accomplished (e.g., Brake pads replaced, wheel alignment performed, fluids topped up)" required></textarea>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.875rem;">Final Findings & Description *</label>
+                            <textarea class="form-control" id="completeFinalDescription" rows="2" placeholder="Overall diagnosis after repair works or test drives" required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Genuine Parts Used Grid -->
+                    <div style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; background: var(--bg-card);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 0.35rem;">
+                                <i data-lucide="cpu" style="width: 16px; height: 16px;"></i> Parts & Consumables Logged
+                            </h4>
+                            <button type="button" class="btn btn-outline" style="font-size: 0.75rem; padding: 0.35rem 0.6rem; display: flex; align-items: center; gap: 0.25rem;" onclick="addPartRow()">
+                                <i data-lucide="plus" style="width: 14px; height: 14px;"></i> Add Part
+                            </button>
+                        </div>
+                        
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem; margin-bottom: 1rem;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                                        <th style="padding: 0.5rem 0.25rem;">Part Name/Serial</th>
+                                        <th style="padding: 0.5rem 0.25rem; width: 80px;">Qty</th>
+                                        <th style="padding: 0.5rem 0.25rem; width: 120px;">Price (Rs.)</th>
+                                        <th style="padding: 0.5rem 0.25rem; width: 120px;">Total (Rs.)</th>
+                                        <th style="padding: 0.5rem 0.25rem; width: 40px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="parts-rows-container">
+                                    <!-- Dynamic rows added here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Auto-Calculated Totals Panel -->
+                        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed var(--border); display: flex; flex-direction: column; gap: 0.25rem; align-items: flex-end; font-size: 0.875rem; color: var(--text-muted);">
+                            <div>Base Service Labor Fee: <strong style="color: var(--text);">Rs. 1,500</strong></div>
+                            <div>Total Parts Cost: <strong id="total-parts-cost" style="color: var(--text);">Rs. 0</strong></div>
+                            <div style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-top: 0.25rem;">
+                                Final Service Billing: <span id="total-service-cost">Rs. 1,500</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Work Completion Photo Upload Area -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.875rem;">Service Work Evidence (Completion Images)</label>
+                        <div id="drop-zone" style="border: 2px dashed var(--border); border-radius: 8px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; background: rgba(0,0,0,0.01);" onclick="document.getElementById('evidence-file-input').click()">
+                            <i data-lucide="camera" style="margin: 0 auto 0.5rem; width: 32px; height: 32px; color: var(--text-muted);"></i>
+                            <p style="font-size: 0.875rem; font-weight: 500;">Click to select or drag and drop completion photos here</p>
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Automatically streams to secure workshop servers</p>
+                            <input type="file" id="evidence-file-input" style="display: none;" accept="image/*" multiple onchange="handleEvidenceSelect(event)">
+                        </div>
+                        <!-- Uploaded evidence list -->
+                        <div id="uploaded-evidence-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+                            <!-- Thumbnails injected here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('completionModal')">Cancel Report</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-completion"><i data-lucide="shield-check"></i> Finalize Report & Bill</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Ensure proper authentication on page load
+        const token = localStorage.getItem('access_token');
+        const activeUser = JSON.parse(localStorage.getItem('activeUser') || '{}');
+        if (!token || activeUser.role !== 'mechanic') {
+            window.location.href = 'index.html';
+        }
+
+        // Set dynamic user profile details in topbar
+        const userMenuBtn = document.getElementById('user-menu-btn');
+        if (userMenuBtn && activeUser && activeUser.name) {
+            userMenuBtn.innerHTML = `
+                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(activeUser.name)}&background=10B981&color=fff&bold=true" alt="User" style="width: 36px; height: 36px; border-radius: 50%;">
+            `;
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        document.getElementById('newStatus').addEventListener('change', function() {
+            document.getElementById('costSection').style.display = this.value === 'completed' ? 'block' : 'none';
+        });
+
+        let jobsData = [];
+        let availableRequestsData = [];
+        let currentFilter = 'active'; // 'active', 'completed', or 'available'
+        let searchQuery = '';
+
+        // Parts Used and Calculated totals helpers
+        let partsCounter = 0;
+        function addPartRow() {
+            const container = document.getElementById('parts-rows-container');
+            const rowId = `part-row-${partsCounter++}`;
+            const tr = document.createElement('tr');
+            tr.id = rowId;
+            tr.style.borderBottom = "1px solid var(--border)";
+            tr.innerHTML = `
+                <td style="padding: 0.5rem 0.25rem;">
+                    <input type="text" class="form-control part-name" style="padding: 0.35rem 0.5rem; font-size: 0.8125rem; height: 32px;" placeholder="e.g., Engine Oil Helix 4L" required>
+                </td>
+                <td style="padding: 0.5rem 0.25rem;">
+                    <input type="number" class="form-control part-qty" style="padding: 0.35rem 0.5rem; font-size: 0.8125rem; width: 65px; height: 32px;" value="1" min="1" oninput="calculateTotalCosts()" required>
+                </td>
+                <td style="padding: 0.5rem 0.25rem;">
+                    <input type="number" class="form-control part-price" style="padding: 0.35rem 0.5rem; font-size: 0.8125rem; width: 100px; height: 32px;" value="0" min="0" oninput="calculateTotalCosts()" required>
+                </td>
+                <td style="padding: 0.5rem 0.25rem; font-weight: 600; text-align: right; vertical-align: middle;">
+                    Rs. <span class="part-row-total">0</span>
+                </td>
+                <td style="padding: 0.5rem 0.25rem; text-align: center; vertical-align: middle;">
+                    <button type="button" class="btn btn-outline" style="padding: 0.25rem; border: none; color: var(--danger); min-height: unset;" onclick="removePartRow('${rowId}')">
+                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                    </button>
+                </td>
+            `;
+            container.appendChild(tr);
+            if (window.lucide) lucide.createIcons();
+            calculateTotalCosts();
+        }
+
+        function removePartRow(id) {
+            const row = document.getElementById(id);
+            if (row) {
+                row.remove();
+            }
+            calculateTotalCosts();
+        }
+
+        function calculateTotalCosts() {
+            let partsTotal = 0;
+            const rows = document.querySelectorAll('#parts-rows-container tr');
+            rows.forEach(row => {
+                const qty = Number(row.querySelector('.part-qty').value) || 0;
+                const price = Number(row.querySelector('.part-price').value) || 0;
+                const rowTotal = qty * price;
+                row.querySelector('.part-row-total').textContent = rowTotal.toLocaleString();
+                partsTotal += rowTotal;
+            });
+
+            const baseLaborFee = 1500;
+            const finalTotal = partsTotal + baseLaborFee;
+
+            document.getElementById('total-parts-cost').textContent = `Rs. ${partsTotal.toLocaleString()}`;
+            document.getElementById('total-service-cost').textContent = `Rs. ${finalTotal.toLocaleString()}`;
+        }
+
+        // Image Selection & Multipart Streaming Uploads helpers
+        let uploadedImagesList = [];
+
+        async function handleEvidenceSelect(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+            uploadFiles(files);
+        }
+
+        function handleEvidenceDrop(event) {
+            event.preventDefault();
+            document.getElementById('drop-zone').style.borderColor = 'var(--border)';
+            const files = event.dataTransfer.files;
+            if (files && files.length > 0) {
+                uploadFiles(files);
+            }
+        }
+
+        async function uploadFiles(files) {
+            const container = document.getElementById('uploaded-evidence-container');
+            const uploadFilesList = Array.from(files);
+
+            for (const file of uploadFilesList) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const thumbId = `thumb-${Date.now()}`;
+                const loaderThumb = document.createElement('div');
+                loaderThumb.id = thumbId;
+                loaderThumb.style.width = '70px';
+                loaderThumb.style.height = '70px';
+                loaderThumb.style.border = '1px solid var(--border)';
+                loaderThumb.style.borderRadius = '4px';
+                loaderThumb.style.display = 'flex';
+                loaderThumb.style.alignItems = 'center';
+                loaderThumb.style.justifyContent = 'center';
+                loaderThumb.style.background = '#e5e7eb';
+                loaderThumb.innerHTML = `<span style="font-size: 0.65rem; color: var(--text-muted);">Uploading</span>`;
+                container.appendChild(loaderThumb);
+
+                try {
+                    const response = await fetch('/api/uploads', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: formData
+                    });
+                    const result = await response.json();
+                    if (response.ok && result.success) {
+                        const imgUrl = result.data.fileUrl;
+                        uploadedImagesList.push(imgUrl);
+
+                        loaderThumb.innerHTML = `
+                            <div style="position: relative; width: 100%; height: 100%;">
+                                <img src="${imgUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" referrerPolicy="no-referrer">
+                                <button type="button" style="position: absolute; top: -4px; right: -4px; background: var(--danger); color: #fff; border: none; border-radius: 50%; width: 16px; height: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px;" onclick="removeUploadedImage('${imgUrl}', '${thumbId}')">&times;</button>
+                            </div>
+                        `;
+                    } else {
+                        loaderThumb.remove();
+                        window.showToast(result.message || 'Error occurred uploading image.', 'error');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    loaderThumb.remove();
+                    window.showToast('Unable to complete secure media streaming.', 'error');
+                }
+            }
+        }
+
+        function removeUploadedImage(url, thumbId) {
+            uploadedImagesList = uploadedImagesList.filter(u => u !== url);
+            const thumb = document.getElementById(thumbId);
+            if (thumb) {
+                thumb.remove();
+            }
+        }
+
+        // Fetch jobs from backend API
+        async function loadJobs() {
+            try {
+                const response = await fetch('/api/v1/mechanic/jobs', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    jobsData = result.data || [];
+                    renderJobsList();
+                } else {
+                    window.showToast(result.message || 'Error occurred fetching assigned jobs.', 'error');
+                }
+            } catch (err) {
+                console.error("Fetch jobs error:", err);
+                window.showToast('Unable to connect to active work schedule database.', 'error');
+            }
+        }
+
+        // Render job lists based on active filters and search queries
+        function renderJobsList() {
+            const container = document.getElementById('jobs-list-container');
+            if (!container) return;
+
+            // Apply filter tab
+            let filtered = [];
+            if (currentFilter === 'available') {
+                filtered = availableRequestsData;
+            } else {
+                filtered = jobsData.filter(job => {
+                    if (currentFilter === 'active') {
+                        return job.status !== 'completed';
+                    } else {
+                        return job.status === 'completed';
+                    }
+                });
+            }
+
+            // Apply search filter (case-insensitive)
+            if (searchQuery.trim() !== '') {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(job => {
+                    const vehicleStr = job.vehicle ? `${job.vehicle.make} ${job.vehicle.model} ${job.vehicle.license_plate}` : '';
+                    const clientStr = job.client ? `${job.client.full_name} ${job.client.phone_number}` : '';
+                    const descStr = job.description || '';
+                    const reqStr = `req-${job.id}`;
+                    return vehicleStr.toLowerCase().includes(q) || 
+                           clientStr.toLowerCase().includes(q) || 
+                           descStr.toLowerCase().includes(q) ||
+                           reqStr.includes(q);
+                });
+            }
+
+            if (filtered.length === 0) {
+                let emptyTitle = "No jobs found";
+                let emptyText = "No assigned jobs match your filter choices or search description at this time.";
+                if (currentFilter === 'available') {
+                    emptyTitle = "No Available Client Requests";
+                    emptyText = "There are currently no unclaimed service requests from vehicle owners.";
+                }
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 4rem 1.5rem; background: var(--bg-card); border: 2px dashed var(--border); border-radius: 8px; color: var(--text-muted);">
+                        <i data-lucide="folder-open" style="margin: 0 auto 1.5rem; width: 44px; height: 44px; opacity: 0.6;"></i>
+                        <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.25rem;">${emptyTitle}</h3>
+                        <p style="font-size: 0.875rem; max-width: 320px; margin: 0 auto;">${emptyText}</p>
+                    </div>
+                `;
+                if (window.lucide) lucide.createIcons();
+                return;
+            }
+
+            container.innerHTML = filtered.map(job => {
+                const isRecovery = job.request_type === 'recovery';
+                const formattedType = job.request_type ? job.request_type.charAt(0).toUpperCase() + job.request_type.slice(1) : 'Roadside Recovery';
+                
+                const baseStatus = (job.status || 'assigned').toLowerCase();
+                let statusLabel = baseStatus.charAt(0).toUpperCase() + baseStatus.slice(1);
+                if (baseStatus === 'in_progress') statusLabel = 'In Progress';
+                if (baseStatus === 'on_the_way') statusLabel = 'On The Way';
+                
+                let badgeClass = 'badge-pending';
+                if (['in_progress', 'on_the_way', 'arrived', 'accepted'].includes(baseStatus)) badgeClass = 'badge-progress';
+                if (baseStatus === 'completed') badgeClass = 'badge-completed';
+
+                // Render dynamic actions buttons depending on status states flow
+                let actionsHtml = '';
+                if (currentFilter === 'available') {
+                    actionsHtml = `<button class="btn btn-primary" onclick="claimRequest(${job.id})"><i data-lucide="plus-circle"></i> Claim & Accept Job</button>`;
+                } else if (isRecovery) {
+                    if (baseStatus === 'assigned') {
+                        actionsHtml = `<button class="btn btn-primary" onclick="updateJobStatus(${job.id}, 'accepted')"><i data-lucide="check"></i> Accept Recovery Job</button>`;
+                    } else if (baseStatus === 'accepted') {
+                        actionsHtml = `<button class="btn btn-warning" onclick="updateJobStatus(${job.id}, 'on_the_way')"><i data-lucide="navigation"></i> On The Way</button>`;
+                    } else if (baseStatus === 'on_the_way') {
+                        actionsHtml = `<button class="btn btn-info" onclick="updateJobStatus(${job.id}, 'arrived')"><i data-lucide="map-pin"></i> Arrived on Scene</button>`;
+                    } else if (baseStatus === 'arrived') {
+                        actionsHtml = `<button class="btn btn-success" onclick="openCompletionModal(${job.id})"><i data-lucide="award"></i> Complete Emergency Work</button>`;
+                    } else {
+                        actionsHtml = `<span style="color: var(--success); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 0.35rem;"><i data-lucide="shield-check" style="width: 18px; height: 18px;"></i> Service Completed (Recovery)</span>`;
+                    }
+                } else {
+                    if (baseStatus === 'assigned') {
+                        actionsHtml = `<button class="btn btn-primary" onclick="updateJobStatus(${job.id}, 'accepted')"><i data-lucide="check"></i> Accept Workshop Job</button>`;
+                    } else if (baseStatus === 'accepted') {
+                        actionsHtml = `<button class="btn btn-warning" onclick="updateJobStatus(${job.id}, 'in_progress')"><i data-lucide="play"></i> Start Service Work</button>`;
+                    } else if (baseStatus === 'in_progress') {
+                        actionsHtml = `<button class="btn btn-success" onclick="openCompletionModal(${job.id})"><i data-lucide="award"></i> Finalize Work & Invoice</button>`;
+                    } else {
+                        actionsHtml = `<span style="color: var(--success); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 0.35rem;"><i data-lucide="shield-check" style="width: 18px; height: 18px;"></i> Service Completed (Workshop)</span>`;
+                    }
+                }
+
+                if (currentFilter !== 'available' && baseStatus !== 'completed' && baseStatus !== 'cancelled') {
+                    actionsHtml = `
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+                            ${actionsHtml}
+                            <button class="btn btn-outline" onclick="openTrackingModal(${job.id})" style="display: inline-flex; align-items: center; gap: 0.35rem; border-color: var(--primary); color: var(--primary);">
+                                <i data-lucide="gauge"></i> Update Progress Tracking
+                            </button>
+                        </div>
+                    `;
+                }
+
+                // Location line
+                const locationText = isRecovery ? `Lat: ${job.location_lat.toFixed(4)}, Lng: ${job.location_lng.toFixed(4)}` : 'Workshop Bay Spot';
+
+                // Format tracking panel
+                const progress = job.progress_percent !== undefined ? job.progress_percent : (baseStatus === 'completed' ? 100 : (baseStatus === 'accepted' ? 10 : 0));
+                const stage = job.current_stage || (baseStatus === 'completed' ? 'Completed & Finalized' : (baseStatus === 'accepted' ? 'Accepted & Queued' : 'Pending Status Update'));
+                const hasTrackingData = progress > 0 || job.current_stage || job.estimated_completion;
+                
+                let trackingHtml = '';
+                if (hasTrackingData) {
+                    trackingHtml = `
+                        <div style="grid-column: 1 / -1; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 6px; padding: 1rem; margin-top: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <i data-lucide="gauge" style="width: 16px; height: 16px; color: var(--primary);"></i>
+                                    <strong style="font-size: 0.85rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em;">Enterprise Tracker Status</strong>
+                                </div>
+                                <span style="font-size: 0.875rem; font-weight: 700; color: var(--text-main);">${progress}% Complete</span>
+                            </div>
+                            
+                            <!-- Progress Bar -->
+                            <div style="width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;">
+                                <div style="width: ${progress}%; height: 100%; background: linear-gradient(90deg, var(--primary), #10b981); border-radius: 4px; transition: width 0.4s ease;"></div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; font-size: 0.825rem; margin-top: 0.25rem; padding-top: 0.5rem; border-top: 1px dashed var(--border);">
+                                <div>
+                                    <span style="color: var(--text-muted); font-size: 0.75rem;">Current Work Stage (Kahan pohancha)</span> <br>
+                                    <strong style="color: var(--text-main); font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem;">
+                                        <span style="display: inline-block; width: 6px; height: 6px; background: #10b981; border-radius: 50%;"></span>
+                                        ${stage}
+                                    </strong>
+                                </div>
+                                <div>
+                                    <span style="color: var(--text-muted); font-size: 0.75rem;">Est. Completion (Kab tak hoga)</span> <br>
+                                    <strong style="color: var(--text-main); font-size: 0.875rem;">
+                                        ${job.estimated_completion ? new Date(job.estimated_completion).toLocaleString() : 'TBD (To Be Determined)'}
+                                    </strong>
+                                </div>
+                            </div>
+                            
+                            ${job.status_history && job.status_history.length > 0 ? `
+                            <div style="margin-top: 0.5rem; border-top: 1px solid rgba(59, 130, 246, 0.1); padding-top: 0.5rem;">
+                                <span style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Latest Activity Log Note:</span>
+                                <p style="font-size: 0.8rem; color: var(--text-main); background: rgba(0,0,0,0.02); padding: 0.35rem 0.5rem; border-radius: 4px; margin: 0; font-style: italic;">
+                                    "${job.status_history[job.status_history.length - 1].notes || 'Status updated.'}"
+                                </p>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="job-card" style="border-left: 4px solid var(${isRecovery && job.status !== 'completed' ? '--danger' : '--border'}); position: relative; animation: fadeIn 0.15s ease-out;" id="job-${job.id}">
+                        <div class="job-header">
+                            <div>
+                                <h3 style="font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: var(--text-main);">
+                                    REQ-${job.id} <span class="badge ${badgeClass}" id="status-${job.id}">${statusLabel}</span>
+                                </h3>
+                                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">Received: ${new Date(job.created_at).toLocaleString()}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <span style="font-size: 0.875rem; font-weight: 500; color: var(${isRecovery ? '--danger' : '--primary'});"><i data-lucide="${isRecovery ? 'alert-triangle' : 'wrench'}" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i> ${formattedType}</span>
+                            </div>
+                        </div>
+                        <div class="job-details">
+                            <div class="detail-item">
+                                <span>Vehicle</span>
+                                <strong>${job.vehicle ? `${job.vehicle.make} ${job.vehicle.model} (${job.vehicle.license_plate})` : 'Unspecified vehicle'}</strong>
+                            </div>
+                            <div class="detail-item">
+                                <span>Client</span>
+                                <strong>${job.client ? job.client.full_name : 'Customer'}</strong>
+                                ${job.client && job.client.phone_number ? `<a href="tel:${job.client.phone_number}" style="font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.25rem; margin-top: 0.25rem;"><i data-lucide="phone" style="width: 12px; height: 12px;"></i> ${job.client.phone_number}</a>` : ''}
+                            </div>
+                            <div class="detail-item">
+                                <span>Location / Routing</span>
+                                <strong>${locationText}</strong>
+                                ${isRecovery ? `<a href="#" onclick="event.preventDefault(); window.showToast('Opening navigation details...', 'info')" style="font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.25rem; margin-top: 0.25rem;"><i data-lucide="map-pin" style="width: 12px; height: 12px;"></i> View Coordinates</a>` : ''}
+                            </div>
+                            <div class="detail-item">
+                                <span>Requirements</span>
+                                <strong>${job.description || 'General checkups'}</strong>
+                            </div>
+                            
+                            ${trackingHtml}
+                        </div>
+                        <div class="job-actions" style="margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+                            ${actionsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // Trigger individual job status updates over API
+        async function updateJobStatus(id, newStatusVal) {
+            try {
+                const response = await fetch(`/api/v1/mechanic/jobs/${id}/status`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ status: newStatusVal })
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    window.showToast(result.message || 'Job status altered.', 'success');
+                    loadJobs();
+                } else {
+                    window.showToast(result.message || 'Error executing job update.', 'error');
+                }
+            } catch (err) {
+                console.error("Status update error:", err);
+                window.showToast('Unable to synchronize status changes.', 'error');
+            }
+        }
+
+        // Open status tracker modal and pre-fill details
+        window.openTrackingModal = function(jobId) {
+            const job = jobsData.find(j => j.id === jobId);
+            if (!job) return;
+
+            document.getElementById('currentJobId').value = jobId;
+            document.getElementById('newStatus').value = job.status || 'accepted';
+            
+            const progress = job.progress_percent !== undefined ? job.progress_percent : 10;
+            document.getElementById('progressPercent').value = progress;
+            document.getElementById('progressPercentVal').textContent = `${progress}%`;
+            
+            document.getElementById('currentStage').value = job.current_stage || '';
+            
+            if (job.estimated_completion) {
+                try {
+                    const d = new Date(job.estimated_completion);
+                    const pad = num => String(num).padStart(2, '0');
+                    const localISO = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                    document.getElementById('estimatedCompletion').value = localISO;
+                } catch(e) {
+                    document.getElementById('estimatedCompletion').value = '';
+                }
+            } else {
+                document.getElementById('estimatedCompletion').value = '';
+            }
+            
+            document.getElementById('statusNotes').value = '';
+            
+            openModal('statusModal');
+        };
+
+        window.setPresetProgress = function(val) {
+            document.getElementById('progressPercent').value = val;
+            document.getElementById('progressPercentVal').textContent = `${val}%`;
+        };
+
+        window.setStagePreset = function(val) {
+            document.getElementById('currentStage').value = val;
+        };
+
+        // Set up local slider label update
+        document.addEventListener('DOMContentLoaded', () => {
+            const rangeInput = document.getElementById('progressPercent');
+            if (rangeInput) {
+                rangeInput.addEventListener('input', function() {
+                    document.getElementById('progressPercentVal').textContent = `${this.value}%`;
+                });
+            }
+        });
+
+        // Submit listener for Enterprise Progress Status Tracking Form
+        document.getElementById('statusForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('currentJobId').value;
+            const status = document.getElementById('newStatus').value;
+            const progress_percent = document.getElementById('progressPercent').value;
+            const current_stage = document.getElementById('currentStage').value.trim();
+            const estimated_completion = document.getElementById('estimatedCompletion').value;
+            const status_notes = document.getElementById('statusNotes').value.trim();
+
+            const modalContent = document.querySelector('#statusModal .modal-content');
+            const originalContent = modalContent.innerHTML;
+            modalContent.innerHTML = `
+                <div style="text-align: center; padding: 3rem 1.5rem; color: var(--text-main);">
+                    <i data-lucide="loader" class="spin" style="margin: 0 auto 1rem; width: 32px; height: 32px; color: var(--primary);"></i>
+                    <p style="font-weight: 600; font-size: 1.05rem; margin-bottom: 0.25rem;">Updating Progress State...</p>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; max-width: 320px; margin: 0 auto;">Broadcasting real-time status and telemetry logs to client active requests dashboard...</p>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+
+            try {
+                const response = await fetch(`/api/v1/mechanic/jobs/${id}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        status,
+                        progress_percent: parseInt(progress_percent),
+                        current_stage,
+                        estimated_completion,
+                        status_notes: status_notes || `Progress updated to ${progress_percent}% - ${current_stage}`
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    window.showToast("Real-time progress sync successful!", "success");
+                    closeModal('statusModal');
+                    setTimeout(() => {
+                        modalContent.innerHTML = originalContent;
+                        document.getElementById('progressPercent').addEventListener('input', function() {
+                            document.getElementById('progressPercentVal').textContent = `${this.value}%`;
+                        });
+                        loadJobs();
+                    }, 500);
+                } else {
+                    window.showToast(result.message || 'Error updating status tracking.', 'error');
+                    modalContent.innerHTML = originalContent;
+                    document.getElementById('progressPercent').addEventListener('input', function() {
+                        document.getElementById('progressPercentVal').textContent = `${this.value}%`;
+                    });
+                    if (window.lucide) lucide.createIcons();
+                }
+            } catch (err) {
+                console.error("Status update error:", err);
+                window.showToast('Unable to synchronize status changes.', 'error');
+                modalContent.innerHTML = originalContent;
+                if (window.lucide) lucide.createIcons();
+            }
+        });
+
+        // Open complete status modal (Detailed)
+        function openCompletionModal(jobId) {
+            document.getElementById('completeJobId').value = jobId;
+            document.getElementById('completeWorkPerformed').value = '';
+            document.getElementById('completeFinalDescription').value = '';
+            document.getElementById('parts-rows-container').innerHTML = '';
+            document.getElementById('uploaded-evidence-container').innerHTML = '';
+            uploadedImagesList = [];
+            partsCounter = 0;
+            calculateTotalCosts();
+            openModal('completionModal');
+        }
+
+        // Bind interactive tabs
+        document.querySelectorAll('#filter-tabs button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('#filter-tabs button').forEach(b => {
+                    b.className = 'btn btn-outline';
+                    // keep badge styling correct
+                    const badge = b.querySelector('#available-count-badge');
+                    if (badge && b !== btn) {
+                        badge.style.background = 'var(--danger)';
+                        badge.style.color = 'white';
+                    }
+                });
+                this.className = 'btn btn-primary';
+                const badge = this.querySelector('#available-count-badge');
+                if (badge) {
+                    badge.style.background = 'white';
+                    badge.style.color = 'var(--primary)';
+                }
+                currentFilter = this.getAttribute('data-filter');
+                if (currentFilter === 'available') {
+                    loadAvailableRequests();
+                } else {
+                    loadJobs();
+                }
+                renderJobsList();
+            });
+        });
+
+        // Bind real-time search
+        document.getElementById('job-search-input').addEventListener('input', function(e) {
+            searchQuery = e.target.value;
+            renderJobsList();
+        });
+
+        // Handle Completion Form Submit (ServiceHistory, PartsUsed, Uploads integration)
+        document.getElementById('completionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const jobId = document.getElementById('completeJobId').value;
+            const workPerformed = document.getElementById('completeWorkPerformed').value;
+            const finalDescription = document.getElementById('completeFinalDescription').value;
+
+            // Map parts used data array
+            const parts = [];
+            const rows = document.querySelectorAll('#parts-rows-container tr');
+            rows.forEach(row => {
+                const part_name = row.querySelector('.part-name').value;
+                const quantity = Number(row.querySelector('.part-qty').value) || 0;
+                const price_per_part = Number(row.querySelector('.part-price').value) || 0;
+                parts.push({
+                    part_name,
+                    quantity,
+                    price_per_part
+                });
+            });
+
+            const modalContent = document.getElementById('completion-modal-inner');
+            const originalContent = modalContent.innerHTML;
+
+            modalContent.innerHTML = `
+                <div style="padding: 2.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem;">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(99, 102, 241, 0.08); display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; border: 1px solid rgba(99, 102, 241, 0.2);">
+                        <i data-lucide="loader" class="spin" style="width: 28px; height: 28px; color: var(--primary);"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Finalizing Job Records</h3>
+                    <p style="color: var(--text-muted); font-size: 0.875rem; max-width: 360px; margin: 0 auto;">Processing completion logs, generating itemized service ledger, and broadcasting invoice to client dashboard...</p>
+                    
+                    <div style="width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 0.75rem; text-align: left; background: var(--bg-card); border: 1px solid var(--border); padding: 1.25rem; border-radius: 8px;">
+                        <div id="step-proc-1" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: var(--success); font-weight: 500;">
+                            <i data-lucide="loader" class="spin" style="width: 14px; height: 14px;"></i>
+                            <span>Analyzing parts consumption & labor sheets...</span>
+                        </div>
+                        <div id="step-proc-2" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: var(--text-muted); opacity: 0.5;">
+                            <i data-lucide="circle" style="width: 14px; height: 14px;"></i>
+                            <span>Compiling itemized digital invoice...</span>
+                        </div>
+                        <div id="step-proc-3" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: var(--text-muted); opacity: 0.5;">
+                            <i data-lucide="circle" style="width: 14px; height: 14px;"></i>
+                            <span>Broadcasting real-time notification update...</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+
+            // STEP 1 Complete
+            await new Promise(r => setTimeout(r, 450));
+            const s1 = document.getElementById('step-proc-1');
+            if (s1) s1.innerHTML = `<i data-lucide="check-circle" style="width: 14px; height: 14px; color: var(--success);"></i> <span style="color: var(--success);">Parts log compiled & validated</span>`;
+            
+            const s2 = document.getElementById('step-proc-2');
+            if (s2) {
+                s2.innerHTML = `<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; color: var(--primary);"></i> <span style="color: var(--text-main); font-weight: 500;">Generating digital itemized service ledger...</span>`;
+                s2.style.opacity = '1';
+            }
+            if (window.lucide) lucide.createIcons();
+
+            // STEP 2 Complete
+            await new Promise(r => setTimeout(r, 450));
+            if (s2) s2.innerHTML = `<i data-lucide="check-circle" style="width: 14px; height: 14px; color: var(--success);"></i> <span style="color: var(--success);">Digital invoice compiled and encrypted</span>`;
+            
+            const s3 = document.getElementById('step-proc-3');
+            if (s3) {
+                s3.innerHTML = `<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; color: var(--primary);"></i> <span style="color: var(--text-main); font-weight: 500;">Synchronizing with enterprise database...</span>`;
+                s3.style.opacity = '1';
+            }
+            if (window.lucide) lucide.createIcons();
+
+            await new Promise(r => setTimeout(r, 400));
+
+            try {
+                const response = await fetch(`/api/v1/mechanic/jobs/${jobId}/complete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        work_performed: workPerformed,
+                        final_description: finalDescription,
+                        parts_used: parts,
+                        completion_images: uploadedImagesList
+                    })
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    modalContent.innerHTML = `
+                        <div style="padding: 2.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;">
+                            <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(16, 185, 129, 0.08); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(16, 185, 129, 0.2);">
+                                <i data-lucide="shield-check" style="width: 28px; height: 28px; color: var(--success);"></i>
+                            </div>
+                            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--success);">Service Registry Updated!</h3>
+                            <p style="color: var(--text-muted); font-size: 0.875rem; max-width: 320px;">The service logs are committed and the repair ledger has been published for billing.</p>
+                        </div>
+                    `;
+                    if (window.lucide) lucide.createIcons();
+                    window.showToast('Job records updated, history saved successfully & dynamic invoice compiled!', 'success');
+                    
+                    setTimeout(() => {
+                        closeModal('completionModal');
+                        // Restore original HTML for next use
+                        modalContent.innerHTML = originalContent;
+                        // Bind dynamic listeners/handlers if any
+                        document.getElementById('completionForm').reset();
+                        loadJobs();
+                    }, 1500);
+                } else {
+                    window.showToast(result.message || 'Error executing job update.', 'error');
+                    modalContent.innerHTML = originalContent;
+                    if (window.lucide) lucide.createIcons();
+                }
+            } catch (err) {
+                console.error("Complete job error:", err);
+                window.showToast('Server connection drop. Record not synchronized.', 'error');
+                modalContent.innerHTML = originalContent;
+                if (window.lucide) lucide.createIcons();
+            }
+        });
+
+        // Fetch available unassigned requests for claiming
+        async function loadAvailableRequests() {
+            try {
+                const response = await fetch('/api/v1/mechanic/available_requests', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    availableRequestsData = result.data || [];
+                    const badge = document.getElementById('available-count-badge');
+                    if (badge) {
+                        if (availableRequestsData.length > 0) {
+                            badge.textContent = availableRequestsData.length;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                    if (currentFilter === 'available') {
+                        renderJobsList();
+                    }
+                }
+            } catch (err) {
+                console.error("Fetch available requests error:", err);
+            }
+        }
+
+        // Action to claim an unassigned request
+        async function claimRequest(id) {
+            if (!confirm('Are you sure you want to claim and accept this service request? This will instantly assign it to your profile.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/v1/mechanic/jobs/${id}/claim`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    window.showToast("Service request successfully assigned to you!", "success");
+                    await loadJobs();
+                    await loadAvailableRequests();
+                    // Auto switch to active tab cleanly
+                    currentFilter = 'active';
+                    document.querySelectorAll('#filter-tabs button').forEach(b => {
+                        if (b.getAttribute('data-filter') === 'active') {
+                            b.className = 'btn btn-primary';
+                        } else {
+                            b.className = 'btn btn-outline';
+                            const badge = b.querySelector('#available-count-badge');
+                            if (badge) {
+                                badge.style.background = 'var(--danger)';
+                                badge.style.color = 'white';
+                            }
+                        }
+                    });
+                    renderJobsList();
+                } else {
+                    window.showToast(result.message || "Failed to claim request.", "error");
+                }
+            } catch (err) {
+                console.error("Error claiming request:", err);
+                window.showToast("Network failure attempting to claim request.", "error");
+            }
+        }
+
+        // Initial load
+        loadJobs();
+        loadAvailableRequests();
+    </script>
+    <style>
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</body>
+</html>

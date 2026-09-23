@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechanic Dashboard - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .stat-info h3 { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .stat-info p { color: var(--text-muted); font-size: 0.875rem; font-weight: 500; }
+        
+        .job-card { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; transition: transform 0.2s; }
+        .job-card:hover { transform: translateX(4px); }
+        .job-card.emergency { border-left-color: var(--danger); }
+        .job-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+        .job-details { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.875rem; margin-bottom: 1.5rem; }
+        .job-details span { color: var(--text-muted); }
+        .job-details strong { color: var(--text); font-weight: 500; }
+    </style>
+</head>
+<body>
+    <!-- Role: Mechanic -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="wrench" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">AutoCare</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <p class="nav-category" style="padding: 1rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Dashboard</p>
+                <a href="mechanic-dashboard.html" class="nav-item active">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                
+                <p class="nav-category" style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Service Center</p>
+                <a href="mechanic-assigned-jobs.html" class="nav-item">
+                    <i data-lucide="briefcase"></i> <span class="nav-text">Assigned Jobs</span>
+                </a>
+                <a href="mechanic-gigs.html" class="nav-item">
+                    <i data-lucide="tag"></i> <span class="nav-text">Manage Gigs</span>
+                </a>
+                <a href="mechanic-map.html" class="nav-item">
+                    <i data-lucide="map"></i> <span class="nav-text">Live Map & Pins</span>
+                </a>
+                
+                <p style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Management</p>
+                <a href="mechanic-messages.html" class="nav-item">
+                    <i data-lucide="message-square"></i> <span class="nav-text">Messages</span>
+                </a>
+                <a href="mechanic-calendar.html" class="nav-item">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Schedule</span>
+                </a>
+                <a href="mechanic-profile.html" class="nav-item">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h2 style="font-size: 1.125rem; font-weight: 600; margin-left: 0.5rem;">Mechanic Portal</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Clear all</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto; padding: 2rem 1rem; text-align: center; color: var(--text-muted);">
+                                <i data-lucide="bell-off" style="width: 28px; height: 28px; margin: 0 auto 0.5rem; opacity: 0.4;"></i>
+                                <p style="font-size: 0.85rem; font-weight: 500;">You are all caught up!</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">No unread mechanic notifications.</p>
+                            </div>
+                            <div style="padding: 0.75rem; border-top: 1px solid var(--border); text-align: center;">
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">AutoCare Notification Hub</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem;">
+                            <img src="https://ui-avatars.com/api/?name=Tariq+Mehmood&background=10B981&color=fff" alt="Mechanic" style="width: 36px; height: 36px; border-radius: 50%;">
+                            <div style="text-align: left; display: none;" class="desktop-user-info">
+                                <p style="font-size: 0.875rem; font-weight: 600;">Mechanic Name</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Senior Mechanic</p>
+                            </div>
+                            <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: var(--text-muted);"></i>
+                        </button>
+                        <div id="user-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 200px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                <p style="font-weight: 600;">Mechanic Name</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">mechanic@autocare.com</p>
+                            </div>
+                            <div style="padding: 0.5rem;">
+                                <a href="index.html" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--danger); border-radius: 4px;"><i data-lucide="log-out" style="width: 16px; height: 16px;"></i> Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div style="margin-bottom: 2rem;">
+                    <h1 style="font-size: 1.5rem; font-weight: 700;">Welcome, Tariq!</h1>
+                    <p id="active-jobs-subtext" style="color: var(--text-muted); margin-top: 0.25rem;">Syncing active jobs list...</p>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i data-lucide="clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-active">0</h3>
+                            <p>Assigned Jobs</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);">
+                            <i data-lucide="alert-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-recovery">0</h3>
+                            <p>Pending Recovery</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i data-lucide="check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-completed">0</h3>
+                            <p>Completed Services</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">
+                            <i data-lucide="badge-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-revenue">Rs. 0</h3>
+                            <p>Total Revenue</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+                    <!-- Today's Jobs -->
+                    <div>
+                        <!-- Available Client Requests (Immediate Claim Board) -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <h2 style="font-size: 1.25rem; font-weight: 600;">Available Owner Requests (Claim Board)</h2>
+                                <span style="background: var(--primary); color: white; font-size: 0.75rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px;" id="available-badge-count">0</span>
+                            </div>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.25rem;">
+                                <i data-lucide="shield-check" style="width: 14px; height: 14px; color: var(--success);"></i> Accept unassigned jobs
+                            </span>
+                        </div>
+
+                        <!-- Available Requests Container -->
+                        <div id="available-requests-container" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                                <i data-lucide="loader" class="spin" style="margin: 0 auto 0.5rem; width: 28px; height: 28px;"></i>
+                                <p>Checking live requests board...</p>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2.5rem; margin-bottom: 1rem;">
+                            <h2 style="font-size: 1.25rem; font-weight: 600;">Priority Jobs (Your Assigned Lineup)</h2>
+                            <a href="mechanic-assigned-jobs.html" style="font-size: 0.875rem; color: var(--primary); font-weight: 500;">View All</a>
+                        </div>
+
+                        <!-- Priority Jobs Real-Time Container -->
+                        <div id="priority-jobs-container" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                                <i data-lucide="loader" class="spin" style="margin: 0 auto 0.5rem; width: 28px; height: 28px;"></i>
+                                <p>Syncing priority jobs...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div>
+                        <div class="card" style="margin-top: 11.2rem;">
+                            <h2 class="card-title" style="margin-bottom: 1rem;">Quick Actions</h2>
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <button class="btn btn-outline" style="justify-content: flex-start; padding: 1rem;">
+                                    <i data-lucide="calendar"></i> View Schedule
+                                </button>
+                                <button class="btn btn-outline" style="justify-content: flex-start; padding: 1rem;">
+                                    <i data-lucide="wrench"></i> Request Parts
+                                </button>
+                                <button class="btn btn-outline" style="justify-content: flex-start; padding: 1rem;">
+                                    <i data-lucide="message-square"></i> Contact Admin
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Ensure proper role authentication on page enter
+        const token = localStorage.getItem('access_token');
+        const activeUser = JSON.parse(localStorage.getItem('activeUser') || '{}');
+        if (!token || activeUser.role !== 'mechanic') {
+            window.location.href = 'index.html';
+        }
+
+        // Set name dynamically on welcome heading
+        if (activeUser && activeUser.name) {
+            const h1El = document.querySelector('.content-area h1');
+            if (h1El) h1El.textContent = `Welcome, ${activeUser.name.split(' ')[0]}!`;
+        }
+
+        // Handle profile avatar in topbar
+        const userMenuBtn = document.getElementById('user-menu-btn');
+        if (userMenuBtn && activeUser && activeUser.name) {
+            userMenuBtn.innerHTML = `
+                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(activeUser.name)}&background=10B981&color=fff&bold=true" alt="User" style="width: 36px; height: 36px; border-radius: 50%;">
+            `;
+        }
+
+        // Render job details with beautiful card markup
+        function renderJobs(jobs) {
+            const container = document.getElementById('priority-jobs-container');
+            if (!container) return;
+
+            // Filter out completed jobs for priority card list
+            const activeJobs = jobs.filter(j => j.status !== 'completed');
+
+            if (activeJobs.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 4rem 1.5rem; background: var(--bg-card); border: 2px dashed var(--border); border-radius: 8px; color: var(--text-muted);">
+                        <i data-lucide="shield-check" style="margin: 0 auto 1.5rem; width: 44px; height: 44px; color: var(--success); opacity: 0.8;"></i>
+                        <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.25rem;">All tasks cleared!</h3>
+                        <p style="font-size: 0.875rem; max-width: 280px; margin: 0 auto;">No high-priority active service requests are currently assigned to you.</p>
+                    </div>
+                `;
+                if (window.lucide) lucide.createIcons();
+                return;
+            }
+
+            container.innerHTML = activeJobs.map(job => {
+                let badgeClass = 'badge-pending';
+                let formattedStatus = 'Pending';
+                if (job.status === 'in_progress') {
+                    badgeClass = 'badge-progress';
+                    formattedStatus = 'In Progress';
+                } else if (job.status === 'accepted') {
+                    badgeClass = 'badge-success';
+                    formattedStatus = 'Accepted';
+                } else if (job.status === 'on_the_way') {
+                    badgeClass = 'badge-warning';
+                    formattedStatus = 'On the Way';
+                } else if (job.status === 'arrived') {
+                    badgeClass = 'badge-info';
+                    formattedStatus = 'Arrived';
+                } else if (job.status === 'assigned') {
+                    badgeClass = 'badge-pending';
+                    formattedStatus = 'Pending Acceptance';
+                }
+                const formattedType = job.request_type ? job.request_type.charAt(0).toUpperCase() + job.request_type.slice(1) : 'Roadside Recovery';
+                const isRecovery = job.request_type === 'recovery';
+                const jobTitle = isRecovery ? 'Emergency recovery request' : `${formattedType} Request`;
+                
+                // Location display
+                const locationText = isRecovery ? `Lat: ${job.location_lat.toFixed(4)}, Lng: ${job.location_lng.toFixed(4)}` : 'Workshop Bay Spot';
+
+                return `
+                    <div class="job-card ${isRecovery ? 'emergency' : ''}" style="animation: fadeIn 0.2s ease-out;">
+                        <div class="job-header">
+                            <div>
+                                <h3 style="font-size: 1.125rem; font-weight: 600;">${jobTitle}</h3>
+                                <p style="font-size: 0.875rem; color: var(${isRecovery ? '--danger' : '--text-muted'}); font-weight: 500; margin-top: 0.25rem;">
+                                    <i data-lucide="${isRecovery ? 'alert-triangle' : 'clock'}" style="width: 14px; height: 14px; display: inline-block;"></i> 
+                                    REQ-${job.id} • ${new Date(job.created_at).toLocaleString()}
+                                </p>
+                            </div>
+                            <span class="badge ${badgeClass}">${formattedStatus}</span>
+                        </div>
+                        <div class="job-details">
+                            <div><span>Vehicle:</span> <br><strong>${job.vehicle ? `${job.vehicle.make} ${job.vehicle.model} (${job.vehicle.license_plate})` : 'Unspecified vehicle'}</strong></div>
+                            <div><span>Location:</span> <br><strong>${locationText}</strong></div>
+                            <div><span>Client:</span> <br><strong>${job.client ? `${job.client.full_name} (${job.client.phone_number})` : 'Direct Customer'}</strong></div>
+                            <div><span>Issue / Task:</span> <br><strong>${job.description || 'Routine auto verification check'}</strong></div>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button class="btn btn-primary" onclick="window.location.href='mechanic-assigned-jobs.html'">Accept & Manage Job</button>
+                            ${isRecovery ? `<button class="btn btn-outline" onclick="window.showToast('Locating coordinates: ${locationText}', 'info')"><i data-lucide="map-pin"></i> View Map</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // Fetch dashboard state
+        async function fetchDashboard() {
+            try {
+                const response = await fetch('/api/v1/mechanic/dashboard', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    const stats = result.data.stats;
+                    document.getElementById('stat-active').textContent = stats.activeJobs || 0;
+                    document.getElementById('stat-recovery').textContent = stats.pendingRecovery || 0;
+                    document.getElementById('stat-completed').textContent = stats.completed || 0;
+                    document.getElementById('stat-revenue').textContent = `Rs. ${(stats.revenue || 0).toLocaleString()}`;
+
+                    const subtext = document.getElementById('active-jobs-subtext');
+                    if (subtext) {
+                        subtext.textContent = `You have ${stats.activeJobs || 0} active job${stats.activeJobs === 1 ? '' : 's'} assigned to your profile today.`;
+                    }
+
+                    renderJobs(result.data.priorityJobs || []);
+                } else {
+                    window.showToast(result.message || 'Error updating dashboard metadata.', 'error');
+                }
+            } catch (err) {
+                console.error("Dashboard synchronization error:", err);
+                window.showToast('Unable to connect to active work schedules.', 'error');
+            }
+        }
+
+        // Fetch unassigned owner requests and update dashboard
+        async function fetchAvailableRequests() {
+            const container = document.getElementById('available-requests-container');
+            const badge = document.getElementById('available-badge-count');
+            if (!container) return;
+
+            try {
+                const response = await fetch('/api/v1/mechanic/available_requests', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    const requests = result.data || [];
+                    if (badge) badge.textContent = requests.length;
+
+                    if (requests.length === 0) {
+                        container.innerHTML = `
+                            <div style="text-align: center; padding: 3rem 1.5rem; background: var(--bg-card); border: 2px dashed var(--border); border-radius: 8px; color: var(--text-muted);">
+                                <i data-lucide="inbox" style="margin: 0 auto 1.25rem; width: 36px; height: 36px; opacity: 0.6;"></i>
+                                <h4 style="font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.25rem;">No unassigned requests</h4>
+                                <p style="font-size: 0.8rem; max-width: 250px; margin: 0 auto;">All client vehicle requests have been assigned. Check back later!</p>
+                            </div>
+                        `;
+                        if (window.lucide) lucide.createIcons();
+                        return;
+                    }
+
+                    container.innerHTML = requests.map(req => {
+                        const isRecovery = req.request_type === 'recovery';
+                        const formattedType = isRecovery ? 'Emergency Roadside Recovery' : (req.request_type ? req.request_type.charAt(0).toUpperCase() + req.request_type.slice(1) : 'Standard Service');
+                        const locationText = isRecovery ? `Lat: ${req.location_lat.toFixed(4)}, Lng: ${req.location_lng.toFixed(4)}` : 'Workshop Bay Spot';
+                        const reqStatusText = req.status ? req.status.toUpperCase() : 'PENDING';
+                        
+                        return `
+                            <div class="job-card ${isRecovery ? 'emergency' : ''}" style="animation: fadeIn 0.2s ease-out; border-left: 4px solid ${isRecovery ? '#ef4444' : 'var(--primary)'}; opacity: 0.95; transition: transform 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.95'">
+                                <div class="job-header">
+                                    <div>
+                                        <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-main);">${formattedType}</h3>
+                                        <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.25rem;">
+                                            <i data-lucide="hash" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i> 
+                                            REQ-${req.id} • ${new Date(req.created_at).toLocaleString()}
+                                        </p>
+                                    </div>
+                                    <span class="badge ${isRecovery ? 'badge-danger' : 'badge-pending'}" style="background: ${isRecovery ? 'rgba(239, 68, 68, 0.1)' : 'rgba(59, 130, 246, 0.1)'}; color: ${isRecovery ? '#ef4444' : '#3b82f6'}; border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.75rem; font-weight: 700;">${reqStatusText}</span>
+                                </div>
+                                <div class="job-details" style="margin-top: 1rem; margin-bottom: 1.25rem; line-height: 1.5; font-size: 0.875rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                    <div>
+                                        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Vehicle Details:</span> <br>
+                                        <strong>${req.vehicle ? `${req.vehicle.make} ${req.vehicle.model}` : 'Unspecified vehicle'}</strong>
+                                        ${req.vehicle && req.vehicle.license_plate ? `<br><span style="font-size: 0.8125rem; color: var(--text-muted);">Plate: ${req.vehicle.license_plate}</span>` : ''}
+                                        ${req.vehicle && req.vehicle.year ? `<br><span style="font-size: 0.8125rem; color: var(--text-muted);">Year: ${req.vehicle.year} ${req.vehicle.color ? `• ${req.vehicle.color}` : ''}</span>` : ''}
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Location / Coordinates:</span> <br>
+                                        <strong>${locationText}</strong>
+                                    </div>
+                                    <div style="grid-column: span 2; border-top: 1px dashed var(--border); padding-top: 0.5rem; margin-top: 0.25rem;">
+                                        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Client Contact:</span> <br>
+                                        <strong>${req.client ? `${req.client.full_name}` : 'Direct Customer'}</strong>
+                                        ${req.client && req.client.phone_number ? `<br><span style="font-size: 0.8125rem; color: var(--primary); display: inline-flex; align-items: center; gap: 0.25rem; margin-top: 0.15rem;"><i data-lucide="phone" style="width: 12px; height: 12px;"></i> ${req.client.phone_number}</span>` : ''}
+                                        ${req.client && req.client.email ? `<br><span style="font-size: 0.8125rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.25rem;"><i data-lucide="mail" style="width: 12px; height: 12px;"></i> ${req.client.email}</span>` : ''}
+                                    </div>
+                                    <div style="grid-column: span 2; border-top: 1px dashed var(--border); padding-top: 0.5rem;">
+                                        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Problem Symptom Description:</span> <br>
+                                        <strong style="font-weight: 500; font-family: var(--font-mono); font-size: 0.8125rem; color: var(--text-main);">${req.description || 'No detailed symptom list provided.'}</strong>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 0.75rem;">
+                                    <button class="btn btn-primary" onclick="claimRequest(${req.id})" style="font-size: 0.85rem; font-weight: 600; padding: 0.5rem 1rem;">
+                                        <i data-lucide="plus-circle" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i> Claim & Handle Request
+                                    </button>
+                                    ${isRecovery ? `<button class="btn btn-outline" onclick="window.showToast('Locating coordinates: ${locationText}', 'info')" style="padding: 0.5rem 1rem;"><i data-lucide="map-pin" style="width: 16px; height: 16px;"></i> Locate</button>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    if (window.lucide) lucide.createIcons();
+                } else {
+                    console.error("Failed to load claims stream", result.message);
+                }
+            } catch (err) {
+                console.error("Error syncing available requests board:", err);
+            }
+        }
+
+        // Action to claim an unassigned request
+        async function claimRequest(id) {
+            if (!confirm('Are you sure you want to claim and accept this service request? It will instantly be added to your active list.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/v1/mechanic/jobs/${id}/claim`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    window.showToast("Service request claimed & accepted successfully! Redirecting to handle job...", "success");
+                    setTimeout(() => {
+                        window.location.href = 'mechanic-assigned-jobs.html';
+                    }, 1000);
+                } else {
+                    window.showToast(result.message || "Failed to claim request.", "error");
+                }
+            } catch (err) {
+                console.error("Error claiming request:", err);
+                window.showToast("Network failure attempting to claim request.", "error");
+            }
+        }
+
+        // Fire initial sync
+        fetchDashboard();
+        fetchAvailableRequests();
+
+        if (window.innerWidth > 768) {
+            const userEl = document.querySelector('.desktop-user-info');
+            if (userEl) userEl.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

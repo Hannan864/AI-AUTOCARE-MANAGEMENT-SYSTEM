@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Request - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .tabs-container { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 2rem; overflow-x: auto; }
+        .tab-btn { padding: 1rem 1.5rem; font-weight: 500; color: var(--text-muted); border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 0.5rem; }
+        .tab-btn:hover { color: var(--text); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-content { display: none; animation: fadeIn 0.3s ease-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .form-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 2rem; max-width: 800px; margin: 0 auto; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
+        
+        .service-checkbox { display: none; }
+        .service-label { display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .service-label:hover { background: rgba(0,0,0,0.02); }
+        body:not(.light-mode) .service-label:hover { background: rgba(255,255,255,0.02); }
+        .service-checkbox:checked + .service-label { border-color: var(--primary); background: rgba(99, 102, 241, 0.05); }
+        .service-checkbox:checked + .service-label .check-icon { color: var(--primary); opacity: 1; }
+        .check-icon { opacity: 0; transition: opacity 0.2s; }
+    </style>
+</head>
+<body>
+    <!-- Role: User -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="wrench" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">AutoCare</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="user-dashboard.html" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="user-vehicles.html" class="nav-item">
+                    <i data-lucide="car"></i> <span class="nav-text">My Vehicles</span>
+                </a>
+                <a href="user-new-request.html" class="nav-item active">
+                    <i data-lucide="plus-circle"></i> <span class="nav-text">New Request</span>
+                </a>
+                <a href="user-my-requests.html" class="nav-item">
+                    <i data-lucide="clipboard-list"></i> <span class="nav-text">My Requests</span>
+                </a>
+                <a href="user-service-history.html" class="nav-item">
+                    <i data-lucide="history"></i> <span class="nav-text">Service History</span>
+                </a>
+                <a href="user-map.html" class="nav-item">
+                    <i data-lucide="map"></i> <span class="nav-text">Live Map & Pins</span>
+                </a>
+                <a href="user-messages.html" class="nav-item">
+                    <i data-lucide="message-square"></i> <span class="nav-text">Messages</span>
+                </a>
+                <a href="user-calendar.html" class="nav-item">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Appointments</span>
+                </a>
+                <a href="user-payments.html" class="nav-item">
+                    <i data-lucide="credit-card"></i> <span class="nav-text">Payments</span>
+                </a>
+                <a href="user-profile.html" class="nav-item">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h2 style="font-size: 1.125rem; font-weight: 600; margin-left: 0.5rem;">New Service Request</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Mark all as read</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border); background: rgba(99, 102, 241, 0.05);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">Service Update</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">New job assigned: Honda Civic (ABC-1234).</p>
+                                    <p style="font-size: 0.7rem; color: var(--primary); margin-top: 0.25rem;">Just now</p>
+                                </div>
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">New Message</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">User Name sent you a message.</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">2 hours ago</p>
+                                </div>
+                            </div>
+                            <div style="padding: 0.75rem; border-top: 1px solid var(--border); text-align: center;">
+                                <a href="#" style="font-size: 0.875rem; color: var(--primary); font-weight: 500;">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem;">
+                            <img src="https://ui-avatars.com/api/?name=Ahmed+Khan&background=6366F1&color=fff" alt="User" style="width: 36px; height: 36px; border-radius: 50%;">
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area" style="padding: 1rem;">
+                <div class="tabs-container">
+                    <button class="tab-btn active" data-target="maintenance">
+                        <i data-lucide="wrench"></i> Maintenance
+                    </button>
+                    <button class="tab-btn" data-target="repair">
+                        <i data-lucide="settings"></i> Repair
+                    </button>
+                    <button class="tab-btn" data-target="recovery">
+                        <i data-lucide="truck"></i> Emergency Recovery
+                    </button>
+                </div>
+
+                <!-- Maintenance Tab -->
+                <div id="maintenance" class="tab-content active">
+                    <div class="form-section">
+                        <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem;">Schedule Maintenance</h3>
+                        
+                        <!-- No Hired Mechanics Warning for Maintenance -->
+                        <div id="no-hired-mechanics-warning-maintenance" style="display: none; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; padding: 1.5rem; text-align: center; margin-bottom: 1.5rem;">
+                            <i data-lucide="alert-circle" style="width: 36px; height: 36px; color: var(--danger); margin: 0 auto 0.75rem; display: block;"></i>
+                            <h4 style="font-weight: 600; font-size: 1rem; color: var(--text); margin-bottom: 0.5rem;">No Hired Mechanics Found</h4>
+                            <p style="color: var(--text-muted); font-size: 0.875rem; max-width: 500px; margin: 0 auto 1.25rem;">You cannot submit a maintenance request randomly. Please browse available Gigs, propose a price offer in the chat, and hire your preferred mechanic first.</p>
+                            <button type="button" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0 auto;" onclick="window.location.href='user-gigs.html'">
+                                <i data-lucide="search" style="width: 16px; height: 16px;"></i> Go to Gigs
+                            </button>
+                        </div>
+
+                        <form id="maintenanceForm">
+                            <div style="margin-bottom: 1.5rem;" id="hired-mechanic-selector-container-maintenance">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Select Hired Mechanic</label>
+                                <select class="form-control" id="hiredMechanicSelectMaintenance" required>
+                                    <option value="">Loading hired mechanics...</option>
+                                </select>
+                                <p style="font-size: 0.75rem; color: var(--success); margin-top: 0.35rem; display: flex; align-items: center; gap: 0.25rem;">
+                                    <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i> You can toggle between your hired mechanics for this maintenance request.
+                                </p>
+                            </div>
+
+                            <div class="form-grid">
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Select Vehicle</label>
+                                    <select class="form-control" required id="mVehicles">
+                                        <option value="">Loading your vehicles...</option>
+                                    </select>
+                                </div>
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Preferred Date</label>
+                                    <input type="date" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <label style="display: block; margin-bottom: 1rem; font-weight: 500;">Select Services Required</label>
+                            <div class="form-grid" style="margin-bottom: 1.5rem;">
+                                <div>
+                                    <input type="checkbox" id="srv-oil" class="service-checkbox">
+                                    <label for="srv-oil" class="service-label">
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 500;">Oil Change</div>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);">Includes filter replacement</div>
+                                        </div>
+                                        <i data-lucide="check-circle" class="check-icon"></i>
+                                    </label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="srv-tune" class="service-checkbox">
+                                    <label for="srv-tune" class="service-label">
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 500;">Engine Tuning</div>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);">Spark plugs, throttle body</div>
+                                        </div>
+                                        <i data-lucide="check-circle" class="check-icon"></i>
+                                    </label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="srv-brake" class="service-checkbox">
+                                    <label for="srv-brake" class="service-label">
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 500;">Brake Service</div>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);">Pad check and fluid top-up</div>
+                                        </div>
+                                        <i data-lucide="check-circle" class="check-icon"></i>
+                                    </label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="srv-wash" class="service-checkbox">
+                                    <label for="srv-wash" class="service-label">
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 500;">Car Wash & Polish</div>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);">Exterior and interior detailing</div>
+                                        </div>
+                                        <i data-lucide="check-circle" class="check-icon"></i>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 1.5rem;">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Additional Notes</label>
+                                <textarea class="form-control" rows="4" placeholder="Any specific issues or instructions..."></textarea>
+                            </div>
+
+                            <div style="display: flex; justify-content: flex-end;">
+                                <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">Submit Request</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Repair Tab -->
+                <div id="repair" class="tab-content">
+                    <div class="form-section">
+                        <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem;">Request Repair</h3>
+                        
+                        <!-- No Hired Mechanics Warning -->
+                        <div id="no-hired-mechanics-warning" style="display: none; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; padding: 1.5rem; text-align: center; margin-bottom: 1.5rem;">
+                            <i data-lucide="alert-circle" style="width: 36px; height: 36px; color: var(--danger); margin: 0 auto 0.75rem; display: block;"></i>
+                            <h4 style="font-weight: 600; font-size: 1rem; color: var(--text); margin-bottom: 0.5rem;">No Hired Mechanics Found</h4>
+                            <p style="color: var(--text-muted); font-size: 0.875rem; max-width: 500px; margin: 0 auto 1.25rem;">You cannot submit a repair request randomly. Please browse available Gigs, propose a price offer in the chat, and hire your preferred mechanic first.</p>
+                            <button type="button" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0 auto;" onclick="window.location.href='user-gigs.html'">
+                                <i data-lucide="search" style="width: 16px; height: 16px;"></i> Go to Gigs
+                            </button>
+                        </div>
+
+                        <form id="repairForm">
+                            <div style="margin-bottom: 1.5rem;" id="hired-mechanic-selector-container">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Select Hired Mechanic</label>
+                                <select class="form-control" id="hiredMechanicSelect" required>
+                                    <option value="">Loading hired mechanics...</option>
+                                </select>
+                                <p style="font-size: 0.75rem; color: var(--success); margin-top: 0.35rem; display: flex; align-items: center; gap: 0.25rem;">
+                                    <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i> You can toggle between your hired mechanics for this repair request.
+                                </p>
+                            </div>
+
+                            <div class="form-grid">
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Select Vehicle</label>
+                                    <select class="form-control" required id="rVehicles">
+                                        <option value="">Loading your vehicles...</option>
+                                    </select>
+                                </div>
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Issue Category</label>
+                                    <select class="form-control" required>
+                                        <option value="">Select category...</option>
+                                        <option value="engine">Engine / Mechanical</option>
+                                        <option value="electrical">Electrical / Battery</option>
+                                        <option value="ac">A/C & Heating</option>
+                                        <option value="suspension">Suspension & Steering</option>
+                                        <option value="body">Bodywork / Denting</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 1.5rem;">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Describe the Problem</label>
+                                <textarea class="form-control" rows="5" placeholder="Please describe the symptoms, noises, or issues you are experiencing in detail..." required></textarea>
+                            </div>
+
+                            <div style="margin-bottom: 1.5rem;">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Upload Photos/Video (Optional)</label>
+                                <div id="drop-zone" style="border: 2px dashed var(--border); border-radius: 8px; padding: 2rem; text-align: center; color: var(--text-muted); cursor: pointer; transition: all 0.2s;" onclick="document.getElementById('file-upload').click()">
+                                    <input type="file" id="file-upload" name="file" accept="image/jpeg, image/png, video/mp4" style="display: none;" onchange="handleFileSelect(event)">
+                                    <i data-lucide="upload-cloud" style="width: 32px; height: 32px; margin-bottom: 0.5rem;"></i>
+                                    <p id="file-name-display">Click or drag files here to upload</p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; justify-content: flex-end;">
+                                <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">Submit Request</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Recovery Tab -->
+                <div id="recovery" class="tab-content">
+                    <div class="form-section" style="border-color: var(--danger);">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; color: var(--danger);">
+                            <i data-lucide="alert-triangle" style="width: 32px; height: 32px;"></i>
+                            <h3 style="font-size: 1.25rem; font-weight: 600;">Emergency Recovery</h3>
+                        </div>
+                        <p style="color: var(--text-muted); margin-bottom: 2rem;">If your vehicle has broken down or been in an accident, use this form to request immediate towing and recovery services.</p>
+                        
+                        <!-- No Hired Mechanics Warning for Recovery -->
+                        <div id="no-hired-mechanics-warning-recovery" style="display: none; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; padding: 1.5rem; text-align: center; margin-bottom: 1.5rem;">
+                            <i data-lucide="alert-circle" style="width: 36px; height: 36px; color: var(--danger); margin: 0 auto 0.75rem; display: block;"></i>
+                            <h4 style="font-weight: 600; font-size: 1rem; color: var(--text); margin-bottom: 0.5rem;">No Hired Mechanics Found</h4>
+                            <p style="color: var(--text-muted); font-size: 0.875rem; max-width: 500px; margin: 0 auto 1.25rem;">You cannot submit a recovery request randomly. Please browse available Gigs, propose a price offer in the chat, and hire your preferred mechanic first.</p>
+                            <button type="button" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0 auto;" onclick="window.location.href='user-gigs.html'">
+                                <i data-lucide="search" style="width: 16px; height: 16px;"></i> Go to Gigs
+                            </button>
+                        </div>
+
+                        <form id="recoveryForm">
+                            <div style="margin-bottom: 1.5rem;" id="hired-mechanic-selector-container-recovery">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Select Hired Mechanic</label>
+                                <select class="form-control" id="hiredMechanicSelectRecovery" required>
+                                    <option value="">Loading hired mechanics...</option>
+                                </select>
+                                <p style="font-size: 0.75rem; color: var(--success); margin-top: 0.35rem; display: flex; align-items: center; gap: 0.25rem;">
+                                    <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i> You can toggle between your hired mechanics for this recovery request.
+                                </p>
+                            </div>
+
+                            <div class="form-grid">
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Select Vehicle</label>
+                                    <select class="form-control" required>
+                                        <option value="">Loading your vehicles...</option>
+                                    </select>
+                                </div>
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Current Location</label>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <input type="text" class="form-control" placeholder="E.g. Murree Road, Rawalpindi" required>
+                                        <button type="button" class="btn btn-outline" title="Use GPS" onclick="window.showToast('Fetching GPS location...', 'info')">
+                                            <i data-lucide="map-pin"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 1.5rem;">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Situation Description</label>
+                                <textarea class="form-control" rows="3" placeholder="E.g. Flat tire, engine won't start, accident..." required></textarea>
+                            </div>
+
+                            <div style="display: flex; justify-content: flex-end;">
+                                <button type="submit" class="btn" style="background: var(--danger); color: white; padding: 0.75rem 2rem;">
+                                    <i data-lucide="phone-call"></i> Request Immediate Help
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // Drag and Drop Logic
+        const dropZone = document.getElementById('drop-zone');
+        const fileUpload = document.getElementById('file-upload');
+        const fileNameDisplay = document.getElementById('file-name-display');
+
+        if (dropZone && fileUpload) {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                dropZone.style.borderColor = 'var(--primary)';
+                dropZone.style.backgroundColor = 'rgba(99, 102, 241, 0.05)';
+            }
+
+            function unhighlight(e) {
+                dropZone.style.borderColor = 'var(--border)';
+                dropZone.style.backgroundColor = 'transparent';
+            }
+
+            dropZone.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                let dt = e.dataTransfer;
+                let files = dt.files;
+                fileUpload.files = files;
+                updateFileNameDisplay();
+            }
+        }
+
+        function handleFileSelect(e) {
+            updateFileNameDisplay();
+        }
+
+        function updateFileNameDisplay() {
+            if (fileUpload && fileUpload.files.length > 0) {
+                const file = fileUpload.files[0];
+                fileNameDisplay.textContent = file.name;
+                
+                // Image preview if it's an image
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        let existingImg = dropZone.querySelector('.preview-img');
+                        if (!existingImg) {
+                            existingImg = document.createElement('img');
+                            existingImg.className = 'preview-img';
+                            existingImg.style.maxWidth = '100px';
+                            existingImg.style.maxHeight = '100px';
+                            existingImg.style.marginTop = '1rem';
+                            existingImg.style.borderRadius = '8px';
+                            dropZone.appendChild(existingImg);
+                        }
+                        existingImg.src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    const existingImg = dropZone.querySelector('.preview-img');
+                    if (existingImg) existingImg.remove();
+                }
+            } else {
+                fileNameDisplay.textContent = 'Click or drag files here to upload';
+                const existingImg = dropZone.querySelector('.preview-img');
+                if (existingImg) existingImg.remove();
+            }
+        }
+
+        // Tab Switching Logic
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked
+                btn.classList.add('active');
+                const target = document.getElementById(btn.getAttribute('data-target'));
+                target.classList.add('active');
+            });
+        });
+
+        // Pre-select vehicle if passed in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const vehicleParam = urlParams.get('vehicle');
+        if (vehicleParam) {
+            const selects = document.querySelectorAll('select');
+            selects.forEach(select => {
+                const option = Array.from(select.options).find(opt => opt.value === vehicleParam);
+                if (option) select.value = vehicleParam;
+            });
+        }
+
+        const titleParam = urlParams.get('title');
+        const descParam = urlParams.get('desc');
+        const typeParam = urlParams.get('type');
+        
+        if (titleParam || descParam) {
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                let prefilledText = "";
+                if (titleParam) prefilledText += `Booking Specialty Package: ${titleParam}\n`;
+                if (descParam) prefilledText += `Details: ${descParam}`;
+                textarea.value = prefilledText;
+            });
+            
+            if (typeParam === 'recovery') {
+                const recoveryBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('data-target') === 'recovery');
+                if (recoveryBtn) {
+                    recoveryBtn.click();
+                }
+            } else {
+                const repairBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('data-target') === 'repair');
+                if (repairBtn) {
+                    repairBtn.click();
+                }
+            }
+        }
+
+        // Mechanic Selection & Draft Restore Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const draftCategory = sessionStorage.getItem('repair_draft_category');
+            const draftDesc = sessionStorage.getItem('repair_draft_desc');
+            
+            if (draftCategory) {
+                const catSelect = document.querySelectorAll('#repairForm select')[1];
+                if (catSelect) catSelect.value = draftCategory;
+                sessionStorage.removeItem('repair_draft_category');
+            }
+            if (draftDesc) {
+                const descArea = document.querySelector('#repairForm textarea');
+                if (descArea) descArea.value = draftDesc;
+                sessionStorage.removeItem('repair_draft_desc');
+            }
+            
+            loadHiredMechanics();
+        });
+
+        const loadHiredMechanics = async () => {
+            const token = localStorage.getItem('access_token');
+            if (!token) return;
+
+            // Repair elements
+            const selectEl = document.getElementById('hiredMechanicSelect');
+            const warnEl = document.getElementById('no-hired-mechanics-warning');
+            const selectorContainer = document.getElementById('hired-mechanic-selector-container');
+            const formEl = document.getElementById('repairForm');
+            const submitBtn = formEl ? formEl.querySelector('button[type="submit"]') : null;
+
+            // Maintenance elements
+            const selectM = document.getElementById('hiredMechanicSelectMaintenance');
+            const warnM = document.getElementById('no-hired-mechanics-warning-maintenance');
+            const containerM = document.getElementById('hired-mechanic-selector-container-maintenance');
+            const formM = document.getElementById('maintenanceForm');
+            const submitBtnM = formM ? formM.querySelector('button[type="submit"]') : null;
+
+            // Recovery elements
+            const selectR = document.getElementById('hiredMechanicSelectRecovery');
+            const warnR = document.getElementById('no-hired-mechanics-warning-recovery');
+            const containerR = document.getElementById('hired-mechanic-selector-container-recovery');
+            const formR = document.getElementById('recoveryForm');
+            const submitBtnR = formR ? formR.querySelector('button[type="submit"]') : null;
+
+            try {
+                const res = await fetch('/api/v1/hired_mechanics', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const payload = await res.json();
+                if (payload.success) {
+                    const hired = payload.data || [];
+                    if (hired.length === 0) {
+                        // Warn them & restrict submission on all three tabs
+                        [
+                            { select: selectEl, warn: warnEl, container: selectorContainer, btn: submitBtn, form: formEl },
+                            { select: selectM, warn: warnM, container: containerM, btn: submitBtnM, form: formM },
+                            { select: selectR, warn: warnR, container: containerR, btn: submitBtnR, form: formR }
+                        ].forEach(group => {
+                            if (group.warn) group.warn.style.display = 'block';
+                            if (group.container) group.container.style.display = 'none';
+                            if (group.btn) {
+                                group.btn.disabled = true;
+                                group.btn.title = "You must hire a mechanic first.";
+                                group.btn.style.opacity = '0.5';
+                                group.btn.style.cursor = 'not-allowed';
+                            }
+                            if (group.form) {
+                                const fields = group.form.querySelectorAll('.form-grid, textarea, .form-control, label');
+                                fields.forEach(f => {
+                                    if (f.id !== 'hiredMechanicSelect' && f.id !== 'hiredMechanicSelectMaintenance' && f.id !== 'hiredMechanicSelectRecovery' && !f.closest('#hired-mechanic-selector-container-maintenance') && !f.closest('#hired-mechanic-selector-container-recovery') && !f.closest('#hired-mechanic-selector-container')) {
+                                        f.style.display = 'none';
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        // We have hired mechanics! Populate all three select elements
+                        let options = hired.map(h => `<option value="${h.mechanic_id}">${h.mechanic_name} (Agreed Price: Rs. ${h.agreed_price || 'Negotiated'})</option>`).join('');
+                        
+                        [
+                            { select: selectEl, warn: warnEl, container: selectorContainer, btn: submitBtn, form: formEl },
+                            { select: selectM, warn: warnM, container: containerM, btn: submitBtnM, form: formM },
+                            { select: selectR, warn: warnR, container: containerR, btn: submitBtnR, form: formR }
+                        ].forEach(group => {
+                            if (group.warn) group.warn.style.display = 'none';
+                            if (group.container) group.container.style.display = 'block';
+                            if (group.btn) {
+                                group.btn.disabled = false;
+                                group.btn.title = "";
+                                group.btn.style.opacity = '1';
+                                group.btn.style.cursor = 'pointer';
+                            }
+                            if (group.select) group.select.innerHTML = options;
+                            if (group.form) {
+                                const fields = group.form.querySelectorAll('.form-grid, textarea, .form-control, label');
+                                fields.forEach(f => f.style.display = '');
+                            }
+                        });
+
+                        // Check URL param hired_mechanic_id or last hired mechanic to pre-select
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const hiredMechId = urlParams.get('hired_mechanic_id');
+                        if (hiredMechId) {
+                            if (selectEl) selectEl.value = hiredMechId;
+                            if (selectM) selectM.value = hiredMechId;
+                            if (selectR) selectR.value = hiredMechId;
+                            
+                            // Auto switch to repair tab
+                            const repairBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('data-target') === 'repair');
+                            if (repairBtn) repairBtn.click();
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Error loading hired mechanics:", err);
+            }
+        };
+
+        // Form Submissions
+        const handleFileUpload = async (entityType, entityId, fileInput) => {
+            if (!fileInput.files || fileInput.files.length === 0) return;
+            const token = localStorage.getItem('access_token');
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const rs = await fetch(`/api/uploads?entity_type=${entityType}&entity_id=${entityId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                const res = await rs.json();
+                if(!res.success) {
+                    window.showToast('Failed to upload file: ' + res.message, 'error');
+                }
+            } catch (err) {
+                console.error("Upload error:", err);
+                window.showToast('Upload error', 'error');
+            }
+        };
+
+        const renderVehicles = async () => {
+            const token = localStorage.getItem('access_token');
+            if(!token) return;
+            try {
+                const rs = await fetch('/api/v1/vehicles', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const res = await rs.json();
+                if(res.success && res.data) {
+                    const options = `<option value="">Choose a vehicle...</option>` + 
+                        res.data.map(v => `<option value="${v.id}">${v.make} ${v.model} (${v.license_plate || v.registration_number})</option>`).join('');
+                    
+                    document.querySelectorAll('form select').forEach(s => {
+                        const label = s.parentElement ? s.parentElement.querySelector('label') : null;
+                        if (label && label.textContent.toLowerCase().includes('vehicle')) {
+                            s.innerHTML = options;
+                        }
+                    });
+
+                    // Restore draft vehicle from sessionStorage if present
+                    const draftVehicle = sessionStorage.getItem('repair_draft_vehicle');
+                    if (draftVehicle) {
+                        document.querySelectorAll('form select').forEach(s => {
+                            const label = s.parentElement ? s.parentElement.querySelector('label') : null;
+                            if (label && label.textContent.toLowerCase().includes('vehicle')) {
+                                s.value = draftVehicle;
+                            }
+                        });
+                        sessionStorage.removeItem('repair_draft_vehicle');
+                    } else {
+                        // Auto-select based on query parameter
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const vehicleIdParam = urlParams.get('vehicle_id') || urlParams.get('vehicle');
+                        if (vehicleIdParam) {
+                            document.querySelectorAll('form select').forEach(s => {
+                                const label = s.parentElement ? s.parentElement.querySelector('label') : null;
+                                if (label && label.textContent.toLowerCase().includes('vehicle')) {
+                                    s.value = vehicleIdParam;
+                                }
+                            });
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching vehicles:", err);
+            }
+        };
+        renderVehicles();
+
+        const submitRequest = async (form, type) => {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.showToast('Please log in first', 'error');
+                return;
+            }
+
+            const btn = form.querySelector('button[type="submit"]');
+            const originalHtml = btn.innerHTML;
+            
+            btn.innerHTML = '<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; margin-right: 4px;"></i> Verifying parameters...';
+            lucide.createIcons();
+            btn.disabled = true;
+
+            const vehicleSelect = form.querySelector('select');
+            const vehicleId = vehicleSelect ? vehicleSelect.value : null;
+
+            if (!vehicleId) {
+                window.showToast('Please select a vehicle', 'error');
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+                lucide.createIcons();
+                return;
+            }
+
+            // Step 1 delay
+            await new Promise(resolve => setTimeout(resolve, 400));
+            btn.innerHTML = '<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; margin-right: 4px;"></i> Checking expert schedules...';
+            lucide.createIcons();
+
+            // Step 2 delay
+            await new Promise(resolve => setTimeout(resolve, 400));
+            btn.innerHTML = '<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; margin-right: 4px;"></i> Dispatching request...';
+            lucide.createIcons();
+
+            try {
+                if (type === 'recovery') {
+                    const descInput = form.querySelector('textarea');
+                    const locInput = form.querySelector('input[type="text"]');
+                    
+                    const payload = {
+                        vehicle_id: parseInt(vehicleId),
+                        location_lat: 0.0,
+                        location_lng: 0.0,
+                        description: `Location: ${locInput ? locInput.value : 'Unknown'} - ${descInput ? descInput.value : ''}`
+                    };
+
+                    const mId = document.getElementById('hiredMechanicSelectRecovery').value;
+                    if (mId) {
+                        payload.mechanic_id = parseInt(mId);
+                    } else {
+                        window.showToast('Please select a hired mechanic', 'warning');
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                        lucide.createIcons();
+                        return;
+                    }
+
+                    const response = await fetch('/api/service_requests/recovery', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        btn.innerHTML = '<i data-lucide="check" style="width: 14px; height: 14px; margin-right: 4px;"></i> Dispatched! Settle...';
+                        lucide.createIcons();
+                        window.showToast('Emergency recovery request dispatched successfully!', 'success');
+                        setTimeout(() => window.location.href = 'user-my-requests.html', 1500);
+                    } else {
+                        window.showToast(data.message || 'Error submitting request', 'error');
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                        lucide.createIcons();
+                    }
+                    
+                } else {
+                    const descInput = form.querySelector('textarea');
+                    let description = descInput ? descInput.value : '';
+                    
+                    if (type === 'maintenance') {
+                        const servicesChecked = Array.from(form.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.nextElementSibling.querySelector('div > div:first-child').textContent.trim());
+                        if (servicesChecked.length > 0) {
+                            description = "Services requested: " + servicesChecked.join(', ') + ". " + description;
+                        }
+                    }
+
+                    const payload = {
+                        vehicle_id: parseInt(vehicleId),
+                        request_type: type, // 'maintenance' or 'repair'
+                        description: description
+                    };
+
+                    // Include selected mechanic/gig for both Maintenance & Repair
+                    const selectId = type === 'maintenance' ? 'hiredMechanicSelectMaintenance' : 'hiredMechanicSelect';
+                    const mId = document.getElementById(selectId).value;
+                    if (mId) {
+                        payload.mechanic_id = parseInt(mId);
+                    } else {
+                        window.showToast('Please select a hired mechanic', 'warning');
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                        lucide.createIcons();
+                        return;
+                    }
+
+                    const response = await fetch('/api/service_requests', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        // Check if file is uploaded
+                        if (type === 'repair') {
+                            const fileUpload = document.getElementById('file-upload');
+                            if (fileUpload && fileUpload.files.length > 0) {
+                                btn.innerHTML = '<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; margin-right: 4px;"></i> Uploading diagnostics file...';
+                                lucide.createIcons();
+                                await handleFileUpload('service_request', data.data.id, fileUpload);
+                            }
+                        }
+                        
+                        btn.innerHTML = '<i data-lucide="check" style="width: 14px; height: 14px; margin-right: 4px;"></i> Dispatched! Settle...';
+                        lucide.createIcons();
+                        window.showToast('Service request submitted successfully!', 'success');
+                        setTimeout(() => window.location.href = 'user-my-requests.html', 1500);
+                    } else {
+                        window.showToast(data.message || 'Error submitting request', 'error');
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                        lucide.createIcons();
+                    }
+                }
+            } catch (error) {
+                window.showToast('Network error occurred', 'error');
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+                lucide.createIcons();
+            }
+        };
+
+        const maintenanceForm = document.getElementById('maintenanceForm');
+        if (maintenanceForm) {
+            maintenanceForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitRequest(this, 'maintenance');
+            });
+        }
+        
+        const repairForm = document.getElementById('repairForm');
+        if (repairForm) {
+            repairForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitRequest(this, 'repair');
+            });
+        }
+        
+        const recoveryForm = document.getElementById('recoveryForm');
+        if (recoveryForm) {
+            recoveryForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitRequest(this, 'recovery');
+            });
+        }
+    </script>
+    <style>
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</body>
+</html>

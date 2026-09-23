@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service History - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <!-- Role: User -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="wrench" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">AutoCare</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="user-dashboard.html" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="user-vehicles.html" class="nav-item">
+                    <i data-lucide="car"></i> <span class="nav-text">My Vehicles</span>
+                </a>
+                <a href="user-new-request.html" class="nav-item">
+                    <i data-lucide="plus-circle"></i> <span class="nav-text">New Request</span>
+                </a>
+                <a href="user-my-requests.html" class="nav-item">
+                    <i data-lucide="clipboard-list"></i> <span class="nav-text">My Requests</span>
+                </a>
+                <a href="user-service-history.html" class="nav-item active">
+                    <i data-lucide="history"></i> <span class="nav-text">Service History</span>
+                </a>
+                <a href="user-map.html" class="nav-item">
+                    <i data-lucide="map"></i> <span class="nav-text">Live Map & Pins</span>
+                </a>
+                <a href="user-messages.html" class="nav-item">
+                    <i data-lucide="message-square"></i> <span class="nav-text">Messages</span>
+                </a>
+                <a href="user-calendar.html" class="nav-item">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Appointments</span>
+                </a>
+                <a href="user-payments.html" class="nav-item">
+                    <i data-lucide="credit-card"></i> <span class="nav-text">Payments</span>
+                </a>
+                <a href="user-profile.html" class="nav-item">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h2 style="font-size: 1.125rem; font-weight: 600; margin-left: 0.5rem;">Service History</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Mark all as read</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border); background: rgba(99, 102, 241, 0.05);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">Service Update</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">New job assigned: Honda Civic (ABC-1234).</p>
+                                    <p style="font-size: 0.7rem; color: var(--primary); margin-top: 0.25rem;">Just now</p>
+                                </div>
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">New Message</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">User Name sent you a message.</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">2 hours ago</p>
+                                </div>
+                            </div>
+                            <div style="padding: 0.75rem; border-top: 1px solid var(--border); text-align: center;">
+                                <a href="#" style="font-size: 0.875rem; color: var(--primary); font-weight: 500;">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem;">
+                            <img src="https://ui-avatars.com/api/?name=Ahmed+Khan&background=6366F1&color=fff" alt="User" style="width: 36px; height: 36px; border-radius: 50%;">
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Summary Stats -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                    <div class="card" style="margin-bottom: 0;">
+                        <h4 style="font-size: 0.875rem; color: var(--text-muted);">Total Completed</h4>
+                        <p style="font-size: 1.5rem; font-weight: 700; margin-top: 0.5rem;">24</p>
+                    </div>
+                    <div class="card" style="margin-bottom: 0;">
+                        <h4 style="font-size: 0.875rem; color: var(--text-muted);">Upcoming</h4>
+                        <p style="font-size: 1.5rem; font-weight: 700; margin-top: 0.5rem;">2</p>
+                    </div>
+                    <div class="card" style="margin-bottom: 0;">
+                        <h4 style="font-size: 0.875rem; color: var(--text-muted);">Total Spent</h4>
+                        <p style="font-size: 1.5rem; font-weight: 700; margin-top: 0.5rem;">Rs. 42,500</p>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="card" style="margin-bottom: 1rem; padding: 1rem;">
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <input type="text" class="form-control" placeholder="Search services..." style="flex: 1;">
+                        <select class="form-control">
+                            <option>All Statuses</option>
+                            <option>Completed</option>
+                            <option>Upcoming</option>
+                            <option>In Progress</option>
+                        </select>
+                        <input type="date" class="form-control">
+                    </div>
+                </div>
+
+                <!-- Main Content List -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Service Timeline</h2>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Request ID</th>
+                                    <th>Vehicle</th>
+                                    <th>Service Type</th>
+                                    <th>Date</th>
+                                    <th>Cost</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-tbody">
+                                <!-- JS will populate this -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rating Modal -->
+            <div id="ratingModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center;">
+                <div class="card" style="width: 100%; max-width: 400px; position: relative;">
+                    <button onclick="document.getElementById('ratingModal').style.display='none'" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; cursor: pointer; color: var(--text-muted);">
+                        <i data-lucide="x"></i>
+                    </button>
+                    <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Rate Mechanic</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.875rem;">How was your experience with Mechanic Name?</p>
+                    
+                    <div style="display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; color: var(--warning);">
+                        <i data-lucide="star" style="width: 32px; height: 32px; cursor: pointer; fill: currentColor;"></i>
+                        <i data-lucide="star" style="width: 32px; height: 32px; cursor: pointer; fill: currentColor;"></i>
+                        <i data-lucide="star" style="width: 32px; height: 32px; cursor: pointer; fill: currentColor;"></i>
+                        <i data-lucide="star" style="width: 32px; height: 32px; cursor: pointer; fill: currentColor;"></i>
+                        <i data-lucide="star" style="width: 32px; height: 32px; cursor: pointer;"></i>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Review (Optional)</label>
+                        <textarea class="form-control" rows="3" placeholder="Write your review here..."></textarea>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="document.getElementById('ratingModal').style.display='none'; window.showToast('Review submitted successfully!', 'success')">Submit Review</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        async function loadServiceHistory() {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const tbody = document.getElementById('history-tbody');
+            if(!tbody) return;
+            
+            try {
+                // Fetch vehicles first for mapping
+                const vehicleRs = await fetch('/api/v1/vehicles', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const vehicleRes = await vehicleRs.json();
+                const vehiclesMap = {};
+                if (vehicleRes.success && vehicleRes.data) {
+                    vehicleRes.data.forEach(v => {
+                        vehiclesMap[v.id] = {
+                            name: `${v.make} ${v.model}`,
+                            plate: v.license_plate || v.registration_number
+                        };
+                    });
+                }
+
+                // Fetch service requests
+                const reqRs = await fetch('/api/service_requests/my_requests', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const reqRes = await reqRs.json();
+
+                // Fetch recovery requests
+                const recRs = await fetch('/api/service_requests/my_recoveries', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const recRes = await recRs.json();
+
+                let allRequests = [];
+                if (reqRes.success && reqRes.data) {
+                    allRequests = allRequests.concat(reqRes.data);
+                }
+                if (recRes.success && recRes.data) {
+                    allRequests = allRequests.concat(recRes.data);
+                }
+
+                // Filter for completed service requests only
+                const completedRequests = allRequests.filter(r => (r.status || '').toLowerCase() === 'completed');
+
+                // Sort by date DESC
+                completedRequests.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+                if (completedRequests.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 4rem 1rem;">
+                                <i data-lucide="info" style="margin: 0 auto 1.5rem; width: 32px; height: 32px; opacity: 0.5;"></i>
+                                <p style="font-weight: 500;">No completed service records found.</p>
+                            </td>
+                        </tr>
+                    `;
+                    lucide.createIcons();
+                    return;
+                }
+
+                tbody.innerHTML = completedRequests.map(req => {
+                    const veh = vehiclesMap[req.vehicle_id] || { name: 'Unknown Vehicle', plate: 'N/A' };
+                    const formattedDate = new Date(req.created_at).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    
+                    return `
+                        <tr>
+                            <td><span style="padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; background: rgba(34, 197, 94, 0.1); color: #22c55e;">Completed</span></td>
+                            <td style="font-weight: 500;">REQ-${req.id}</td>
+                            <td>${veh.name} (${veh.plate})</td>
+                            <td>${req.request_type ? req.request_type.charAt(0).toUpperCase() + req.request_type.slice(1) : 'Maintenance'}</td>
+                            <td>${formattedDate}</td>
+                            <td>Rs. ${req.cost || '8,500'}</td>
+                            <td>
+                                <button class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="window.showToast('Downloading invoice...', 'info')">Invoice</button>
+                                <button class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem; margin-left: 0.5rem;" onclick="document.getElementById('ratingModal').style.display='flex'">Rate</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                lucide.createIcons();
+            } catch (err) {
+                console.error("Error loading service history:", err);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--danger); padding: 4rem 1rem;">
+                            Failed to read completed services logs.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Initialize history loading
+        loadServiceHistory();
+    </script>
+</body>
+</html>

@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .stat-info h3 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .stat-info p { color: var(--text-muted); font-size: 0.875rem; font-weight: 500; }
+        
+        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+        @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        
+        /* Modal styling */
+        .modal-backdrop {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.2s ease-out;
+        }
+        .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            animation: modalSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes modalSlide {
+            from { transform: translateY(20px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .modal-header-block {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+        }
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        .close-btn {
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s;
+            background: none;
+            border: none;
+            padding: 0.25rem;
+        }
+        .close-btn:hover {
+            color: var(--text);
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+        .payment-method-row {
+            transition: border-color 0.2s, background 0.2s, transform 0.1s;
+        }
+        .payment-method-row:hover {
+            border-color: var(--primary) !important;
+            transform: translateY(-1px);
+        }
+        .payment-method-row:active {
+            transform: scale(0.99);
+        }
+        .invoice-receipt-container {
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.15);
+            font-family: 'JetBrains Mono', Courier, monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text);
+        }
+        body.light-mode .invoice-receipt-container {
+            background: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <!-- Role: User -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="wrench" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">AutoCare</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="user-dashboard.html" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="user-vehicles.html" class="nav-item">
+                    <i data-lucide="car"></i> <span class="nav-text">My Vehicles</span>
+                </a>
+                <a href="user-new-request.html" class="nav-item">
+                    <i data-lucide="plus-circle"></i> <span class="nav-text">New Request</span>
+                </a>
+                <a href="user-my-requests.html" class="nav-item">
+                    <i data-lucide="clipboard-list"></i> <span class="nav-text">My Requests</span>
+                </a>
+                <a href="user-service-history.html" class="nav-item">
+                    <i data-lucide="history"></i> <span class="nav-text">Service History</span>
+                </a>
+                <a href="user-map.html" class="nav-item">
+                    <i data-lucide="map"></i> <span class="nav-text">Live Map & Pins</span>
+                </a>
+                <a href="user-messages.html" class="nav-item">
+                    <i data-lucide="message-square"></i> <span class="nav-text">Messages</span>
+                </a>
+                <a href="user-calendar.html" class="nav-item">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Appointments</span>
+                </a>
+                <a href="user-payments.html" class="nav-item active">
+                    <i data-lucide="credit-card"></i> <span class="nav-text">Payments</span>
+                </a>
+                <a href="user-profile.html" class="nav-item">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div style="position: relative; display: none;" class="desktop-search">
+                        <i data-lucide="search" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 18px; height: 18px;"></i>
+                        <input type="text" placeholder="Search..." style="padding-left: 2.5rem; width: 300px; border-radius: 9999px; background: var(--bg);">
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Mark all as read</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border); background: rgba(99, 102, 241, 0.05);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">Service Update</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Your vehicle Honda Civic is ready for pickup.</p>
+                                    <p style="font-size: 0.7rem; color: var(--primary); margin-top: 0.25rem;">Just now</p>
+                                </div>
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">New Message</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Mechanic Name sent you a message.</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">2 hours ago</p>
+                                </div>
+                                <div style="padding: 1rem;">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">Payment Successful</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Invoice #INV-2045 has been paid.</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">Yesterday</p>
+                                </div>
+                            </div>
+                            <div style="padding: 0.75rem; border-top: 1px solid var(--border); text-align: center;">
+                                <a href="#" style="font-size: 0.875rem; color: var(--primary); font-weight: 500;">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem;">
+                            <img src="https://ui-avatars.com/api/?name=Ahmed+Khan&background=6366F1&color=fff" alt="User" style="width: 36px; height: 36px; border-radius: 50%;">
+                            <div style="text-align: left; display: none;" class="desktop-user-info">
+                                <p style="font-size: 0.875rem; font-weight: 600;">User Name</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Vehicle Owner</p>
+                            </div>
+                            <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: var(--text-muted);"></i>
+                        </button>
+                        <div id="user-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 200px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                <p style="font-weight: 600;">User Name</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">user@example.com</p>
+                            </div>
+                            <div style="padding: 0.5rem;">
+                                <a href="#" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--text); border-radius: 4px;"><i data-lucide="user" style="width: 16px; height: 16px;"></i> Profile</a>
+                                <a href="#" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--text); border-radius: 4px;"><i data-lucide="settings" style="width: 16px; height: 16px;"></i> Settings</a>
+                                <a href="index.html" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--danger); border-radius: 4px; margin-top: 0.25rem;"><i data-lucide="log-out" style="width: 16px; height: 16px;"></i> Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area" style="padding: 1rem;">
+
+                <!-- Interactive Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i data-lucide="shield-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stats-total-paid">Rs. 0</h3>
+                            <p>Total Paid</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i data-lucide="clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stats-total-pending">Rs. 0</h3>
+                            <p>Outstanding Balance</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">
+                            <i data-lucide="receipt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stats-invoices-count">0</h3>
+                            <p>Total Invoices</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <!-- Recent Invoices Dynamic Table -->
+                    <div class="card" id="payments-invoices-card" style="grid-column: span 2;">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Invoices</h2>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Invoice ID</th>
+                                        <th>Service & Description</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoices-tbody">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                                            <i data-lucide="loader" class="spin" style="margin: 0 auto; width: 24px; height: 24px;"></i>
+                                            <p style="margin-top: 0.5rem; font-size: 0.875rem;">Loading billing history...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: Settle / Declare Manual Offline Payment -->
+    <div id="checkout-modal" class="modal-backdrop" style="display: none;">
+        <div class="modal-box">
+            <div id="checkout-modal-inner">
+                <div class="modal-header-block">
+                    <h3 class="modal-title">Record Offline Payment</h3>
+                    <button onclick="closeCheckoutModal()" class="close-btn"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <p style="color: var(--text-muted); font-size: 0.875rem;">Declaring payment for:</p>
+                    <div style="background: rgba(99, 102, 241, 0.05); padding: 1rem; border-radius: 8px; margin-top: 0.5rem; border: 1px solid var(--border);">
+                        <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 1.05rem;">
+                            <span id="checkout-invoice-desc">Oil Change Service</span>
+                            <span id="checkout-invoice-amount" style="color: var(--primary);">Rs. 120</span>
+                        </div>
+                        <p id="checkout-invoice-id" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; font-family: monospace;">Invoice ID: #INV-1</p>
+                    </div>
+                </div>
+
+                <form id="checkout-form" onsubmit="handleCheckoutFormSubmit(event)">
+                    <input type="hidden" id="checkout-invoice-raw-id">
+                    
+                    <div class="form-group">
+                        <label for="offline-channel">Offline Channel Paid Through</label>
+                        <select id="offline-channel" required>
+                            <option value="Cash">Cash at Counter</option>
+                            <option value="Bank Transfer">Bank Transfer (HBL Account)</option>
+                            <option value="Easypaisa">Easypaisa Mobile Wallet</option>
+                            <option value="JazzCash">JazzCash Mobile Wallet</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="offline-reference">Transaction Reference ID / Deposit ID</label>
+                        <input type="text" id="offline-reference" placeholder="e.g. TXN-1029481, or Cash Confirmation Code" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="offline-remarks">Declaration / Verification Remarks</label>
+                        <textarea id="offline-remarks" rows="2" placeholder="e.g. Deposited cash at Markaz clinic counter or bank slip copy" style="width: 100%; min-height: 60px; padding: 0.5rem; border-radius: 4px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 0.875rem;"></textarea>
+                    </div>
+
+                    <!-- Simulation Alert -->
+                    <div style="background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 0.75rem 1rem; font-size: 0.8rem; color: var(--success); display: flex; align-items: flex-start; gap: 0.5rem; margin-top: 1.5rem; margin-bottom: 1.5rem;">
+                        <i data-lucide="shield-check" style="width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;"></i>
+                        <p>I confirm that I have made manual transfer of Rs. standard total. Admin/Workshop team will review this transaction reference.</p>
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                        <button type="button" onclick="closeCheckoutModal()" class="btn btn-outline">Cancel</button>
+                        <button type="submit" id="checkout-submit-btn" class="btn btn-primary" style="min-width: 140px;">
+                            <i data-lucide="check" style="width: 14px; height: 14px;"></i> Save Record
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Detailed Print-ready Receipt Statement Overlay -->
+    <div id="receipt-modal" class="modal-backdrop" style="display: none;">
+        <div class="modal-box" style="max-width: 550px;">
+            <div class="modal-header-block">
+                <h3 class="modal-title">Invoice Receipt</h3>
+                <button onclick="closeReceiptModal()" class="close-btn"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+            </div>
+            
+            <div id="receipt-statement-content" class="invoice-receipt-container" style="margin-bottom: 1.5rem;">
+                <!-- Filled dynamically by JavaScript -->
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button type="button" onclick="closeReceiptModal()" class="btn btn-outline">Close</button>
+                <button type="button" onclick="printReceipt()" class="btn btn-success">
+                    <i data-lucide="printer" style="width: 14px; height: 14px;"></i> Print Statement
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: Renegotiate Price Price Modal -->
+    <div id="renegotiate-modal" class="modal-backdrop" style="display: none;">
+        <div class="modal-box" style="max-width: 480px;">
+            <div id="renegotiate-modal-inner">
+                <div class="modal-header-block">
+                    <h3 class="modal-title">Renegotiate Price</h3>
+                    <button onclick="closeRenegotiateModal()" class="close-btn"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <p style="color: var(--text-muted); font-size: 0.875rem;">Propose counter offer for:</p>
+                    <div style="background: rgba(245, 158, 11, 0.05); padding: 1rem; border-radius: 8px; margin-top: 0.5rem; border: 1px solid rgba(245, 158, 11, 0.2);">
+                        <div style="font-weight: 600; font-size: 0.95rem; color: var(--text);" id="reneg-invoice-desc">-</div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.875rem;">
+                            <span style="color: var(--text-muted);">Current Invoice Price:</span>
+                            <strong id="reneg-invoice-current-amount" style="color: var(--danger); font-size: 1rem;">Rs. 0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="renegotiate-form" onsubmit="handleRenegotiateFormSubmit(event)">
+                    <input type="hidden" id="reneg-invoice-id">
+                    
+                    <div class="form-group">
+                        <label for="reneg-counter-amount" style="color: var(--text); font-weight: 500;">Your Proposed Price (Rs.)</label>
+                        <input type="number" id="reneg-counter-amount" placeholder="Enter counter price..." required style="width: 100%; padding: 0.65rem 0.75rem; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 0.95rem; font-weight: 600;">
+                        <p style="font-size: 0.725rem; color: var(--text-muted); margin-top: 0.25rem;">This will cancel the current invoice and send a counter proposal back to the mechanic.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reneg-message" style="color: var(--text); font-weight: 500;">Note to Mechanic</label>
+                        <textarea id="reneg-message" rows="3" placeholder="Describe your budget request or changes in job scope..." required style="width: 100%; min-height: 80px; padding: 0.65rem 0.75rem; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 0.875rem;"></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+                        <button type="button" onclick="closeRenegotiateModal()" class="btn btn-outline">Cancel</button>
+                        <button type="submit" id="reneg-submit-btn" class="btn btn-primary" style="background: var(--warning); border-color: var(--warning); color: #000; font-weight: 600; min-width: 150px;">
+                            <i data-lucide="gavel" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i> Propose Counter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            window.location.href = 'index.html';
+        }
+
+        // Active state cache
+        let invoices = [];
+        let paymentMethods = [];
+        let currentUserId = null;
+
+        // Extract active user name and details
+        const activeUser = JSON.parse(localStorage.getItem('activeUser') || '{}');
+        if (activeUser && activeUser.name) {
+            const h1Element = document.querySelector('.content-area h1');
+            if (h1Element) {
+                h1Element.textContent = `Welcome back, ${activeUser.name}!`;
+            }
+            const userTextEl = document.querySelector('.desktop-user-info p');
+            if (userTextEl) {
+                userTextEl.textContent = activeUser.name;
+            }
+        }
+
+        // Decode JWT-like token safely to detect user_id
+        try {
+            const parts = token.split('.');
+            if (parts.length === 2 || parts.length === 3) {
+                const payload = JSON.parse(atob(parts[0]));
+                currentUserId = payload.id;
+            }
+        } catch (e) {
+            console.error("JWT Decode error", e);
+        }
+
+        // Show desktop specific elements using JS to avoid complex media queries in inline styles
+        if (window.innerWidth > 768) {
+            const searchEl = document.querySelector('.desktop-search');
+            if (searchEl) searchEl.style.display = 'block';
+            const userEl = document.querySelector('.desktop-user-info');
+            if (userEl) userEl.style.display = 'block';
+        }
+
+        // Load page entities from REST endpoints
+        const loadPaymentPageData = async () => {
+            try {
+                const resInvoices = await fetch('/api/invoices', { headers: { 'Authorization': `Bearer ${token}` } });
+
+                if (resInvoices.status === 401) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                if (resInvoices.ok) {
+                    const data = await resInvoices.json();
+                    invoices = data.data || [];
+                }
+
+                renderStats();
+                renderInvoices();
+            } catch (err) {
+                console.error("Failed to load payment details:", err);
+                showToast("Connection to payment server failed.", "error");
+            }
+        };
+
+        const renderStats = () => {
+            const activeInvoices = invoices.filter(inv => inv.status !== 'cancelled');
+            const paidSum = activeInvoices.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + Number(inv.amount), 0);
+            const pendingSum = activeInvoices.filter(inv => inv.status === 'pending').reduce((sum, inv) => sum + Number(inv.amount), 0);
+            const count = activeInvoices.length;
+
+            document.getElementById('stats-total-paid').textContent = `Rs. ${paidSum.toLocaleString()}`;
+            document.getElementById('stats-total-pending').textContent = `Rs. ${pendingSum.toLocaleString()}`;
+            document.getElementById('stats-invoices-count').textContent = count;
+        };
+
+        const renderInvoices = () => {
+            const tbody = document.getElementById('invoices-tbody');
+            if (!tbody) return;
+
+            const activeInvoices = invoices.filter(inv => inv.status !== 'cancelled');
+
+            if (activeInvoices.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 4rem 1rem;">
+                            <i data-lucide="receipt" style="width: 32px; height: 32px; margin: 0 auto 0.5rem; opacity: 0.5;"></i>
+                            <p style="font-weight: 500;">No invoices registered</p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Any service requested by you will appear here once registered.</p>
+                        </td>
+                    </tr>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            // High to low sort
+            const sortedInvoices = [...activeInvoices].sort((a, b) => b.id - a.id);
+
+            tbody.innerHTML = sortedInvoices.map(inv => {
+                const badgeClass = inv.status === 'paid' ? 'badge-completed' : 'badge-pending';
+                const actionBtn = inv.status === 'paid' 
+                    ? `<button onclick="viewReceipt(${inv.id})" class="btn btn-outline" style="padding: 0.35rem 0.6rem; font-size: 0.725rem;"><i data-lucide="eye" style="width: 12px; height: 12px;"></i> View Receipt</button>`
+                    : `<div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                        <button onclick="openPayModal(${inv.id})" class="btn btn-primary" style="padding: 0.35rem 0.6rem; font-size: 0.725rem; font-weight: 600;"><i data-lucide="wallet" style="width: 12px; height: 12px;"></i> Record Payment</button>
+                        ${inv.price_offer_id ? `<button onclick="openRenegotiateModal(${inv.id})" class="btn btn-outline" style="border-color: var(--warning); color: var(--warning); padding: 0.35rem 0.6rem; font-size: 0.725rem;"><i data-lucide="gavel" style="width: 12px; height: 12px;"></i> Renegotiate</button>` : ''}
+                       </div>`;
+
+                return `
+                    <tr>
+                        <td style="font-weight: 600; font-family: monospace; color: var(--primary);">#INV-${inv.id}</td>
+                        <td>
+                            <div style="font-weight: 600; font-size: 0.95rem;">${inv.description}</div>
+                            <div style="font-size: 0.725rem; color: var(--text-muted); margin-top: 0.25rem;">
+                                Registered on ${new Date(inv.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                        </td>
+                        <td style="font-weight: 700; font-size: 1.05rem;">Rs. ${Number(inv.amount).toLocaleString()}</td>
+                        <td><span class="badge ${badgeClass}" style="font-size: 0.675rem;">${inv.status}</span></td>
+                        <td>${actionBtn}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        };
+
+        // Store pristine structures for modal resetting
+        const originalCheckoutHTML = document.getElementById('checkout-modal-inner').innerHTML;
+        const originalRenegotiateHTML = document.getElementById('renegotiate-modal-inner').innerHTML;
+
+        // Checkout & Pay Operations
+        const openPayModal = (invoiceId) => {
+            const invoice = invoices.find(inv => inv.id === invoiceId);
+            if (!invoice) return;
+
+            // Reset structure
+            document.getElementById('checkout-modal-inner').innerHTML = originalCheckoutHTML;
+
+            document.getElementById('checkout-invoice-raw-id').value = invoice.id;
+            document.getElementById('checkout-invoice-desc').textContent = invoice.description;
+            document.getElementById('checkout-invoice-amount').textContent = `Rs. ${Number(invoice.amount).toLocaleString()}`;
+            document.getElementById('checkout-invoice-id').textContent = `INVOICE ID: #INV-${invoice.id}`;
+
+            document.getElementById('checkout-modal').style.display = 'flex';
+            lucide.createIcons();
+        };
+
+        const closeCheckoutModal = () => {
+            document.getElementById('checkout-modal').style.display = 'none';
+        };
+
+        // Renegotiate Modals Operations
+        const openRenegotiateModal = (invoiceId) => {
+            const invoice = invoices.find(inv => inv.id === invoiceId);
+            if (!invoice) return;
+
+            // Reset structure
+            document.getElementById('renegotiate-modal-inner').innerHTML = originalRenegotiateHTML;
+
+            document.getElementById('reneg-invoice-id').value = invoice.id;
+            document.getElementById('reneg-invoice-desc').textContent = invoice.description;
+            document.getElementById('reneg-invoice-current-amount').textContent = `Rs. ${Number(invoice.amount).toLocaleString()}`;
+            document.getElementById('reneg-counter-amount').value = Math.round(invoice.amount * 0.9); // default suggestion of 10% lower
+            document.getElementById('reneg-message').value = "Hi, I would like to propose a renegotiated counter price for this service. Let me know if this works for you!";
+
+            document.getElementById('renegotiate-modal').style.display = 'flex';
+            lucide.createIcons();
+        };
+
+        const closeRenegotiateModal = () => {
+            document.getElementById('renegotiate-modal').style.display = 'none';
+        };
+
+        // Submit price counter renegotiation proposal
+        window.handleRenegotiateFormSubmit = async (e) => {
+            e.preventDefault();
+            const invoiceId = document.getElementById('reneg-invoice-id').value;
+            const counterAmount = document.getElementById('reneg-counter-amount').value;
+            const message = document.getElementById('reneg-message').value.trim();
+
+            const modalInner = document.getElementById('renegotiate-modal-inner');
+
+            modalInner.innerHTML = `
+                <div style="text-align: center; padding: 2.5rem 1.5rem;">
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <i data-lucide="loader" class="spin" style="width: 20px; height: 20px; color: var(--primary);"></i>
+                        Submitting Counter-Offer...
+                    </h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left; max-width: 360px; margin: 0 auto; background: rgba(245, 158, 11, 0.03); border: 1px solid var(--border); padding: 1.25rem; border-radius: 8px;">
+                        <div id="reneg-step-1" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; color: var(--primary); font-weight: 500; transition: all 0.3s;">
+                            <i data-lucide="loader" class="spin" style="width: 16px; height: 16px;"></i>
+                            <span>Compiling budget specifications...</span>
+                        </div>
+                        <div id="reneg-step-2" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; color: var(--text-muted); opacity: 0.4; transition: all 0.3s;">
+                            <i data-lucide="circle" style="width: 16px; height: 16px;"></i>
+                            <span>Cancelling old pending invoice...</span>
+                        </div>
+                        <div id="reneg-step-3" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; color: var(--text-muted); opacity: 0.4; transition: all 0.3s;">
+                            <i data-lucide="circle" style="width: 16px; height: 16px;"></i>
+                            <span>Dispatched counter proposal to expert...</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+
+            // STEP 1
+            await new Promise(resolve => setTimeout(resolve, 500));
+            const step1 = document.getElementById('reneg-step-1');
+            if (step1) {
+                step1.innerHTML = `<i data-lucide="check-circle" style="width: 16px; height: 16px; color: var(--success);"></i> <span style="color: var(--success);">Budget specifications compiled</span>`;
+            }
+            const step2 = document.getElementById('reneg-step-2');
+            if (step2) {
+                step2.innerHTML = `<i data-lucide="loader" class="spin" style="width: 16px; height: 16px; color: var(--primary);"></i> <span>Cancelling old pending invoice...</span>`;
+                step2.style.opacity = '1';
+                step2.style.color = 'var(--primary)';
+                step2.style.fontWeight = '500';
+            }
+            lucide.createIcons();
+
+            // STEP 2
+            await new Promise(resolve => setTimeout(resolve, 500));
+            if (step2) {
+                step2.innerHTML = `<i data-lucide="check-circle" style="width: 16px; height: 16px; color: var(--success);"></i> <span style="color: var(--success);">Old invoice successfully voided</span>`;
+                step2.style.color = '';
+            }
+            const step3 = document.getElementById('reneg-step-3');
+            if (step3) {
+                step3.innerHTML = `<i data-lucide="loader" class="spin" style="width: 16px; height: 16px; color: var(--primary);"></i> <span>Dispatched counter proposal to expert...</span>`;
+                step3.style.opacity = '1';
+                step3.style.color = 'var(--primary)';
+                step3.style.fontWeight = '500';
+            }
+            lucide.createIcons();
+
+            // STEP 3: API Submit
+            try {
+                const res = await fetch(`/api/invoices/${invoiceId}/renegotiate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        counter_amount: parseInt(counterAmount),
+                        message: message
+                    })
+                });
+
+                const payload = await res.json();
+                if (payload.success) {
+                    await new Promise(resolve => setTimeout(resolve, 400));
+                    const mechanicId = payload.data ? payload.data.receiver_id : '';
+
+                    modalInner.innerHTML = `
+                        <div style="text-align: center; padding: 2.5rem 1rem;">
+                            <div style="width: 72px; height: 72px; background: rgba(245, 158, 11, 0.1); color: var(--warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; border: 2px solid var(--warning); animation: modalSlide 0.3s ease-out;">
+                                <i data-lucide="gavel" style="width: 36px; height: 36px; color: var(--warning);"></i>
+                            </div>
+                            <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--warning); margin-bottom: 0.5rem;">Proposal Submitted!</h3>
+                            <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 2rem; line-height: 1.5; max-width: 380px; margin-left: auto; margin-right: auto;">
+                                Proposed a new rate of <strong>Rs. ${Number(counterAmount).toLocaleString()}</strong>. The mechanic has been notified in your chat room to review this counter price.
+                            </p>
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 280px; margin: 0 auto;">
+                                <button onclick="window.location.href='user-messages.html?contact_id=${mechanicId}'" class="btn btn-primary" style="width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: var(--primary); border-color: var(--primary); font-weight: 600;">
+                                    <i data-lucide="message-square" style="width: 16px; height: 16px;"></i> Go to Chat Thread 💬
+                                </button>
+                                <button onclick="closeRenegotiateModal()" class="btn btn-outline" style="width: 100%;">
+                                    Close Window
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                    await loadPaymentPageData();
+                } else {
+                    showToast(payload.message || "Failed to submit proposal", "error");
+                    openRenegotiateModal(invoiceId);
+                }
+            } catch (err) {
+                console.error("Renegotiation submit error:", err);
+                showToast("Connection failure while sending counter price.", "error");
+                openRenegotiateModal(invoiceId);
+            }
+        };
+
+        // Form Submit: Process manual payment registration
+        window.handleCheckoutFormSubmit = async (e) => {
+            e.preventDefault();
+
+            const invoiceId = document.getElementById('checkout-invoice-raw-id').value;
+            const offlineChannel = document.getElementById('offline-channel').value;
+            const offlineReference = document.getElementById('offline-reference').value.trim();
+            const offlineRemarks = document.getElementById('offline-remarks').value.trim();
+
+            const modalInner = document.getElementById('checkout-modal-inner');
+            
+            // Render premium multi-step loading experience
+            modalInner.innerHTML = `
+                <div style="text-align: center; padding: 2.5rem 1.5rem;">
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <i data-lucide="loader" class="spin" style="width: 20px; height: 20px; color: var(--primary);"></i>
+                        Processing Offline Payment...
+                    </h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left; max-width: 360px; margin: 0 auto; background: rgba(99, 102, 241, 0.03); border: 1px solid var(--border); padding: 1.25rem; border-radius: 8px;">
+                        <div id="check-step-1" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; color: var(--primary); font-weight: 500; transition: all 0.3s;">
+                            <i data-lucide="loader" class="spin" style="width: 16px; height: 16px;"></i>
+                            <span>Validating reference transaction details...</span>
+                        </div>
+                        <div id="check-step-2" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; color: var(--text-muted); opacity: 0.4; transition: all 0.3s;">
+                            <i data-lucide="circle" style="width: 16px; height: 16px;"></i>
+                            <span>Registering offline manual record...</span>
+                        </div>
+                        <div id="check-step-3" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; color: var(--text-muted); opacity: 0.4; transition: all 0.3s;">
+                            <i data-lucide="circle" style="width: 16px; height: 16px;"></i>
+                            <span>Syncing workshop billing invoice ledger...</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+
+            // STEP 1
+            await new Promise(resolve => setTimeout(resolve, 500));
+            const step1 = document.getElementById('check-step-1');
+            if (step1) {
+                step1.innerHTML = `<i data-lucide="check-circle" style="width: 16px; height: 16px; color: var(--success);"></i> <span style="color: var(--success);">Validated transaction details</span>`;
+            }
+            const step2 = document.getElementById('check-step-2');
+            if (step2) {
+                step2.innerHTML = `<i data-lucide="loader" class="spin" style="width: 16px; height: 16px; color: var(--primary);"></i> <span>Registering offline manual record...</span>`;
+                step2.style.opacity = '1';
+                step2.style.color = 'var(--primary)';
+                step2.style.fontWeight = '500';
+            }
+            lucide.createIcons();
+
+            // STEP 2
+            await new Promise(resolve => setTimeout(resolve, 500));
+            if (step2) {
+                step2.innerHTML = `<i data-lucide="check-circle" style="width: 16px; height: 16px; color: var(--success);"></i> <span style="color: var(--success);">Offline manual record registered</span>`;
+                step2.style.color = '';
+            }
+            const step3 = document.getElementById('check-step-3');
+            if (step3) {
+                step3.innerHTML = `<i data-lucide="loader" class="spin" style="width: 16px; height: 16px; color: var(--primary);"></i> <span>Syncing workshop billing invoice ledger...</span>`;
+                step3.style.opacity = '1';
+                step3.style.color = 'var(--primary)';
+                step3.style.fontWeight = '500';
+            }
+            lucide.createIcons();
+
+            // STEP 3: API Request
+            try {
+                const requestBody = {
+                    payment_details: {
+                        type: offlineChannel,
+                        reference: offlineReference,
+                        notes: offlineRemarks
+                    }
+                };
+
+                const res = await fetch(`/api/invoices/${invoiceId}/pay`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (res.ok) {
+                    await new Promise(resolve => setTimeout(resolve, 400));
+                    
+                    // Render Gorgeous Success Screen
+                    modalInner.innerHTML = `
+                        <div style="text-align: center; padding: 2.5rem 1rem;">
+                            <div style="width: 72px; height: 72px; background: rgba(16, 185, 129, 0.1); color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; border: 2px solid var(--success); animation: modalSlide 0.3s ease-out;">
+                                <i data-lucide="check" style="width: 40px; height: 40px;"></i>
+                            </div>
+                            <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--success); margin-bottom: 0.5rem;">Payment Logged!</h3>
+                            <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 2rem; line-height: 1.5; max-width: 380px; margin-left: auto; margin-right: auto;">
+                                Offline payment for invoice <strong>#INV-${invoiceId}</strong> has been registered. The workshop staff has been alerted to verify reference: <code style="background: rgba(255,255,255,0.08); padding: 0.15rem 0.35rem; border-radius: 4px; font-family: monospace;">${offlineReference}</code>.
+                            </p>
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 280px; margin: 0 auto;">
+                                <button onclick="viewReceipt(${invoiceId}); closeCheckoutModal();" class="btn btn-primary" style="width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 600;">
+                                    <i data-lucide="eye" style="width: 16px; height: 16px;"></i> View & Print Receipt
+                                </button>
+                                <button onclick="closeCheckoutModal()" class="btn btn-outline" style="width: 100%;">
+                                    Close Window
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                    await loadPaymentPageData();
+                } else {
+                    const data = await res.json();
+                    showToast(data.message || "Failed to log. Try again.", "error");
+                    openPayModal(invoiceId);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("Server error during registration.", "error");
+                openPayModal(invoiceId);
+            }
+        };
+
+        // VIEW & PRINT HISTORIC DETAILED RECEIPTS
+        const viewReceipt = (invoiceId) => {
+            const invoice = invoices.find(inv => inv.id === invoiceId);
+            if (!invoice) return;
+
+            const subtotal = invoice.amount / 1.16;
+            const tax = invoice.amount - subtotal;
+            const dateStr = new Date(invoice.created_at).toLocaleDateString(undefined, {
+                month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            const paidDateStr = invoice.paid_at 
+                ? new Date(invoice.paid_at).toLocaleDateString(undefined, {
+                    month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                  })
+                : dateStr;
+
+            // Manual payment description info
+            let paidVia = invoice.paid_via || "Manual Offline Transfer";
+            if (invoice.offline_reference) {
+                paidVia += ` [Ref: ${invoice.offline_reference}]`;
+            }
+            if (invoice.offline_notes) {
+                paidVia += ` (${invoice.offline_notes})`;
+            }
+
+            const receiptContainer = document.getElementById('receipt-statement-content');
+            receiptContainer.innerHTML = `
+<div style="text-align: center; margin-bottom: 1.5rem; border-bottom: 1px dashed var(--border); padding-bottom: 1rem;">
+    <h4 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem;">AUTOCARE PRO WORKSHOP</h4>
+    <p style="font-size: 0.75rem; color: var(--text-muted);">Sector G-10, Islamabad, Pakistan</p>
+    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">TEL: +92-51-111-228-227</p>
+</div>
+
+<div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.775rem;">
+    <span>STATEMENT NO:</span>
+    <span style="font-weight: 700; color: var(--primary);">#INV-STATEMENT-${invoice.id}</span>
+</div>
+<div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.775rem;">
+    <span>INVOICE DATE:</span>
+    <span>${dateStr}</span>
+</div>
+<div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.775rem;">
+    <span>PAYMENT DATE:</span>
+    <span>${paidDateStr}</span>
+</div>
+<div style="display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 0.775rem; border-bottom: 1px dashed var(--border); padding-bottom: 0.5rem;">
+    <span>STATUS:</span>
+    <span style="font-weight: 700; color: var(--success); text-transform: uppercase;">✔ MANUAL RECORD VERIFIED</span>
+</div>
+
+<div style="margin-bottom: 1rem;">
+    <p style="font-weight: 700; margin-bottom: 0.5rem; font-size: 0.775rem;">BILL TO:</p>
+    <p style="font-size: 0.8rem; font-weight: 500;">${activeUser.name || "Valued Customer"}</p>
+    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">${activeUser.email || "customer@example.com"}</p>
+</div>
+
+<div style="border-bottom: 1px dashed var(--border); padding-bottom: 0.75rem; margin-bottom: 0.75rem;">
+    <p style="font-weight: 700; margin-bottom: 0.4rem; font-size: 0.775rem;">ITEMIZED LINE REPAIRS:</p>
+    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+        <span>1. ${invoice.description}</span>
+        <span style="font-weight: 600;">Rs. ${subtotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+    </div>
+</div>
+
+<div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.8rem;">
+    <span>SUBTOTAL (Net):</span>
+    <span>Rs. ${subtotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+</div>
+<div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.8rem;">
+    <span>SALES TAX (16% PST):</span>
+    <span>Rs. ${tax.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+</div>
+<div style="display: flex; justify-content: space-between; margin-top: 0.5rem; border-top: 1px dashed var(--border); padding-top: 0.5rem; font-size: 1rem; font-weight: 700;">
+    <span>TOTAL PAID:</span>
+    <span style="color: var(--success);">Rs. ${Number(invoice.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+</div>
+
+<div style="margin-top: 1rem; font-size: 0.725rem; background: rgba(99, 102, 241, 0.05); padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid var(--border); line-height: 1.4;">
+    <span style="font-weight: 600;">PAID VIA:</span> ${paidVia}
+</div>
+
+<div style="text-align: center; margin-top: 1.5rem; font-size: 0.725rem; color: var(--text-muted);">
+    <p>⚡ Powered by AutoCare Digital Billing Network</p>
+    <p style="margin-top: 0.25rem;">Thank you for trusting AutoCare Pro. Safe riding!</p>
+</div>
+            `;
+
+            document.getElementById('receipt-modal').style.display = 'flex';
+        };
+
+        const closeReceiptModal = () => {
+            document.getElementById('receipt-modal').style.display = 'none';
+        };
+
+        const printReceipt = () => {
+            const printContent = document.getElementById('receipt-statement-content').innerHTML;
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write('<html><head><title>Print Statement Receipt</title>');
+            printWindow.document.write('<style>');
+            printWindow.document.write('body { font-family: monospace; padding: 40px; color: #000; background: #fff; }');
+            printWindow.document.write('</style></head><body>');
+            printWindow.document.write(printContent);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+        };
+
+        // Initialize lists
+        loadPaymentPageData();
+    </script>
+</body>
+</html>
+

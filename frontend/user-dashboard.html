@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .stat-info h3 { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .stat-info p { color: var(--text-muted); font-size: 0.875rem; font-weight: 500; }
+        
+        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+        @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        
+        .activity-item { display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border); }
+        .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .activity-icon { width: 36px; height: 36px; border-radius: 50%; background: rgba(99, 102, 241, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .activity-details h4 { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .activity-details p { font-size: 0.875rem; color: var(--text-muted); }
+        .activity-time { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+    </style>
+</head>
+<body>
+    <!-- Role: User -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="wrench" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">AutoCare</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <p class="nav-category" style="padding: 1rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Dashboard</p>
+                <a href="user-dashboard.html" class="nav-item active">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                
+                <p class="nav-category" style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Service Center</p>
+                <a href="user-new-request.html" class="nav-item">
+                    <i data-lucide="plus-circle"></i> <span class="nav-text">New Repair Request</span>
+                </a>
+                <a href="user-my-requests.html" class="nav-item">
+                    <i data-lucide="clipboard-list"></i> <span class="nav-text">Active Requests</span>
+                </a>
+                <a href="user-service-history.html" class="nav-item">
+                    <i data-lucide="history"></i> <span class="nav-text">Service History</span>
+                </a>
+                <a href="user-vehicles.html" class="nav-item">
+                    <i data-lucide="car"></i> <span class="nav-text">My Vehicles</span>
+                </a>
+                <a href="user-map.html" class="nav-item">
+                    <i data-lucide="map"></i> <span class="nav-text">Live Map & Pins</span>
+                </a>
+                
+                <p style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Management</p>
+                <a href="user-messages.html" class="nav-item">
+                    <i data-lucide="message-square"></i> <span class="nav-text">Messages</span>
+                </a>
+                <a href="user-calendar.html" class="nav-item">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Appointments</span>
+                </a>
+                <a href="user-payments.html" class="nav-item">
+                    <i data-lucide="credit-card"></i> <span class="nav-text">Payments</span>
+                </a>
+                <a href="user-profile.html" class="nav-item">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div style="position: relative; display: none;" class="desktop-search">
+                        <i data-lucide="search" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 18px; height: 18px;"></i>
+                        <input type="text" placeholder="Search..." style="padding-left: 2.5rem; width: 300px; border-radius: 9999px; background: var(--bg);">
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Clear all</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto; padding: 2rem 1rem; text-align: center; color: var(--text-muted);">
+                                <i data-lucide="bell-off" style="width: 28px; height: 28px; margin: 0 auto 0.5rem; opacity: 0.4;"></i>
+                                <p style="font-size: 0.85rem; font-weight: 500;">You are all caught up!</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">No unread system notifications.</p>
+                            </div>
+                            <div style="padding: 0.75rem; border-top: 1px solid var(--border); text-align: center;">
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">AutoCare Notification Hub</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem;">
+                            <img src="https://ui-avatars.com/api/?name=Ahmed+Khan&background=6366F1&color=fff" alt="User" style="width: 36px; height: 36px; border-radius: 50%;">
+                            <div style="text-align: left; display: none;" class="desktop-user-info">
+                                <p style="font-size: 0.875rem; font-weight: 600;">User Name</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Vehicle Owner</p>
+                            </div>
+                            <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: var(--text-muted);"></i>
+                        </button>
+                        <div id="user-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 200px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                <p style="font-weight: 600;">User Name</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">user@example.com</p>
+                            </div>
+                            <div style="padding: 0.5rem;">
+                                <a href="#" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--text); border-radius: 4px;"><i data-lucide="user" style="width: 16px; height: 16px;"></i> Profile</a>
+                                <a href="#" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--text); border-radius: 4px;"><i data-lucide="settings" style="width: 16px; height: 16px;"></i> Settings</a>
+                                <a href="index.html" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--danger); border-radius: 4px; margin-top: 0.25rem;"><i data-lucide="log-out" style="width: 16px; height: 16px;"></i> Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Premium Error Handling Alert -->
+                <div id="dashboard-error-state" style="display: none; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; padding: 1.25rem; margin-bottom: 2rem; align-items: center; justify-content: space-between; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i data-lucide="alert-circle" style="color: var(--danger); width: 24px; height: 24px; flex-shrink: 0;"></i>
+                        <div>
+                            <p style="font-weight: 600; margin: 0; font-size: 0.95rem;">Unable to load your requests.</p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.15rem 0 0 0;">Please try again.</p>
+                        </div>
+                    </div>
+                    <button id="error-retry-btn" class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
+                        <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Retry
+                    </button>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div>
+                        <h1 style="font-size: 1.25rem; font-weight: 700;">Dashboard</h1>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <button id="refresh-dashboard-btn" class="btn btn-outline" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem;">
+                            <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i> Refresh
+                        </button>
+                        <a href="user-new-request.html" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="plus"></i> New Request
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">
+                            <i data-lucide="car"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stats-vehicles">0</h3>
+                            <p>Registered Vehicles</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i data-lucide="clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stats-active">0</h3>
+                            <p>Active Requests</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i data-lucide="check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stats-completed">0</h3>
+                            <p>Completed Services</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">
+                            <i data-lucide="credit-card"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stats-spending">Rs 0</h3>
+                            <p>Total Spending</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Active Requests -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Active Requests</h2>
+                            <a href="user-my-requests.html" style="font-size: 0.875rem; font-weight: 500;">View All</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Vehicle</th>
+                                        <th>Service Type</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-active-tbody">
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem 1rem;">
+                                            <div style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; opacity: 0.7;">
+                                                <i class="spin" data-lucide="loader" style="width: 18px; height: 18px;"></i>
+                                                <span>Fetching secure records...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Activity</h2>
+                        </div>
+                        <div id="recent-activity-container" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div style="text-align: center; color: var(--text-muted); padding: 3rem 1rem;">
+                                <div style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; opacity: 0.7;">
+                                    <i class="spin" data-lucide="loader" style="width: 18px; height: 18px;"></i>
+                                    <span>Syncing active logs...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Specialty Service Packages (Gigs) list -->
+                <div class="card" style="margin-top: 2rem; border: 1px solid var(--border);">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <h2 class="card-title" style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 700; margin: 0;">Specialist Workshop Gigs & Packages</h2>
+                            <p style="color: var(--text-muted); font-size: 0.8125rem; margin-top: 0.15rem; margin-bottom: 0;">Browse individual specialty packages listed directly by top neighbourhood mechanics.</p>
+                        </div>
+                        <span style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.1); color: var(--success); font-weight: 600; padding: 0.25rem 0.6rem; border-radius: 4px; text-transform: uppercase;">Direct Booking</span>
+                    </div>
+                    <div id="user-gigs-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+                        <!-- Gigs dynamically loaded over GET /api/gigs or public endpoint -->
+                        <div style="grid-column: 1 / -1; display: flex; align-items: center; gap: 0.5rem; color: var(--text-muted); padding: 1.5rem 0;">
+                            <i class="spin" data-lucide="loader" style="width: 16px; height: 16px;"></i>
+                            <span>Syncing available offerings...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Ensure proper role authentication on page enter
+        const tokenVal = localStorage.getItem('access_token');
+        const loggedUser = JSON.parse(localStorage.getItem('activeUser') || '{}');
+        const loggedRole = (loggedUser.role || '').toLowerCase();
+        if (!tokenVal || (loggedRole !== 'user' && loggedRole !== 'vehicle_owner' && loggedRole !== 'owner')) {
+            window.location.href = 'index.html';
+        }
+
+        // Adjust desktop topbar items size
+        if (window.innerWidth > 768) {
+            const searchEl = document.querySelector('.desktop-search');
+            if (searchEl) searchEl.style.display = 'block';
+            const userEl = document.querySelector('.desktop-user-info');
+            if (userEl) userEl.style.display = 'block';
+        }
+
+        // Fetch dashboard data from the unified /api/v1/owner/dashboard enterprise endpoint
+        const loadDashboardData = async () => {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Hide error state on fresh fetch
+            const errorBanner = document.getElementById('dashboard-error-state');
+            if (errorBanner) {
+                errorBanner.style.display = 'none';
+            }
+
+            const refreshBtn = document.getElementById('refresh-dashboard-btn');
+            if (refreshBtn) {
+                const icon = refreshBtn.querySelector('i');
+                if (icon) icon.classList.add('spin');
+            }
+
+            try {
+                // Fetch stats, activities, and active requests with a single query
+                const response = await fetch('/api/v1/owner/dashboard', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error("HTTP error " + response.status);
+                }
+
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error(result.message || "Failed API call");
+                }
+
+                const dashboard = result.data;
+
+                // Set dynamic welcome greeting based on response user info
+                if (dashboard.user && dashboard.user.full_name) {
+                    const h1Element = document.querySelector('.content-area h1');
+                    if (h1Element) {
+                        h1Element.textContent = `Welcome back, ${dashboard.user.full_name}!`;
+                    }
+                    
+                    // Update user profile dropdowns/names as well
+                    const topbarUserNames = document.querySelectorAll('.desktop-user-info p:first-child, #user-dropdown p:first-child');
+                    topbarUserNames.forEach(el => {
+                        el.textContent = dashboard.user.full_name;
+                    });
+                }
+
+                // Update Stats Cards
+                document.getElementById('stats-vehicles').textContent = dashboard.vehicles_count;
+                document.getElementById('stats-active').textContent = dashboard.active_requests_count;
+                document.getElementById('stats-completed').textContent = dashboard.completed_services_count;
+                document.getElementById('stats-spending').textContent = `Rs. ${Number(dashboard.total_spending).toLocaleString()}`;
+
+                // Populate Active Requests Table
+                const tableBody = document.getElementById('dashboard-active-tbody');
+                const activeRequests = dashboard.active_requests || [];
+
+                if (activeRequests.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 3.5rem 1rem;">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.6rem;">
+                                    <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(99, 102, 241, 0.05); display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                                        <i data-lucide="shield-alert" style="width: 22px; height: 22px;"></i>
+                                    </div>
+                                    <p style="font-weight: 600; font-size: 1rem; color: var(--text); margin: 0;">No active requests found</p>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Create a new service request to get started.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    tableBody.innerHTML = activeRequests.map(req => {
+                        const displayId = `#REQ-${req.id}`;
+                        let badgeClass = 'badge-pending';
+                        const statusUpper = (req.status || '').toUpperCase();
+                        if (statusUpper === 'IN_PROGRESS' || statusUpper === 'IN PROGRESS') {
+                            badgeClass = 'badge-progress';
+                        } else if (statusUpper === 'ASSIGNED') {
+                            badgeClass = 'badge-progress';
+                        } else if (statusUpper === 'COMPLETED') {
+                            badgeClass = 'badge-success';
+                        }
+
+                        const statusBadge = `<span class="badge ${badgeClass}">${statusUpper}</span>`;
+
+                        const reqDate = new Date(req.created_at).toLocaleDateString(undefined, { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            year: 'numeric' 
+                        });
+
+                        const detailsUrl = `user-my-requests.html?id=${req.id}`;
+
+                        return `
+                            <tr>
+                                <td style="font-weight: 600; color: var(--primary);">${displayId}</td>
+                                <td>${req.vehicle}</td>
+                                <td style="text-transform: capitalize;">${req.request_type || "General"}</td>
+                                <td>${statusBadge}</td>
+                                <td>${reqDate}</td>
+                                <td>
+                                    <a href="${detailsUrl}" class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.2rem;">
+                                        View Details
+                                    </a>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+
+                // Populate Recent Activity Container
+                const activityContainer = document.getElementById('recent-activity-container');
+                const recentActivities = dashboard.recent_activity || [];
+
+                if (recentActivities.length === 0) {
+                    activityContainer.innerHTML = `
+                        <div style="text-align: center; color: var(--text-muted); padding: 3.5rem 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.6rem;">
+                            <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(99, 102, 241, 0.05); display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                                <i data-lucide="clipboard-list" style="width: 22px; height: 22px;"></i>
+                            </div>
+                            <span style="font-weight: 500; font-size: 0.875rem;">No recent activity available</span>
+                        </div>
+                    `;
+                } else {
+                    activityContainer.innerHTML = recentActivities.slice(0, 5).map(act => {
+                        let iconName = 'file-text';
+                        let iconBg = 'rgba(99, 102, 241, 0.1)';
+                        let iconColor = 'var(--primary)';
+                        let title = act.action || 'Updates Logged';
+                        let desc = act.description || `State change detected.`;
+
+                        const status = (act.action || '').toUpperCase();
+                        if (status.includes('COMPLETED') || status.includes('SUCCESS')) {
+                            iconName = 'check-circle';
+                            iconBg = 'rgba(16, 185, 129, 0.1)';
+                            iconColor = 'var(--success)';
+                        } else if (status.includes('START') || status.includes('PROGRESS')) {
+                            iconName = 'wrench';
+                            iconBg = 'rgba(99, 102, 241, 0.08)';
+                            iconColor = 'var(--primary)';
+                        } else if (status.includes('ACCEPT') || status.includes('ASSIGN')) {
+                            iconName = 'user-check';
+                            iconBg = 'rgba(245, 158, 11, 0.1)';
+                            iconColor = 'var(--warning)';
+                        } else if (status.includes('CANCEL') || status.includes('FAIL')) {
+                            iconName = 'x-circle';
+                            iconBg = 'rgba(239, 68, 68, 0.1)';
+                            iconColor = 'var(--danger)';
+                        } else if (status.includes('OFFER') || status.includes('BID')) {
+                            iconName = 'tag';
+                            iconBg = 'rgba(16, 185, 129, 0.08)';
+                            iconColor = 'var(--success)';
+                        }
+
+                        const timeStr = new Date(act.timestamp || act.date || Date.now()).toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+
+                        return `
+                            <div class="activity-item" style="display: flex; align-items: flex-start; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+                                <div class="activity-icon" style="background: ${iconBg}; color: ${iconColor}; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;">
+                                    <i data-lucide="${iconName}" style="width: 18px; height: 18px;"></i>
+                                </div>
+                                <div class="activity-details" style="flex-grow: 1;">
+                                    <h4 style="font-size: 0.875rem; font-weight: 600; margin: 0; display: flex; justify-content: space-between;">
+                                        <span>${title}</span>
+                                    </h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.25rem 0 0 0; line-height: 1.3;">${desc}</p>
+                                    <div class="activity-time" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">${timeStr}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                // Fetch public gigs for owner
+                try {
+                    const gigsRes = await fetch('/api/v1/gigs', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const gigsResult = await gigsRes.json();
+                    const gigsContainer = document.getElementById('user-gigs-container');
+                    if (gigsRes.ok && gigsResult.success && gigsContainer) {
+                        const gigs = gigsResult.data || [];
+                        if (gigs.length === 0) {
+                            gigsContainer.innerHTML = `
+                                <div style="grid-column: 1 / -1; padding: 2rem; border: 1px dashed var(--border); border-radius: 6px; text-align: center; color: var(--text-muted);">
+                                    <i data-lucide="tag" style="margin: 0 auto 0.75rem; width: 32px; height: 32px; opacity: 0.5;"></i>
+                                    <p style="font-size: 0.875rem; font-weight: 500; margin: 0;">No specialist workshop packages are currently cataloged by mechanics.</p>
+                                </div>
+                            `;
+                        } else {
+                            gigsContainer.innerHTML = gigs.map(g => {
+                                const categoryNames = {
+                                    diagnostics: 'Diagnostics & Tuning',
+                                    brakes: 'Brakes & Suspension',
+                                    engine: 'Engine Maintenance',
+                                    electrical: 'Electrical Repair',
+                                    recovery: 'Roadside Recovery',
+                                    other: 'General Maintenance'
+                                };
+                                const catLabel = categoryNames[g.category] || g.category;
+                                const mechName = g.mechanic_name || 'Expert Mechanic';
+                                
+                                return `
+                                    <div class="stat-card" style="box-shadow: none; border: 1px solid var(--border); background: var(--bg-card); padding: 1.25rem; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between;">
+                                        <div>
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                                <span style="font-size: 0.7rem; color: var(--success); background: rgba(16, 185, 129, 0.08); font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 4px; text-transform: uppercase;">${catLabel}</span>
+                                                <span style="font-size: 0.75rem; font-weight: 500; color: var(--text-muted); display: flex; align-items: center; gap: 0.2rem;"><i data-lucide="user" style="width: 12px; height: 12px;"></i> ${mechName}</span>
+                                            </div>
+                                            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem;">${g.title}</h4>
+                                            <p style="font-size: 0.8125rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 1rem;">${g.description}</p>
+                                        </div>
+                                        <div style="border-top: 1px dashed var(--border); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                                            <div>
+                                                <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; display: block; font-weight: 500;">Pricing</span>
+                                                <span style="font-size: 0.95rem; font-weight: 700; color: var(--primary);">${g.price_range}</span>
+                                            </div>
+                                            <a href="user-new-request.html?title=${encodeURIComponent(g.title)}&desc=${encodeURIComponent(g.description)}&type=${g.category === 'recovery' ? 'recovery' : 'repair'}" class="btn btn-primary" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; border-radius: 4px; display: inline-flex; align-items: center; gap: 0.2rem; min-height: unset;">
+                                                Book Now <i data-lucide="arrow-right" style="width: 12px; height: 12px;"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('');
+                        }
+                    }
+                } catch (gigsError) {
+                    console.error("Gigs fetch error on user panel:", gigsError);
+                }
+
+                lucide.createIcons();
+            } catch (err) {
+                console.error("Dashboard dynamic load error:", err);
+                
+                // Show user friendly error banner instead of technical backend errors
+                const errorBanner = document.getElementById('dashboard-error-state');
+                if (errorBanner) {
+                    errorBanner.style.display = 'flex';
+                }
+
+                // Render secure retry triggers in tables
+                const tableBody = document.getElementById('dashboard-active-tbody');
+                if (tableBody) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: var(--danger); padding: 2.5rem 1rem;">
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                                    <i data-lucide="alert-triangle" style="width: 24px; height: 24px;"></i>
+                                    <p style="font-weight: 600; margin: 0;">Unable to load your requests.</p>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Please try again.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                const activityContainer = document.getElementById('recent-activity-container');
+                if (activityContainer) {
+                    activityContainer.innerHTML = `
+                        <div style="text-align: center; color: var(--danger); padding: 2.5rem 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="alert-triangle" style="width: 24px; height: 24px;"></i>
+                            <span style="font-weight: 500;">No recent activity available</span>
+                        </div>
+                    `;
+                }
+                lucide.createIcons();
+            } finally {
+                if (refreshBtn) {
+                    const icon = refreshBtn.querySelector('i');
+                    if (icon) icon.classList.remove('spin');
+                }
+            }
+        };
+
+        // Bind refresh and retry buttons clicks
+        document.getElementById('refresh-dashboard-btn').addEventListener('click', loadDashboardData);
+        document.getElementById('error-retry-btn').addEventListener('click', loadDashboardData);
+
+        // Initial launch
+        loadDashboardData();
+    </script>
+</body>
+</html>

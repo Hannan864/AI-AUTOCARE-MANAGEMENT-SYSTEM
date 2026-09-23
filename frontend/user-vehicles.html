@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Vehicles - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .vehicle-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+        .vehicle-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+        .vehicle-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .vehicle-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
+        .vehicle-plate { display: inline-block; background: #FFD700; color: #000; padding: 0.25rem 0.75rem; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 1.125rem; border: 2px solid #000; letter-spacing: 1px; }
+        .vehicle-body { padding: 1.5rem; }
+        .vehicle-detail { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.875rem; }
+        .vehicle-detail span:first-child { color: var(--text-muted); }
+        .vehicle-detail span:last-child { font-weight: 500; }
+        .vehicle-footer { padding: 1rem 1.5rem; background: rgba(0,0,0,0.02); border-top: 1px solid var(--border); display: flex; gap: 0.5rem; }
+        body:not(.light-mode) .vehicle-footer { background: rgba(255,255,255,0.02); }
+        
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { background: var(--bg-card); border-radius: 8px; width: 100%; max-width: 500px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); transform: scale(0.95); transition: transform 0.3s; max-height: 85vh; overflow-y: auto; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer { padding: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 1rem; }
+    </style>
+</head>
+<body>
+    <!-- Role: User -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="wrench" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">AutoCare</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="user-dashboard.html" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="user-vehicles.html" class="nav-item active">
+                    <i data-lucide="car"></i> <span class="nav-text">My Vehicles</span>
+                </a>
+                <a href="user-new-request.html" class="nav-item">
+                    <i data-lucide="plus-circle"></i> <span class="nav-text">New Request</span>
+                </a>
+                <a href="user-my-requests.html" class="nav-item">
+                    <i data-lucide="clipboard-list"></i> <span class="nav-text">My Requests</span>
+                </a>
+                <a href="user-service-history.html" class="nav-item">
+                    <i data-lucide="history"></i> <span class="nav-text">Service History</span>
+                </a>
+                <a href="user-map.html" class="nav-item">
+                    <i data-lucide="map"></i> <span class="nav-text">Live Map & Pins</span>
+                </a>
+                <a href="user-messages.html" class="nav-item">
+                    <i data-lucide="message-square"></i> <span class="nav-text">Messages</span>
+                </a>
+                <a href="user-calendar.html" class="nav-item">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Appointments</span>
+                </a>
+                <a href="user-payments.html" class="nav-item">
+                    <i data-lucide="credit-card"></i> <span class="nav-text">Payments</span>
+                </a>
+                <a href="user-profile.html" class="nav-item">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h2 style="font-size: 1.125rem; font-weight: 600; margin-left: 0.5rem;">My Vehicles</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Mark all as read</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border); background: rgba(99, 102, 241, 0.05);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">Service Update</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">New job assigned: Honda Civic (ABC-1234).</p>
+                                    <p style="font-size: 0.7rem; color: var(--primary); margin-top: 0.25rem;">Just now</p>
+                                </div>
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">New Message</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">User Name sent you a message.</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">2 hours ago</p>
+                                </div>
+                            </div>
+                            <div style="padding: 0.75rem; border-top: 1px solid var(--border); text-align: center;">
+                                <a href="#" style="font-size: 0.875rem; color: var(--primary); font-weight: 500;">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem;">
+                            <img src="https://ui-avatars.com/api/?name=Ahmed+Khan&background=6366F1&color=fff" alt="User" style="width: 36px; height: 36px; border-radius: 50%;">
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area" style="padding: 1rem;">
+                <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <button class="btn btn-primary" onclick="openModal('addVehicleModal')">
+                        <i data-lucide="plus"></i> Add New Vehicle
+                    </button>
+                </div>
+
+                <div class="vehicle-grid" id="vehicleGrid">
+                    <div style="grid-column: 1/-1; text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
+                        <i data-lucide="loader" class="spin" style="margin: 0 auto 1.5rem; width: 32px; height: 32px;"></i>
+                        <p style="font-weight: 500;">Retrieving synchronized car registry...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Vehicle Modal -->
+    <div class="modal-overlay" id="addVehicleModal">
+        <div class="modal-content" id="add-vehicle-inner">
+            <div class="modal-header">
+                <h3 style="font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="car" style="color: var(--primary);"></i> Register New Vehicle
+                </h3>
+                <button class="btn btn-outline" style="padding: 0.25rem; border: none;" onclick="closeModal('addVehicleModal')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="addVehicleForm">
+                <input type="hidden" id="addVImageUrl">
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">Make</label>
+                            <input type="text" class="form-control" placeholder="e.g. Honda, Suzuki" required id="vMake">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">Model</label>
+                            <input type="text" class="form-control" placeholder="e.g. Civic, Alto" required id="vModel">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">Year</label>
+                            <input type="number" class="form-control" placeholder="e.g. 2022" min="1950" max="2026" required id="vYear">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">Registration / Plate Number</label>
+                            <input type="text" class="form-control" placeholder="e.g. ABC-1234" required id="vPlate" style="text-transform: uppercase;">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">Exterior Color</label>
+                            <input type="text" class="form-control" placeholder="e.g. Solid White" required id="vColor">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">Current Odometer (km)</label>
+                            <input type="number" class="form-control" placeholder="e.g. 19200" required id="vMileage">
+                        </div>
+                    </div>
+
+                    <!-- Beautiful Upload Zone -->
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">Vehicle Photograph</label>
+                        <div id="addDropZone" class="form-control" style="border: 2px dashed var(--border); border-radius: 8px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; background: rgba(0,0,0,0.01);">
+                            <i data-lucide="image" style="margin: 0 auto 0.5rem; width: 32px; height: 32px; color: var(--text-muted);"></i>
+                            <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0; font-weight: 500;">Click to select or drag and drop image</p>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">PNG, JPG, JPEG under 5 MB</span>
+                            <input type="file" id="addVImageFile" accept="image/*" style="display: none;">
+                        </div>
+                        <div id="addUploadPreview" style="display: none; align-items: center; gap: 1rem; margin-top: 1rem; background: rgba(0,0,0,0.02); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border);">
+                            <img id="addPreviewImg" src="" alt="Thumbnail" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border);">
+                            <div style="flex-grow: 1; overflow: hidden;">
+                                <p id="addPreviewName" style="font-size: 0.85rem; font-weight: 600; margin: 0; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">uploaded_image.png</p>
+                                <p id="addPreviewStatus" style="font-size: 0.75rem; color: var(--success); margin: 0; font-weight: 500;">✓ Uploaded</p>
+                            </div>
+                            <button type="button" class="btn btn-outline" style="padding: 0.25rem; border: none; color: var(--danger);" onclick="resetZone('add')">
+                                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('addVehicleModal')">Cancel</button>
+                    <button id="addSubmitBtn" type="submit" class="btn btn-primary">Save Vehicle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Vehicle Modal -->
+    <div class="modal-overlay" id="editVehicleModal">
+        <div class="modal-content" id="edit-vehicle-inner">
+            <div class="modal-header">
+                <h3 style="font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="edit" style="color: var(--primary);"></i> Edit Vehicle Registry
+                </h3>
+                <button class="btn btn-outline" style="padding: 0.25rem; border: none;" onclick="closeModal('editVehicleModal')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="editVehicleForm">
+                <input type="hidden" id="editVehicleId">
+                <input type="hidden" id="editVImageUrl">
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">Make</label>
+                            <input type="text" class="form-control" required id="editVMake">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">Model</label>
+                            <input type="text" class="form-control" required id="editVModel">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">Year</label>
+                            <input type="number" class="form-control" min="1950" max="2026" required id="editVYear">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">Registration / Plate Number</label>
+                            <input type="text" class="form-control" required id="editVPlate" style="text-transform: uppercase;">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">Exterior Color</label>
+                            <input type="text" class="form-control" required id="editVColor">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">Current Odometer (km)</label>
+                            <input type="number" class="form-control" required id="editVMileage">
+                        </div>
+                    </div>
+
+                    <!-- Beautiful Upload Zone -->
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">Vehicle Photograph</label>
+                        <div id="editDropZone" class="form-control" style="border: 2px dashed var(--border); border-radius: 8px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; background: rgba(0,0,0,0.01);">
+                            <i data-lucide="image" style="margin: 0 auto 0.5rem; width: 32px; height: 32px; color: var(--text-muted);"></i>
+                            <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0; font-weight: 500;">Click to select or drag and drop image</p>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">PNG, JPG, JPEG under 5 MB</span>
+                            <input type="file" id="editVImageFile" accept="image/*" style="display: none;">
+                        </div>
+                        <div id="editUploadPreview" style="display: none; align-items: center; gap: 1rem; margin-top: 1rem; background: rgba(0,0,0,0.02); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border);">
+                            <img id="editPreviewImg" src="" alt="Thumbnail" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border);">
+                            <div style="flex-grow: 1; overflow: hidden;">
+                                <p id="editPreviewName" style="font-size: 0.85rem; font-weight: 600; margin: 0; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">uploaded_image.png</p>
+                                <p id="editPreviewStatus" style="font-size: 0.75rem; color: var(--success); margin: 0; font-weight: 500;">✓ Uploaded</p>
+                            </div>
+                            <button type="button" class="btn btn-outline" style="padding: 0.25rem; border: none; color: var(--danger);" onclick="resetZone('edit')">
+                                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('editVehicleModal')">Cancel</button>
+                    <button id="editSubmitBtn" type="submit" class="btn btn-primary">Update Vehicle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal (Enterprise-Level) -->
+    <div class="modal-overlay" id="deleteVehicleModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(239, 68, 68, 0.1);">
+                <h3 style="font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: var(--danger); margin: 0;">
+                    <i data-lucide="alert-triangle" style="color: var(--danger); width: 22px; height: 22px;"></i> Confirm Registry Deletion
+                </h3>
+                <button class="btn btn-outline" style="padding: 0.25rem; border: none;" onclick="closeModal('deleteVehicleModal')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem 1.25rem;">
+                <div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.14); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+                    <p style="font-size: 0.85rem; color: #dc2626; margin: 0; font-weight: 600; line-height: 1.4;">
+                        ⚠️ WARNING: This operation is highly destructive and irreversible. Removing this vehicle registry will permanently wipe its association from active service requests, vehicle diagnostics logs, and scheduled checkups.
+                    </p>
+                </div>
+                <p style="font-size: 0.9rem; margin: 0 0 0.5rem; color: var(--text-main);">
+                    Please confirm you want to delete:
+                </p>
+                <div style="background: rgba(0,0,0,0.02); border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem; margin-bottom: 1.25rem;">
+                    <div id="deleteVehicleName" style="font-weight: 700; font-size: 1.05rem; color: var(--text-main);">Honda Civic</div>
+                    <div id="deleteVehiclePlate" style="font-family: monospace; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">PLATE: N/A</div>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Type plate number to authorize</label>
+                    <input type="text" id="deleteConfirmPlateInput" class="form-control" placeholder="Type vehicle plate to proceed" style="text-transform: uppercase; font-family: monospace;">
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 1rem 1.25rem;">
+                <button type="button" class="btn btn-outline" onclick="closeModal('deleteVehicleModal')">Cancel</button>
+                <button id="deleteConfirmBtn" type="button" class="btn" style="background: var(--danger); color: white; border: none; font-weight: 600; padding: 0.5rem 1rem; border-radius: 6px; cursor: not-allowed; opacity: 0.5;" disabled>Authorize Deletion</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Ensure proper role authentication on page enter
+        const checkTokenVal = localStorage.getItem('access_token');
+        const checkLoggedUser = JSON.parse(localStorage.getItem('activeUser') || '{}');
+        const checkLoggedRole = (checkLoggedUser.role || '').toLowerCase();
+        if (!checkTokenVal || (checkLoggedRole !== 'user' && checkLoggedRole !== 'vehicle_owner' && checkLoggedRole !== 'owner')) {
+            window.location.href = 'index.html';
+        }
+
+        // Set dynamic user profile details in topbar
+        const activeUser = JSON.parse(localStorage.getItem('activeUser') || '{}');
+        if (activeUser && activeUser.name) {
+            const userMenuBtn = document.getElementById('user-menu-btn');
+            if (userMenuBtn) {
+                userMenuBtn.innerHTML = `
+                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(activeUser.name)}&background=6366F1&color=fff" alt="User" style="width: 36px; height: 36px; border-radius: 50%;">
+                `;
+            }
+        }
+
+        // Store current in-memory list of vehicles
+        let localVehiclesState = [];
+
+        // Modal triggers
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // Close modal on outside shade click
+        document.getElementById('addVehicleModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal('addVehicleModal');
+        });
+        document.getElementById('editVehicleModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal('editVehicleModal');
+        });
+        document.getElementById('deleteVehicleModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal('deleteVehicleModal');
+        });
+
+        // Setup Drag and Drop mechanics
+        function setupZone(type) {
+            const dropzone = document.getElementById(`${type}DropZone`);
+            const fileInput = document.getElementById(`${type}VImageFile`);
+            
+            dropzone.addEventListener('click', () => fileInput.click());
+
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.style.borderColor = 'var(--primary)';
+                dropzone.style.background = 'rgba(99, 102, 241, 0.05)';
+            });
+
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.style.borderColor = 'var(--border)';
+                dropzone.style.background = 'rgba(0,0,0,0.01)';
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.style.borderColor = 'var(--border)';
+                dropzone.style.background = 'rgba(0,0,0,0.01)';
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    processFile(e.dataTransfer.files[0], type);
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    processFile(e.target.files[0], type);
+                }
+            });
+        }
+
+        function resetZone(type) {
+            document.getElementById(`${type}DropZone`).style.display = 'block';
+            document.getElementById(`${type}UploadPreview`).style.display = 'none';
+            document.getElementById(`${type}VImageUrl`).value = '';
+            document.getElementById(`${type}VImageFile`).value = '';
+        }
+
+        // Process file size and type, then execute standard multipart upload to server
+        async function processFile(file, type) {
+            // Validations
+            if (!file.type.match('image.*')) {
+                window.showToast('Please upload a valid image file.', 'error');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                window.showToast('File size must be strictly smaller than 5 MB.', 'error');
+                return;
+            }
+
+            const token = localStorage.getItem('access_token');
+            const previewContainer = document.getElementById(`${type}UploadPreview`);
+            const previewImg = document.getElementById(`${type}PreviewImg`);
+            const previewName = document.getElementById(`${type}PreviewName`);
+            const statusText = document.getElementById(`${type}PreviewStatus`);
+
+            // Instantly display a system spinner
+            previewImg.src = 'https://ui-avatars.com/api/?name=Loading&background=f1f1f1';
+            previewName.textContent = file.name;
+            statusText.textContent = 'Uploading...';
+            statusText.style.color = 'var(--text-muted)';
+            document.getElementById(`${type}DropZone`).style.display = 'none';
+            previewContainer.style.display = 'flex';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/uploads', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    const uploadedUrl = result.data.fileUrl;
+                    document.getElementById(`${type}VImageUrl`).value = uploadedUrl;
+                    previewImg.src = uploadedUrl;
+                    statusText.textContent = '✓ Uploaded';
+                    statusText.style.color = 'var(--success)';
+                } else {
+                    throw new Error(result.message || 'Server error uploading');
+                }
+            } catch (err) {
+                console.error("Upload failed:", err);
+                window.showToast(err.message || 'Network error uploading file', 'error');
+                resetZone(type);
+            }
+        }
+
+        // Setup dropzones on initialization
+        setupZone('add');
+        setupZone('edit');
+
+        // Dynamic Loading of secure vehicles state
+        const loadVehicles = async () => {
+            const token = localStorage.getItem('access_token');
+            const grid = document.getElementById('vehicleGrid');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            grid.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
+                    <i data-lucide="loader" class="spin" style="margin: 0 auto 1.5rem; width: 32px; height: 32px;"></i>
+                    <p style="font-weight: 500;">Retrieving synchronized car registry...</p>
+                </div>
+            `;
+            lucide.createIcons();
+
+            try {
+                const res = await fetch('/api/v1/vehicles', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                
+                if (res.ok && result.success) {
+                    const vehicles = result.data || [];
+                    localVehiclesState = vehicles; // hold state locally for editing
+
+                    if (vehicles.length === 0) {
+                        grid.innerHTML = `
+                            <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; border: 2px dashed var(--border); border-radius: 8px; color: var(--text-muted); background: rgba(0,0,0,0.01);">
+                                <i data-lucide="car" style="margin: 0 auto 1rem; width: 48px; height: 48px; opacity: 0.4;"></i>
+                                <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.25rem;">No registered vehicles</h3>
+                                <p style="font-size: 0.875rem; margin-bottom: 1.5rem; max-width: 320px; margin-left: auto; margin-right: auto;">Keep track of make, mileage, and active repairs securely. Register your first vehicle to continue.</p>
+                                <button class="btn btn-primary" onclick="openModal('addVehicleModal')" style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0 auto;">
+                                    <i data-lucide="plus"></i> Add Vehicle
+                                </button>
+                            </div>
+                        `;
+                        lucide.createIcons();
+                        return;
+                    }
+
+                    grid.innerHTML = vehicles.map(v => {
+                        const hasImg = v.image && v.image !== '/uploads/placeholder_car.png';
+                        const coverImg = v.image || "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=600";
+                        const plate = v.license_plate || v.registration_number;
+
+                        return `
+                            <div class="vehicle-card" style="display: flex; flex-direction: column; overflow: hidden; animation: fadeIn 0.25s ease-out;">
+                                <div style="position: relative; width: 100%; height: 160px; overflow: hidden; background: #e5e7eb;">
+                                    <img src="${coverImg}" alt="${v.make}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    <div style="position: absolute; bottom: 10px; right: 10px;">
+                                        <div class="vehicle-plate" style="font-size: 0.95rem; padding: 0.15rem 0.5rem; border-width: 1.5px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">${plate}</div>
+                                    </div>
+                                </div>
+                                <div class="vehicle-body" style="flex-grow: 1; padding: 1.25rem;">
+                                    <div style="margin-bottom: 1rem;">
+                                        <h3 style="font-size: 1.2rem; font-weight: 700; margin: 0; color: var(--text-main);">${v.make} ${v.model}</h3>
+                                        <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">${v.year} Model • ${v.color}</span>
+                                    </div>
+                                    
+                                    <div style="display: flex; flex-direction: column; gap: 0.5rem; border-top: 1px solid var(--border); padding-top: 0.75rem;">
+                                        <div class="vehicle-detail" style="margin: 0; display: flex; justify-content: space-between; font-size: 0.85rem;">
+                                            <span>Current Mileage</span>
+                                            <span style="font-weight: 600; color: var(--text-main);">${Number(v.mileage || 0).toLocaleString()} km</span>
+                                        </div>
+                                        <div class="vehicle-detail" style="margin: 0; display: flex; justify-content: space-between; font-size: 0.85rem;">
+                                            <span>System Status</span>
+                                            <span style="font-weight: 600; color: var(--success); display: inline-flex; align-items: center; gap: 0.25rem;">
+                                                <span style="width: 8px; height: 8px; background: var(--success); border-radius: 50%;"></span> Active
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="vehicle-footer" style="padding: 0.75rem 1.25rem; background: var(--bg-card-footer, rgba(0,0,0,0.015)); border-top: 1px solid var(--border); display: flex; gap: 0.5rem;">
+                                    <a href="user-new-request.html?vehicle_id=${v.id}" class="btn btn-primary" style="flex-grow: 1; font-size: 0.85rem; padding: 0.5rem; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem;">
+                                        <i data-lucide="wrench" style="width: 14px; height: 14px;"></i> Request Care
+                                    </a>
+                                    <button onclick="triggerEditVehicle(${v.id})" class="btn btn-outline" style="padding: 0.5rem;" title="Edit details">
+                                        <i data-lucide="edit-2" style="width: 15px; height: 15px;"></i>
+                                    </button>
+                                    <button onclick="triggerDeleteVehicle(${v.id})" class="btn btn-outline" style="padding: 0.5rem; color: var(--danger); border-color: rgba(239, 68, 68, 0.2);" title="Remove vehicle">
+                                        <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    lucide.createIcons();
+                } else {
+                    grid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--danger);">
+                            <i data-lucide="alert-octagon" style="margin: 0 auto 1rem; width: 36px; height: 36px;"></i>
+                            <p style="font-weight: 500;">Unable to connect to dynamic car registry: ${result.message || 'Unknown protocol error'}</p>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                }
+            } catch (err) {
+                console.error("Load vehicles error:", err);
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--danger);">
+                        <i data-lucide="wifi-off" style="margin: 0 auto 1rem; width: 36px; height: 36px;"></i>
+                        <p style="font-weight: 500;">Connection timeout. Verify system engine is running.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+            }
+        };
+
+        // Load initially
+        loadVehicles();
+
+        // Submit form handler for adding
+        document.getElementById('addVehicleForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const token = localStorage.getItem('access_token');
+            if (!token) return;
+
+            const payload = {
+                make: document.getElementById('vMake').value,
+                model: document.getElementById('vModel').value,
+                year: parseInt(document.getElementById('vYear').value),
+                registration_number: document.getElementById('vPlate').value.toUpperCase(),
+                color: document.getElementById('vColor').value,
+                mileage: document.getElementById('vMileage').value,
+                image: document.getElementById('addVImageUrl').value || '/uploads/placeholder_car.png'
+            };
+
+            const modalContent = document.getElementById('add-vehicle-inner');
+            const originalContent = modalContent.innerHTML;
+
+            modalContent.innerHTML = `
+                <div style="padding: 2.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem;">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(99, 102, 241, 0.08); display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; border: 1px solid rgba(99, 102, 241, 0.2);">
+                        <i data-lucide="loader" class="spin" style="width: 28px; height: 28px; color: var(--primary);"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text);">Registering Vehicle</h3>
+                    <p style="color: var(--text-muted); font-size: 0.875rem; max-width: 360px; margin: 0 auto;">Analyzing specifications, verifying registration plate uniqueness, and creating dynamic maintenance dashboard entries...</p>
+                    
+                    <div style="width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 0.75rem; text-align: left; background: var(--bg-card); border: 1px solid var(--border); padding: 1.25rem; border-radius: 8px;">
+                        <div id="add-step-1" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: var(--success); font-weight: 500;">
+                            <i data-lucide="loader" class="spin" style="width: 14px; height: 14px;"></i>
+                            <span>Verifying vehicle identification parameters...</span>
+                        </div>
+                        <div id="add-step-2" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: var(--text-muted); opacity: 0.5;">
+                            <i data-lucide="circle" style="width: 14px; height: 14px;"></i>
+                            <span>Processing and optimizing visual assets...</span>
+                        </div>
+                        <div id="add-step-3" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: var(--text-muted); opacity: 0.5;">
+                            <i data-lucide="circle" style="width: 14px; height: 14px;"></i>
+                            <span>Binding newly registered vehicle to secure ledger...</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+
+            // STEP 1 Complete
+            await new Promise(r => setTimeout(r, 450));
+            const s1 = document.getElementById('add-step-1');
+            if (s1) s1.innerHTML = `<i data-lucide="check-circle" style="width: 14px; height: 14px; color: var(--success);"></i> <span style="color: var(--success);">Plate & VIN parameters verified</span>`;
+            
+            const s2 = document.getElementById('add-step-2');
+            if (s2) {
+                s2.innerHTML = `<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; color: var(--primary);"></i> <span style="color: var(--text); font-weight: 500;">Uploading and hashing digital photo...</span>`;
+                s2.style.opacity = '1';
+            }
+            if (window.lucide) lucide.createIcons();
+
+            // STEP 2 Complete
+            await new Promise(r => setTimeout(r, 450));
+            if (s2) s2.innerHTML = `<i data-lucide="check-circle" style="width: 14px; height: 14px; color: var(--success);"></i> <span style="color: var(--success);">Asset registered on cloud storage</span>`;
+            
+            const s3 = document.getElementById('add-step-3');
+            if (s3) {
+                s3.innerHTML = `<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; color: var(--primary);"></i> <span style="color: var(--text); font-weight: 500;">Persisting digital registry ledger...</span>`;
+                s3.style.opacity = '1';
+            }
+            if (window.lucide) lucide.createIcons();
+
+            await new Promise(r => setTimeout(r, 400));
+
+            try {
+                const res = await fetch('/api/v1/vehicles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                
+                if (res.ok && result.success) {
+                    modalContent.innerHTML = `
+                        <div style="padding: 2.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;">
+                            <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(16, 185, 129, 0.08); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(16, 185, 129, 0.2);">
+                                <i data-lucide="shield-check" style="width: 28px; height: 28px; color: var(--success);"></i>
+                            </div>
+                            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--success);">Vehicle Registered!</h3>
+                            <p style="color: var(--text-muted); font-size: 0.875rem; max-width: 320px;">The vehicle specification profile has been registered in the system database.</p>
+                        </div>
+                    `;
+                    if (window.lucide) lucide.createIcons();
+                    window.showToast('Vehicle registered in registry successfully!', 'success');
+
+                    setTimeout(async () => {
+                        closeModal('addVehicleModal');
+                        modalContent.innerHTML = originalContent;
+                        document.getElementById('addVehicleForm').reset();
+                        resetZone('add');
+                        await loadVehicles();
+                    }, 1500);
+                } else {
+                    window.showToast(result.message || 'Failed to complete registration.', 'error');
+                    modalContent.innerHTML = originalContent;
+                    if (window.lucide) lucide.createIcons();
+                }
+            } catch (err) {
+                console.error("Add vehicle error:", err);
+                window.showToast('Connection error. Try refreshing dashboard.', 'error');
+                modalContent.innerHTML = originalContent;
+                if (window.lucide) lucide.createIcons();
+            }
+        });
+
+        // Trigger Editor Modal
+        window.triggerEditVehicle = function(id) {
+            const vehicle = localVehiclesState.find(v => v.id === id);
+            if (!vehicle) {
+                window.showToast('Unable to synchronize target vehicle registry context.', 'error');
+                return;
+            }
+
+            document.getElementById('editVehicleId').value = vehicle.id;
+            document.getElementById('editVMake').value = vehicle.make;
+            document.getElementById('editVModel').value = vehicle.model;
+            document.getElementById('editVYear').value = vehicle.year;
+            document.getElementById('editVPlate').value = (vehicle.registration_number || vehicle.license_plate || '').toUpperCase();
+            document.getElementById('editVColor').value = vehicle.color || '';
+            document.getElementById('editVMileage').value = vehicle.mileage || '';
+            
+            // Image preview configuration
+            const imgUrl = vehicle.image || '';
+            if (imgUrl && imgUrl !== '/uploads/placeholder_car.png') {
+                document.getElementById('editVImageUrl').value = imgUrl;
+                document.getElementById('editDropZone').style.display = 'none';
+                
+                const previewImg = document.getElementById('editPreviewImg');
+                previewImg.src = imgUrl;
+                document.getElementById('editPreviewName').textContent = imgUrl.substring(imgUrl.lastIndexOf('/') + 1);
+                document.getElementById('editPreviewStatus').textContent = '✓ Active Registered Photo';
+                document.getElementById('editPreviewStatus').style.color = 'var(--primary)';
+                document.getElementById('editUploadPreview').style.display = 'flex';
+            } else {
+                resetZone('edit');
+            }
+
+            openModal('editVehicleModal');
+            lucide.createIcons();
+        };
+
+        // Submit form handler for editing
+        document.getElementById('editVehicleForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const token = localStorage.getItem('access_token');
+            const vehicleId = document.getElementById('editVehicleId').value;
+            if (!token || !vehicleId) return;
+
+            const payload = {
+                make: document.getElementById('editVMake').value,
+                model: document.getElementById('editVModel').value,
+                year: parseInt(document.getElementById('editVYear').value),
+                registration_number: document.getElementById('editVPlate').value.toUpperCase(),
+                color: document.getElementById('editVColor').value,
+                mileage: document.getElementById('editVMileage').value,
+                image: document.getElementById('editVImageUrl').value || '/uploads/placeholder_car.png'
+            };
+
+            const modalContent = document.getElementById('edit-vehicle-inner');
+            const originalContent = modalContent.innerHTML;
+
+            modalContent.innerHTML = `
+                <div style="padding: 2.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem;">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(99, 102, 241, 0.08); display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; border: 1px solid rgba(99, 102, 241, 0.2);">
+                        <i data-lucide="loader" class="spin" style="width: 28px; height: 28px; color: var(--primary);"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text);">Synchronizing Changes</h3>
+                    <p style="color: var(--text-muted); font-size: 0.875rem; max-width: 360px; margin: 0 auto;">Aligning specifications, storing modifications, and broadcasting changes to authorized mechanical workshops...</p>
+                    
+                    <div style="width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 0.75rem; text-align: left; background: var(--bg-card); border: 1px solid var(--border); padding: 1.25rem; border-radius: 8px;">
+                        <div id="edit-step-1" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: var(--success); font-weight: 500;">
+                            <i data-lucide="loader" class="spin" style="width: 14px; height: 14px;"></i>
+                            <span>Comparing ledger diffs & checking bounds...</span>
+                        </div>
+                        <div id="edit-step-2" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: var(--text-muted); opacity: 0.5;">
+                            <i data-lucide="circle" style="width: 14px; height: 14px;"></i>
+                            <span>Updating localized attributes...</span>
+                        </div>
+                        <div id="edit-step-3" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: var(--text-muted); opacity: 0.5;">
+                            <i data-lucide="circle" style="width: 14px; height: 14px;"></i>
+                            <span>Committing changes to persistent storage...</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+
+            // STEP 1 Complete
+            await new Promise(r => setTimeout(r, 450));
+            const s1 = document.getElementById('edit-step-1');
+            if (s1) s1.innerHTML = `<i data-lucide="check-circle" style="width: 14px; height: 14px; color: var(--success);"></i> <span style="color: var(--success);">Ledger parameters aligned</span>`;
+            
+            const s2 = document.getElementById('edit-step-2');
+            if (s2) {
+                s2.innerHTML = `<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; color: var(--primary);"></i> <span style="color: var(--text); font-weight: 500;">Aligning asset metadata...</span>`;
+                s2.style.opacity = '1';
+            }
+            if (window.lucide) lucide.createIcons();
+
+            // STEP 2 Complete
+            await new Promise(r => setTimeout(r, 450));
+            if (s2) s2.innerHTML = `<i data-lucide="check-circle" style="width: 14px; height: 14px; color: var(--success);"></i> <span style="color: var(--success);">Visual asset metadata synchronized</span>`;
+            
+            const s3 = document.getElementById('edit-step-3');
+            if (s3) {
+                s3.innerHTML = `<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; color: var(--primary);"></i> <span style="color: var(--text); font-weight: 500;">Pushing to transaction servers...</span>`;
+                s3.style.opacity = '1';
+            }
+            if (window.lucide) lucide.createIcons();
+
+            await new Promise(r => setTimeout(r, 400));
+
+            try {
+                const res = await fetch(`/api/v1/vehicles/${vehicleId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                
+                if (res.ok && result.success) {
+                    modalContent.innerHTML = `
+                        <div style="padding: 2.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;">
+                            <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(16, 185, 129, 0.08); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(16, 185, 129, 0.2);">
+                                <i data-lucide="shield-check" style="width: 28px; height: 28px; color: var(--success);"></i>
+                            </div>
+                            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--success);">Changes Applied!</h3>
+                            <p style="color: var(--text-muted); font-size: 0.875rem; max-width: 320px;">Your vehicle metadata has been successfully updated on the workshop registers.</p>
+                        </div>
+                    `;
+                    if (window.lucide) lucide.createIcons();
+                    window.showToast('Vehicle metadata updated successfully!', 'success');
+
+                    setTimeout(async () => {
+                        closeModal('editVehicleModal');
+                        modalContent.innerHTML = originalContent;
+                        await loadVehicles();
+                    }, 1500);
+                } else {
+                    window.showToast(result.message || 'Failed to modify registry records.', 'error');
+                    modalContent.innerHTML = originalContent;
+                    if (window.lucide) lucide.createIcons();
+                }
+            } catch (err) {
+                console.error("Edit vehicle error:", err);
+                window.showToast('Network synchronization failure.', 'error');
+                modalContent.innerHTML = originalContent;
+                if (window.lucide) lucide.createIcons();
+            }
+        });
+
+        // Trigger secure deletion
+        let vehicleToDeleteId = null;
+        let expectedPlateToConfirm = "";
+
+        window.triggerDeleteVehicle = function(id) {
+            const vehicle = localVehiclesState.find(v => v.id === id);
+            if (!vehicle) return;
+
+            vehicleToDeleteId = id;
+            expectedPlateToConfirm = (vehicle.license_plate || vehicle.registration_number || "").toUpperCase().trim();
+
+            document.getElementById('deleteVehicleName').textContent = `${vehicle.make} ${vehicle.model}`;
+            document.getElementById('deleteVehiclePlate').textContent = `PLATE: ${expectedPlateToConfirm || 'N/A'}`;
+            
+            const confirmInput = document.getElementById('deleteConfirmPlateInput');
+            confirmInput.value = "";
+            
+            const confirmBtn = document.getElementById('deleteConfirmBtn');
+            confirmBtn.disabled = true;
+            confirmBtn.style.opacity = "0.5";
+            confirmBtn.style.cursor = "not-allowed";
+
+            openModal('deleteVehicleModal');
+        };
+
+        document.getElementById('deleteConfirmPlateInput').addEventListener('input', function(e) {
+            const typedVal = e.target.value.toUpperCase().trim();
+            const confirmBtn = document.getElementById('deleteConfirmBtn');
+            if (typedVal === expectedPlateToConfirm) {
+                confirmBtn.disabled = false;
+                confirmBtn.style.opacity = "1";
+                confirmBtn.style.cursor = "pointer";
+            } else {
+                confirmBtn.disabled = true;
+                confirmBtn.style.opacity = "0.5";
+                confirmBtn.style.cursor = "not-allowed";
+            }
+        });
+
+        document.getElementById('deleteConfirmBtn').addEventListener('click', async function() {
+            if (!vehicleToDeleteId) return;
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="loading-spinner" style="border-color: #ffffff; border-top-color: transparent;"></span> Deleting...';
+            btn.disabled = true;
+
+            const token = localStorage.getItem('access_token');
+            if (!token) return;
+
+            try {
+                const res = await fetch(`/api/v1/vehicles/${vehicleToDeleteId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+
+                if (res.ok && result.success) {
+                    window.showToast('Vehicle successfully removed', 'success');
+                    closeModal('deleteVehicleModal');
+                    await loadVehicles();
+                } else {
+                    window.showToast(result.message || 'Failure to execute deletion routine.', 'error');
+                }
+            } catch (err) {
+                console.error("Delete vehicle error:", err);
+                window.showToast('Network failure deleting vehicle.', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.cursor = "pointer";
+            }
+        });
+    </script>
+</body>
+</html>

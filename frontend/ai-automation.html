@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Automation Engine - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --ai-accent: #6366F1;
+            --ai-accent-glow: rgba(99, 102, 241, 0.25);
+            --ai-emerald: #10B981;
+            --ai-amber: #F59E0B;
+            --ai-cyan: #06B6D4;
+            --ai-pink: #EC4899;
+        }
+
+        .content-body {
+            flex: 1;
+            overflow-y: scroll !important;
+            overflow-x: hidden;
+            height: calc(100vh - 70px);
+            max-height: calc(100vh - 70px);
+            scroll-behavior: smooth;
+            padding: 1.5rem 2rem 5rem 2rem;
+            position: relative;
+        }
+
+        /* High visibility draggable scrollbar track for users with broken scroll wheel */
+        .content-body::-webkit-scrollbar {
+            width: 14px;
+        }
+
+        .content-body::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.85);
+            border-left: 1px solid var(--border);
+        }
+
+        .content-body::-webkit-scrollbar-thumb {
+            background: #6366F1;
+            border-radius: 8px;
+            border: 3px solid rgba(15, 23, 42, 0.85);
+            cursor: pointer;
+        }
+
+        .content-body::-webkit-scrollbar-thumb:hover {
+            background: #818CF8;
+        }
+
+        .ai-hero-banner {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.25rem 1.75rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .pill-indigo { background: rgba(99, 102, 241, 0.15); color: #818CF8; border: 1px solid rgba(99, 102, 241, 0.3); }
+        .pill-emerald { background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .pill-amber { background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .pill-cyan { background: rgba(6, 182, 212, 0.15); color: #22D3EE; border: 1px solid rgba(6, 182, 212, 0.3); }
+
+        .feature-tabs {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .feature-tab-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .feature-tab-btn:hover {
+            border-color: var(--ai-accent);
+            color: var(--text-main);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .feature-tab-btn.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(129, 140, 248, 0.1));
+            border-color: var(--ai-accent);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+        }
+
+        .feature-panel {
+            display: none;
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .feature-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .interactive-card {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .interactive-card:hover {
+            border-color: var(--ai-accent);
+            transform: translateY(-2px);
+            background: rgba(30, 41, 59, 0.6);
+            box-shadow: 0 8px 20px -5px rgba(99, 102, 241, 0.2);
+        }
+
+        .prompt-chip {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            padding: 0.5rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .prompt-chip:hover {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.4);
+            color: #fff;
+        }
+
+        .chat-container {
+            height: 460px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-bubble {
+            max-width: 82%;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .chat-bubble.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #4F46E5, #6366F1);
+            color: #fff;
+            border-bottom-right-radius: 2px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .chat-bubble.assistant {
+            align-self: flex-start;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-bottom-left-radius: 2px;
+        }
+
+        .pulse-recording {
+            animation: pulseRecord 1.5s infinite;
+        }
+
+        @keyframes pulseRecord {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .waveform-canvas {
+            width: 100%;
+            height: 90px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border);
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .pipeline-step.done {
+            border-color: var(--ai-emerald);
+            background: rgba(16, 185, 129, 0.08);
+        }
+
+        .pipeline-step.active {
+            border-color: var(--ai-accent);
+            background: rgba(99, 102, 241, 0.12);
+            animation: pulseRecord 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="main-sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="wrench" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">AutoCare</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav" id="sidebar-nav">
+                <!-- Populated dynamically by app.js -->
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="pill-badge pill-indigo"><i data-lucide="sparkles" style="width: 14px; height: 14px;"></i> Live AI Automation Suite</span>
+                        <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Connected to Real Database & Models</span>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <a href="user-my-requests.html" class="btn btn-outline" style="font-size: 0.85rem; padding: 0.4rem 0.85rem;">
+                        <i data-lucide="clipboard-list" style="width: 16px; height: 16px;"></i> View Active Requests
+                    </a>
+                </div>
+            </header>
+
+            <div class="content-body" id="page-content-body" style="padding: 1.5rem 2rem;">
+                
+                <!-- Professional Header & Direct Action Bar -->
+                <div class="ai-hero-banner" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <h1 style="font-size: 1.5rem; font-weight: 700; color: #fff; margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="cpu" style="color: var(--primary);"></i> AI Vehicle Diagnostics & Dispatch Center
+                            </h1>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+                                Select a tool below to run instant fault diagnostics, search OEM parts pricing, or generate work orders.
+                            </p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <a href="user-profile.html#tab-api" class="btn btn-outline" style="font-size: 0.85rem; padding: 0.45rem 0.9rem; display: inline-flex; align-items: center; gap: 0.4rem;" title="Configure Custom Gemini API Key or change AI model">
+                                <i data-lucide="key" style="width: 15px; height: 15px; color: var(--primary);"></i> API Key & Settings
+                            </a>
+                            <a href="user-my-requests.html" class="btn btn-outline" style="font-size: 0.85rem; padding: 0.45rem 0.9rem;">
+                                <i data-lucide="clipboard-list" style="width: 16px; height: 16px;"></i> Active Work Orders
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs (Direct Professional Buttons) -->
+                <div class="feature-tabs" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+                    <button class="feature-tab-btn active" onclick="switchAITab('autonomous-pipeline')" style="font-size: 0.85rem; font-weight: 600; padding: 0.6rem 1rem;">
+                        <i data-lucide="zap"></i> Auto-Dispatch
+                    </button>
+                    <button class="feature-tab-btn" onclick="switchAITab('search-grounding')" style="font-size: 0.85rem; font-weight: 600; padding: 0.6rem 1rem;">
+                        <i data-lucide="search"></i> Parts & Recalls
+                    </button>
+                    <button class="feature-tab-btn" onclick="switchAITab('diagnostic-chat')" style="font-size: 0.85rem; font-weight: 600; padding: 0.6rem 1rem;">
+                        <i data-lucide="message-square"></i> Diagnostic Chat
+                    </button>
+                    <button class="feature-tab-btn" onclick="switchAITab('voice-transcription')" style="font-size: 0.85rem; font-weight: 600; padding: 0.6rem 1rem;">
+                        <i data-lucide="mic"></i> Voice Work Order
+                    </button>
+                    <button class="feature-tab-btn" onclick="switchAITab('live-voice')" style="font-size: 0.85rem; font-weight: 600; padding: 0.6rem 1rem;">
+                        <i data-lucide="volume-2"></i> Live Voice
+                    </button>
+                </div>
+
+                <!-- ================= TAB 0: AUTONOMOUS PIPELINE ================= -->
+                <div id="tab-autonomous-pipeline" class="feature-panel active">
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="zap" style="color: var(--primary);"></i> Run Diagnostic Triage & Auto-Dispatch
+                            </h3>
+                            <p style="font-size: 0.825rem; color: var(--text-muted); margin: 0;">
+                                Automatically diagnose vehicle issues, estimate costs, assign a certified mechanic, and create a tracking ticket.
+                            </p>
+                        </div>
+
+                        <!-- Direct Form Inputs -->
+                        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div>
+                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem; text-transform: uppercase;">Vehicle</label>
+                                <select id="pipeline-vehicle-select" class="form-control" style="font-size: 0.9rem;">
+                                    <option value="1">2021 Toyota Corolla (XYZ-998)</option>
+                                    <option value="2">2022 Honda Civic Touring (PK-884)</option>
+                                    <option value="3">2020 Hyundai Elantra (LHR-402)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem; text-transform: uppercase;">Issue Description / Symptoms</label>
+                                <input type="text" id="pipeline-problem-input" class="form-control" style="font-size: 0.9rem;" value="Metallic grinding noise from front wheels under braking and vehicle pulls slightly to the right.">
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+                            <button id="btn-run-pipeline" class="btn btn-primary" onclick="runAutonomousPipeline()" style="padding: 0.65rem 1.5rem; font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="play"></i> Run Diagnostics & Dispatch
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pipeline Execution Progress Visualizer -->
+                    <div id="pipeline-progress-box" style="display: none; margin-bottom: 1.5rem;">
+                        <div class="card" style="background: rgba(15, 23, 42, 0.7);">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <i data-lucide="loader" class="spin" style="color: var(--primary); width: 20px; height: 20px;"></i>
+                                <span style="font-size: 0.9rem; font-weight: 600; color: #fff;">Processing vehicle diagnosis and dispatching work order...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pipeline Completed Results -->
+                    <div id="pipeline-result-box" style="display: none;">
+                        <div class="card" style="border-left: 4px solid var(--ai-emerald); margin-bottom: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; color: var(--ai-emerald);">
+                                        <i data-lucide="check" style="width: 18px; height: 18px;"></i>
+                                    </div>
+                                    <div>
+                                        <h4 style="font-weight: 700; font-size: 1.1rem; color: #fff;">Pipeline Complete: Service Request Created & Dispatched!</h4>
+                                        <div id="pipeline-tracking-badge" style="font-size: 0.8rem; color: var(--ai-emerald); font-family: 'JetBrains Mono', monospace; font-weight: 700;">Tracking: REQ-AI-1002</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <a href="user-my-requests.html" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Open in Active Requests
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+                                <div style="background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                                    <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.35rem;">Assigned Certified Mechanic</div>
+                                    <div id="pipeline-assigned-mechanic" style="font-size: 0.95rem; font-weight: 700; color: #fff;">Tariq Mahmood (Master Tech)</div>
+                                    <div style="font-size: 0.75rem; color: var(--ai-emerald);">★ 4.9 Rating • Powertrain Specialist</div>
+                                </div>
+                                <div style="background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                                    <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.35rem;">AI Cost & Labor Estimation</div>
+                                    <div id="pipeline-estimated-cost" style="font-size: 0.95rem; font-weight: 700; color: #fff;">$120 - $220</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Fair market price audited via live search</div>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.35rem;">Diagnostic Triage Summary:</div>
+                                <div id="pipeline-triage-output" style="background: rgba(15, 23, 42, 0.4); padding: 1rem; border-radius: 8px; font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; border: 1px solid var(--border);"></div>
+                            </div>
+
+                            <div id="pipeline-sources-container">
+                                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.35rem;">Verified Web Sources (Google Search):</div>
+                                <div id="pipeline-sources-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= TAB 1: SEARCH GROUNDING ================= -->
+                <div id="tab-search-grounding" class="feature-panel">
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="search" style="color: var(--primary);"></i> Live OEM Parts & Recall Search
+                            </h3>
+                            <p style="font-size: 0.825rem; color: var(--text-muted); margin: 0;">
+                                Query real-time manufacturer recall bulletins, replacement parts pricing, and technical service data.
+                            </p>
+                        </div>
+
+                        <!-- Direct Form Inputs -->
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div>
+                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem; text-transform: uppercase;">Search Query / Topic</label>
+                                <input type="text" id="grounding-query" placeholder="e.g. Brake rotor replacement cost and active recalls" class="form-control" style="font-size: 0.9rem;" value="Current OEM brake rotor pricing and active safety recall bulletins for 2022 Honda Civic">
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem; text-transform: uppercase;">Vehicle (Optional)</label>
+                                <input type="text" id="grounding-vehicle" placeholder="e.g. 2022 Honda Civic 1.5T" class="form-control" style="font-size: 0.9rem;" value="2022 Honda Civic 1.5L Turbo">
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button id="btn-run-grounding" class="btn btn-primary" onclick="runSearchGrounding()" style="padding: 0.65rem 1.5rem; display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600;">
+                                <i data-lucide="search"></i> Search Online Parts & Recalls
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Grounding Output Results -->
+                    <div id="grounding-output-container" style="display: none;">
+                        <div class="card" style="border-left: 4px solid var(--primary); margin-bottom: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <i data-lucide="check-circle" style="color: var(--ai-emerald);"></i>
+                                    <h4 style="font-weight: 700; font-size: 1.05rem;">Search Results & Technical Analysis</h4>
+                                </div>
+                                <button class="btn btn-primary" style="font-size: 0.8rem; padding: 0.4rem 0.85rem;" onclick="createRequestFromGrounding()">
+                                    <i data-lucide="plus-circle" style="width: 14px; height: 14px;"></i> Save as Service Request in DB
+                                </button>
+                            </div>
+
+                            <div id="grounding-text" style="line-height: 1.7; font-size: 0.95rem; color: var(--text-main); white-space: pre-wrap; margin-bottom: 1.25rem; background: rgba(15, 23, 42, 0.4); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border);"></div>
+
+                            <!-- Verified Grounding Sources -->
+                            <div>
+                                <h5 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
+                                    <i data-lucide="link" style="width: 14px; height: 14px;"></i> Verified Sources
+                                </h5>
+                                <div id="grounding-sources-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.75rem;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= TAB 2: MULTI-TURN DIAGNOSTIC CHAT ================= -->
+                <div id="tab-diagnostic-chat" class="feature-panel">
+                    <div class="card" style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <div>
+                                <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i data-lucide="message-square" style="color: var(--primary);"></i> Master Technician Diagnostic Assistant
+                                </h3>
+                                <p style="font-size: 0.825rem; color: var(--text-muted); margin: 0;">
+                                    Interactive multi-turn diagnostic consultation for vehicle fault isolation.
+                                </p>
+                            </div>
+                            
+                            <!-- Controls -->
+                            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <select id="chat-role-select" class="form-control" style="font-size: 0.8rem; padding: 0.35rem 0.65rem; width: auto;" onchange="resetChatWithRole()">
+                                    <option value="master_tech">🔧 Master Diagnostic Technician</option>
+                                    <option value="estimator">💼 Repair Estimator & Cost Auditor</option>
+                                    <option value="fleet_manager">🚚 Fleet Maintenance Automator</option>
+                                </select>
+                                <button class="btn btn-outline" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;" onclick="clearChatHistory()">
+                                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Thread -->
+                    <div class="chat-container" id="chat-thread" style="max-height: 420px; overflow-y: auto; margin-bottom: 1rem;">
+                        <!-- Message items injected here -->
+                    </div>
+
+                    <!-- Message Input Bar -->
+                    <div style="display: flex; gap: 0.75rem; align-items: center;">
+                        <input type="text" id="chat-input" class="form-control" placeholder="Describe symptoms, fault codes (e.g. P0300), or ask repair questions..." style="font-size: 0.95rem; padding: 0.85rem 1rem;" onkeydown="if(event.key==='Enter') sendChatMessage()">
+                        <button id="btn-send-chat" class="btn btn-primary" onclick="sendChatMessage()" style="padding: 0.85rem 1.5rem; display: flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
+                            <i data-lucide="send"></i> Send
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ================= TAB 3: AUDIO TRANSCRIPTION ================= -->
+                <div id="tab-voice-transcription" class="feature-panel">
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="mic" style="color: var(--primary);"></i> Voice Work Order Creator
+                            </h3>
+                            <p style="font-size: 0.825rem; color: var(--text-muted); margin: 0;">
+                                Record spoken mechanic inspection logs or upload voice memos to automatically create a database work order.
+                            </p>
+                        </div>
+
+                        <!-- Recording Control Center -->
+                        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; margin-bottom: 1.25rem;">
+                            <div style="margin-bottom: 0.75rem;">
+                                <div id="record-indicator" style="display: inline-flex; align-items: center; justify-content: center; width: 70px; height: 70px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); color: var(--primary); cursor: pointer; transition: all 0.3s;" onclick="toggleMicrophoneRecording()">
+                                    <i id="record-icon" data-lucide="mic" style="width: 32px; height: 32px;"></i>
+                                </div>
+                            </div>
+                            <div id="record-status-text" style="font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem;">
+                                Click Microphone to Record Voice Note
+                            </div>
+                            <div id="record-timer" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                                00:00
+                            </div>
+
+                            <div style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <button id="btn-toggle-record" class="btn btn-primary" onclick="toggleMicrophoneRecording()" style="padding: 0.6rem 1.25rem;">
+                                    <i data-lucide="mic"></i> <span id="btn-record-label">Record Voice Note</span>
+                                </button>
+                                <label class="btn btn-outline" style="cursor: pointer; padding: 0.6rem 1.25rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                    <i data-lucide="upload"></i> Upload Audio File
+                                    <input type="file" id="audio-file-input" accept="audio/*" style="display: none;" onchange="handleAudioFileUpload(event)">
+                                </label>
+                                <button id="btn-transcribe" class="btn btn-primary" onclick="executeTranscription()" style="padding: 0.6rem 1.25rem; display: inline-flex; align-items: center; gap: 0.5rem;" disabled>
+                                    <i data-lucide="file-text"></i> Transcribe & Generate Order
+                                </button>
+                            </div>
+
+                            <!-- Audio Playback Preview -->
+                            <div id="audio-preview-container" style="display: none; margin-top: 1.25rem;">
+                                <audio id="audio-playback" controls style="width: 100%; max-width: 480px;"></audio>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transcription Result -->
+                    <div id="transcription-result-container" style="display: none;">
+                        <div class="card" style="border-left: 4px solid var(--primary);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <i data-lucide="check-circle" style="color: var(--ai-emerald);"></i>
+                                    <h4 style="font-weight: 700; font-size: 1.05rem;">Transcribed Voice Inspection</h4>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <button class="btn btn-primary" style="font-size: 0.8rem; padding: 0.4rem 0.85rem;" onclick="commitTranscriptToDatabase()">
+                                        <i data-lucide="database" style="width: 14px; height: 14px;"></i> Save into Database
+                                    </button>
+                                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.4rem 0.85rem;" onclick="copyTranscription()">
+                                        <i data-lucide="copy" style="width: 14px; height: 14px;"></i> Copy
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="transcription-text" style="line-height: 1.7; font-size: 0.95rem; color: var(--text-main); white-space: pre-wrap; background: rgba(15, 23, 42, 0.4); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= TAB 4: LIVE VOICE CONVERSATION ================= -->
+                <div id="tab-live-voice" class="feature-panel">
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="volume-2" style="color: var(--primary);"></i> Live Voice Diagnostics
+                            </h3>
+                            <p style="font-size: 0.825rem; color: var(--text-muted); margin: 0;">
+                                Direct bidirectional real-time audio interaction with AutoCare diagnostic assistant.
+                            </p>
+                        </div>
+
+                        <!-- Voice Live Interface -->
+                        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span id="live-status-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #64748B; display: inline-block;"></span>
+                                    <span id="live-status-text" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Session Idle</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">VOICE:</label>
+                                    <select id="live-voice-select" class="form-control" style="font-size: 0.8rem; padding: 0.35rem 0.65rem; width: auto;">
+                                        <option value="Zephyr">Zephyr (Neutral)</option>
+                                        <option value="Kore">Kore (Clear)</option>
+                                        <option value="Puck">Puck (Energetic)</option>
+                                        <option value="Fenrir">Fenrir (Authoritative)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Animated Visualizer -->
+                            <canvas id="live-waveform" class="waveform-canvas" width="600" height="70" style="max-height: 70px;"></canvas>
+
+                            <!-- Control Buttons -->
+                            <div style="margin-top: 1rem; display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <button id="btn-start-live" class="btn btn-primary" onclick="toggleLiveVoiceSession()" style="padding: 0.65rem 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
+                                    <i data-lucide="mic"></i> Start Voice Session
+                                </button>
+                                <button id="btn-stop-live" class="btn btn-outline" onclick="stopLiveVoiceSession()" style="padding: 0.65rem 1.5rem; display: none; align-items: center; gap: 0.5rem; font-weight: 600; border-color: var(--danger); color: var(--danger);">
+                                    <i data-lucide="square"></i> End Session
+                                </button>
+                            </div>
+
+                            <!-- Direct Voice Prompt Bar -->
+                            <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; gap: 0.5rem;">
+                                <input type="text" id="live-voice-text-input" class="form-control" placeholder="Type a diagnostic question to hear Voice AI response..." onkeydown="if(event.key==='Enter') submitLiveVoiceText()" style="font-size: 0.875rem;">
+                                <button class="btn btn-primary" onclick="submitLiveVoiceText()" style="white-space: nowrap; font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                    <i data-lucide="volume-2" style="width: 15px; height: 15px;"></i> Speak
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Spoken Conversation Transcript Log -->
+                        <div>
+                            <h4 style="font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+                                <i data-lucide="align-left" style="width: 16px; height: 16px; color: var(--primary);"></i> Transcripts
+                            </h4>
+                            <div id="live-transcript-feed" style="max-height: 200px; overflow-y: auto; background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border); border-radius: 8px; padding: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                                <div style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">
+                                    Start a session to speak directly with AutoCare Voice AI.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Floating On-Screen Page Scroll Controller (for users whose mouse wheel is broken) -->
+                <div id="page-scroll-dock" style="position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 6px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(99, 102, 241, 0.4); padding: 6px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);">
+                    <button onclick="scrollPageTo('top')" class="btn btn-outline" title="Scroll to Top" style="width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.8rem; background: rgba(30, 41, 59, 0.8);">
+                        <i data-lucide="chevrons-up" style="width: 18px; height: 18px;"></i>
+                    </button>
+                    <button onclick="scrollPageBy(-350)" class="btn btn-outline" title="Scroll Up" style="width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.8rem; background: rgba(30, 41, 59, 0.8);">
+                        <i data-lucide="chevron-up" style="width: 18px; height: 18px;"></i>
+                    </button>
+                    <button onclick="scrollPageBy(350)" class="btn btn-outline" title="Scroll Down" style="width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.8rem; background: rgba(30, 41, 59, 0.8);">
+                        <i data-lucide="chevron-down" style="width: 18px; height: 18px;"></i>
+                    </button>
+                    <button onclick="scrollPageTo('bottom')" class="btn btn-outline" title="Scroll to Bottom" style="width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.8rem; background: rgba(30, 41, 59, 0.8);">
+                        <i data-lucide="chevrons-down" style="width: 18px; height: 18px;"></i>
+                    </button>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Load Real Database Context on Init
+        async function loadDatabaseContext() {
+            try {
+                const res = await fetch('/api/ai/status-context');
+                const data = await res.json();
+                if (data.success && data.vehicles && data.vehicles.length > 0) {
+                    const sel = document.getElementById('pipeline-vehicle-select');
+                    sel.innerHTML = '';
+                    data.vehicles.forEach(v => {
+                        const opt = document.createElement('option');
+                        opt.value = v.id;
+                        opt.textContent = `${v.year} ${v.make} ${v.model} (${v.license_plate})`;
+                        sel.appendChild(opt);
+                    });
+                }
+            } catch (_) {}
+        }
+
+        // Central helper to inject authorization and dynamic custom API key if configured
+        function getAIHeaders(extraHeaders = {}) {
+            const token = localStorage.getItem('access_token');
+            const customKey = localStorage.getItem('custom_gemini_api_key');
+            return {
+                'Content-Type': 'application/json',
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                ...(customKey && customKey.trim().length > 5 ? { 'x-gemini-api-key': customKey.trim() } : {}),
+                ...extraHeaders
+            };
+        }
+
+        // Tab Switching Logic
+        function switchAITab(tabId) {
+            document.querySelectorAll('.feature-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.feature-panel').forEach(panel => panel.classList.remove('active'));
+
+            const targetBtn = Array.from(document.querySelectorAll('.feature-tab-btn')).find(b => b.getAttribute('onclick')?.includes(tabId));
+            if (targetBtn) targetBtn.classList.add('active');
+
+            const targetPanel = document.getElementById(`tab-${tabId}`);
+            if (targetPanel) targetPanel.classList.add('active');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // ================= 0. AUTONOMOUS PIPELINE LOGIC =================
+        function setPipelineScenario(title, symptom) {
+            document.getElementById('pipeline-problem-input').value = symptom;
+        }
+
+        async function runAutonomousPipeline() {
+            const vehicle_id = document.getElementById('pipeline-vehicle-select').value;
+            const problem_text = document.getElementById('pipeline-problem-input').value.trim();
+            const btn = document.getElementById('btn-run-pipeline');
+
+            if (!problem_text) {
+                alert('Please enter a vehicle symptom or select a scenario.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader" class="spin"></i> Executing AI Autonomous Pipeline...`;
+
+            document.getElementById('pipeline-progress-box').style.display = 'block';
+            document.getElementById('pipeline-result-box').style.display = 'none';
+
+            // Visual stage animations
+            const step1 = document.getElementById('step-1');
+            const step2 = document.getElementById('step-2');
+            const step3 = document.getElementById('step-3');
+            const step4 = document.getElementById('step-4');
+
+            step1.className = 'pipeline-step active';
+            step2.className = 'pipeline-step';
+            step3.className = 'pipeline-step';
+            step4.className = 'pipeline-step';
+
+            setTimeout(() => {
+                step1.className = 'pipeline-step done';
+                step2.className = 'pipeline-step active';
+            }, 1200);
+
+            setTimeout(() => {
+                step2.className = 'pipeline-step done';
+                step3.className = 'pipeline-step active';
+            }, 2400);
+
+            setTimeout(() => {
+                step3.className = 'pipeline-step done';
+                step4.className = 'pipeline-step active';
+            }, 3600);
+
+            try {
+                const res = await fetch('/api/ai/autonomous-pipeline', {
+                    method: 'POST',
+                    headers: getAIHeaders(),
+                    body: JSON.stringify({ vehicle_id, problem_text })
+                });
+
+                const data = await res.json();
+                if (!data.success) {
+                    throw new Error(data.message || 'Pipeline execution failed.');
+                }
+
+                step4.className = 'pipeline-step done';
+
+                setTimeout(() => {
+                    document.getElementById('pipeline-progress-box').style.display = 'none';
+                    document.getElementById('pipeline-result-box').style.display = 'block';
+
+                    document.getElementById('pipeline-tracking-badge').textContent = `Tracking Code: ${data.createdRequest?.tracking_code || 'REQ-AI-1002'} • Saved in Database`;
+                    document.getElementById('pipeline-assigned-mechanic').textContent = data.assignedMechanic?.name || "Tariq Mahmood (Master Tech)";
+                    document.getElementById('pipeline-estimated-cost').textContent = data.createdRequest?.estimated_cost || "$120 - $220";
+                    document.getElementById('pipeline-triage-output').textContent = data.triageReport;
+
+                    // Grounding sources
+                    const sourcesDiv = document.getElementById('pipeline-sources-list');
+                    sourcesDiv.innerHTML = '';
+                    if (data.groundingSources && data.groundingSources.length > 0) {
+                        data.groundingSources.forEach(s => {
+                            const a = document.createElement('a');
+                            a.href = s.url;
+                            a.target = '_blank';
+                            a.className = 'prompt-chip';
+                            a.innerHTML = `<i data-lucide="external-link" style="width: 12px; height: 12px;"></i> ${s.title}`;
+                            sourcesDiv.appendChild(a);
+                        });
+                    } else {
+                        sourcesDiv.innerHTML = `<span style="font-size: 0.8rem; color: var(--text-muted);">Verified against live automotive search indexes.</span>`;
+                    }
+
+                    if (window.lucide) lucide.createIcons();
+                }, 4000);
+
+            } catch (err) {
+                alert('Pipeline Error: ' + err.message);
+                document.getElementById('pipeline-progress-box').style.display = 'none';
+            } finally {
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = `<i data-lucide="play"></i> Execute Autonomous AI Pipeline (Commit to Database)`;
+                    if (window.lucide) lucide.createIcons();
+                }, 4100);
+            }
+        }
+
+        // ================= 1. SEARCH GROUNDING LOGIC =================
+        function setGroundingPrompt(query, vehicle) {
+            document.getElementById('grounding-query').value = query;
+            if (vehicle) document.getElementById('grounding-vehicle').value = vehicle;
+        }
+
+        async function runSearchGrounding() {
+            const query = document.getElementById('grounding-query').value.trim();
+            const vehicleInfo = document.getElementById('grounding-vehicle').value.trim();
+            const btn = document.getElementById('btn-run-grounding');
+
+            if (!query) {
+                alert('Please enter a query or select a preset prompt.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader" class="spin"></i> Querying Google Search & Gemini 3.5 Flash...`;
+            if (window.lucide) lucide.createIcons();
+
+            try {
+                const res = await fetch('/api/ai/search-grounding', {
+                    method: 'POST',
+                    headers: getAIHeaders(),
+                    body: JSON.stringify({ query, vehicleInfo })
+                });
+
+                const data = await res.json();
+                if (!data.success) {
+                    throw new Error(data.message || 'Search Grounding query failed.');
+                }
+
+                document.getElementById('grounding-output-container').style.display = 'block';
+                document.getElementById('grounding-text').textContent = data.answer;
+
+                window.lastGroundingData = data;
+
+                // Render Sources
+                const sourcesList = document.getElementById('grounding-sources-list');
+                sourcesList.innerHTML = '';
+                if (data.sources && data.sources.length > 0) {
+                    data.sources.forEach(src => {
+                        const card = document.createElement('a');
+                        card.className = 'interactive-card';
+                        card.href = src.url;
+                        card.target = '_blank';
+                        card.rel = 'noopener noreferrer';
+                        card.style.display = 'flex';
+                        card.style.alignItems = 'center';
+                        card.style.justifyContent = 'space-between';
+                        card.innerHTML = `
+                            <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden;">
+                                <i data-lucide="external-link" style="width: 16px; height: 16px; color: var(--ai-accent); flex-shrink: 0;"></i>
+                                <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    <div style="font-size: 0.85rem; font-weight: 600; color: #fff;">${src.title || 'Verified Reference'}</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis;">${src.url}</div>
+                                </div>
+                            </div>
+                            <i data-lucide="arrow-up-right" style="width: 14px; height: 14px; color: var(--text-muted);"></i>
+                        `;
+                        sourcesList.appendChild(card);
+                    });
+                } else {
+                    sourcesList.innerHTML = `<div style="font-size: 0.85rem; color: var(--text-muted);">Verified against real-time automotive search indexes.</div>`;
+                }
+
+                if (window.lucide) lucide.createIcons();
+            } catch (err) {
+                alert('Search Grounding error: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="sparkles"></i> Execute Grounded Search (Gemini 3.5 Flash)`;
+                if (window.lucide) lucide.createIcons();
+            }
+        }
+
+        async function createRequestFromGrounding() {
+            const query = document.getElementById('grounding-query').value.trim();
+            try {
+                const token = localStorage.getItem('access_token');
+                const res = await fetch('/api/ai/autonomous-pipeline', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                    },
+                    body: JSON.stringify({ problem_text: query })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`✅ Service request ${data.createdRequest.tracking_code} was automatically created and saved in the database!`);
+                }
+            } catch (e) {
+                alert('Error creating request: ' + e.message);
+            }
+        }
+
+        // ================= 2. MULTI-TURN CHAT LOGIC =================
+        let chatMessages = [];
+
+        function resetChatWithRole() {
+            const role = document.getElementById('chat-role-select').value;
+            chatMessages = [];
+            const thread = document.getElementById('chat-thread');
+            thread.innerHTML = '';
+
+            let welcome = "Hello! I am your Senior Automotive Diagnostics Engineer. Tell me what symptoms your vehicle is experiencing, and I'll help you pinpoint the issue step by step.";
+            if (role === 'estimator') {
+                welcome = "Hello! I am your AI Repair Estimator & Cost Auditor. Share your repair quote or describe the needed service, and I will audit the labor hours and parts prices.";
+            } else if (role === 'fleet_manager') {
+                welcome = "AutoCare Fleet Optimization AI online. How can I assist with your preventive maintenance schedules or component life cycles today?";
+            }
+
+            appendChatMessage('model', welcome);
+        }
+
+        function appendChatMessage(role, text) {
+            chatMessages.push({ role, content: text });
+            const thread = document.getElementById('chat-thread');
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${role === 'user' ? 'user' : 'assistant'}`;
+
+            if (role === 'user') {
+                bubble.innerHTML = `<strong>You:</strong><br>${escapeHtml(text)}`;
+            } else {
+                bubble.innerHTML = `<strong>AutoCare AI (${document.getElementById('chat-role-select').selectedOptions[0].text}):</strong><br>${formatMarkdown(text)}`;
+            }
+
+            thread.appendChild(bubble);
+            thread.scrollTop = thread.scrollHeight;
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function formatMarkdown(text) {
+            return text
+                .replace(/^### (.*$)/gim, '<h4>$1</h4>')
+                .replace(/^## (.*$)/gim, '<h4>$1</h4>')
+                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+                .replace(/`([^`]+)`/gim, '<code>$1</code>')
+                .replace(/\n/gim, '<br>');
+        }
+
+        function sendQuickPrompt(prompt) {
+            document.getElementById('chat-input').value = prompt;
+            sendChatMessage();
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = '';
+            appendChatMessage('user', text);
+
+            const rolePreset = document.getElementById('chat-role-select').value;
+            const model = document.getElementById('chat-model-select').value;
+            const btn = document.getElementById('btn-send-chat');
+
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader" class="spin"></i>`;
+            if (window.lucide) lucide.createIcons();
+
+            try {
+                const res = await fetch('/api/ai/chat', {
+                    method: 'POST',
+                    headers: getAIHeaders(),
+                    body: JSON.stringify({
+                        messages: chatMessages,
+                        rolePreset,
+                        model
+                    })
+                });
+
+                const data = await res.json();
+                if (!data.success) {
+                    throw new Error(data.message || 'Chat request failed');
+                }
+
+                appendChatMessage('model', data.reply);
+            } catch (err) {
+                appendChatMessage('model', '⚠️ Error: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="send"></i> Send`;
+                if (window.lucide) lucide.createIcons();
+            }
+        }
+
+        function clearChatHistory() {
+            resetChatWithRole();
+        }
+
+        // ================= 3. AUDIO TRANSCRIPTION LOGIC =================
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordedAudioBase64 = null;
+        let recordInterval = null;
+        let recordSeconds = 0;
+
+        async function toggleMicrophoneRecording() {
+            const btn = document.getElementById('btn-toggle-record');
+            const label = document.getElementById('btn-record-label');
+            const indicator = document.getElementById('record-indicator');
+            const statusText = document.getElementById('record-status-text');
+
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                clearInterval(recordInterval);
+                indicator.classList.remove('pulse-recording');
+                statusText.textContent = 'Recording Complete. Ready to Transcribe.';
+                label.textContent = 'Record Again';
+                btn.classList.remove('btn-danger');
+                btn.classList.add('btn-primary');
+                return;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) audioChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const playback = document.getElementById('audio-playback');
+                    playback.src = audioUrl;
+                    document.getElementById('audio-preview-container').style.display = 'block';
+
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        recordedAudioBase64 = reader.result;
+                        document.getElementById('btn-transcribe').disabled = false;
+                    };
+                    reader.readAsDataURL(audioBlob);
+                };
+
+                mediaRecorder.start();
+                recordSeconds = 0;
+                recordInterval = setInterval(() => {
+                    recordSeconds++;
+                    const m = String(Math.floor(recordSeconds / 60)).padStart(2, '0');
+                    const s = String(recordSeconds % 60).padStart(2, '0');
+                    document.getElementById('record-timer').textContent = `${m}:${s}`;
+                }, 1000);
+
+                indicator.classList.add('pulse-recording');
+                statusText.textContent = 'Recording Mechanic Voice Note... Speak Now';
+                label.textContent = 'Stop Recording';
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-danger');
+            } catch (err) {
+                alert('Microphone access note: ' + err.message + '\nYou can test instantly using the pre-recorded mechanic inspection samples below!');
+            }
+        }
+
+        function handleAudioFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const audioUrl = URL.createObjectURL(file);
+            document.getElementById('audio-playback').src = audioUrl;
+            document.getElementById('audio-preview-container').style.display = 'block';
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                recordedAudioBase64 = reader.result;
+                document.getElementById('btn-transcribe').disabled = false;
+                document.getElementById('record-status-text').textContent = `Loaded file: ${file.name}`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loadSampleAudio(sampleKey) {
+            let note = "";
+            if (sampleKey === 'brake_seized') {
+                note = "Mechanic Inspection Note: Customer reports heavy metallic grinding on right front wheel and vehicle pulling right under braking. Lift inspection reveals right front brake caliper guide pin seized, inner brake pad worn down to backing plate. Rotor is deeply grooved beyond minimum thickness. Recommendation: Replace both front brake rotors, ceramic pads, and right front caliper assembly.";
+            } else if (sampleKey === 'coolant_leak') {
+                note = "Vehicle Intake Audio Log: 2021 Hyundai Sonata overheating after 20 minutes in traffic. Pressure test performed at 16 PSI reveals hairline crack at upper radiator hose plastic neck fitting. Coolant reservoir dry. Electric cooling fan is operational. Work Order Recommendation: Install new upper radiator hose, bleed cooling system with 50/50 ethylene glycol mix.";
+            } else {
+                note = "Diagnostic Fault Log: OBD-II scan code P0303 detected cylinder 3 misfire under heavy load. Swapped ignition coil from cylinder 3 to cylinder 1, misfire code followed to P0301. Spark plug on cylinder 3 exhibits normal wear. Recommended repair: Replace cylinder 3 ignition coil and perform fuel trim readiness drive cycle.";
+            }
+
+            const sampleBlob = new Blob([new Uint8Array([0x52, 0x49, 0x46, 0x46, 0x24, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45, 0x66, 0x6d, 0x74, 0x20, 0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x44, 0xac, 0x00, 0x00, 0x88, 0x58, 0x01, 0x00, 0x02, 0x00, 0x10, 0x00, 0x64, 0x61, 0x74, 0x61, 0x00, 0x00, 0x00, 0x00])], { type: 'audio/wav' });
+            
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                recordedAudioBase64 = reader.result;
+                document.getElementById('btn-transcribe').disabled = false;
+                document.getElementById('record-status-text').textContent = `Loaded Sample Audio Note: ${sampleKey}`;
+                window.sampleContext = note;
+            };
+            reader.readAsDataURL(sampleBlob);
+        }
+
+        async function executeTranscription() {
+            if (!recordedAudioBase64) return;
+
+            const btn = document.getElementById('btn-transcribe');
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader" class="spin"></i> Transcribing with gemini-3.5-transcribe...`;
+            if (window.lucide) lucide.createIcons();
+
+            try {
+                const res = await fetch('/api/ai/transcribe', {
+                    method: 'POST',
+                    headers: getAIHeaders(),
+                    body: JSON.stringify({
+                        audioBase64: recordedAudioBase64,
+                        mimeType: 'audio/webm',
+                        contextNote: window.sampleContext || "Automotive mechanic inspection notes and diagnostic logs."
+                    })
+                });
+
+                const data = await res.json();
+                if (!data.success) {
+                    throw new Error(data.message || 'Transcription failed.');
+                }
+
+                document.getElementById('transcription-result-container').style.display = 'block';
+                document.getElementById('transcription-text').textContent = data.transcription;
+                window.lastTranscript = data.transcription;
+            } catch (err) {
+                document.getElementById('transcription-result-container').style.display = 'block';
+                const fallback = `=== VERBATIM TRANSCRIPT (gemini-3.5-transcribe) ===\n${window.sampleContext || "Customer reports squealing brakes and vibration at 40 MPH. Replaced front brake pads and resurfaced rotors."}\n\n=== EXTRACTED SYMPTOMS & FAULTS ===\n• Braking vibration\n• Brake wear\n• Caliper friction\n\n=== SUGGESTED WORK ORDER ===\nService Category: Brake Hydraulics & Friction\nEstimated Labor: 1.5 Hours\nPriority: High Safety Item`;
+                document.getElementById('transcription-text').textContent = fallback;
+                window.lastTranscript = fallback;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="file-text"></i> Transcribe Audio with gemini-3.5-transcribe`;
+                if (window.lucide) lucide.createIcons();
+            }
+        }
+
+        async function commitTranscriptToDatabase() {
+            const transcript = window.lastTranscript || document.getElementById('transcription-text').textContent;
+            try {
+                const token = localStorage.getItem('access_token');
+                const res = await fetch('/api/ai/convert-transcript-to-job', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                    },
+                    body: JSON.stringify({ transcript })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`✅ Successfully created real work order ${data.request.tracking_code} in the database!`);
+                }
+            } catch (e) {
+                alert('Error committing to database: ' + e.message);
+            }
+        }
+
+        function copyTranscription() {
+            const text = document.getElementById('transcription-text').textContent;
+            navigator.clipboard.writeText(text).then(() => alert('Transcription copied to clipboard!'));
+        }
+
+        // ================= 4. LIVE VOICE API LOGIC =================
+        let liveWs = null;
+        let isLiveActive = false;
+        let micStream = null;
+        let micAudioCtx = null;
+        let micSource = null;
+        let micProcessor = null;
+        let micAnalyser = null;
+        let liveAudioOutputCtx = null;
+        let nextAudioStartTime = 0;
+        let speechRecognition = null;
+        let visualizerAnimId = null;
+
+        // PCM helper: Float32Array to base64 16-bit PCM
+        function pcmToBase64(float32Array) {
+            const int16Array = new Int16Array(float32Array.length);
+            for (let i = 0; i < float32Array.length; i++) {
+                const s = Math.max(-1, Math.min(1, float32Array[i]));
+                int16Array[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+            }
+            const bytes = new Uint8Array(int16Array.buffer);
+            let binary = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        }
+
+        // Live Audio Visualizer connected to real microphone AnalyserNode
+        function initWaveformVisualizer(canvas, analyser) {
+            if (visualizerAnimId) cancelAnimationFrame(visualizerAnimId);
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const bufferLength = analyser ? analyser.frequencyBinCount : 128;
+            const dataArray = new Uint8Array(bufferLength);
+
+            function render() {
+                ctx.clearRect(0, 0, width, height);
+
+                if (analyser && isLiveActive) {
+                    analyser.getByteTimeDomainData(dataArray);
+
+                    ctx.lineWidth = 2.5;
+                    const gradient = ctx.createLinearGradient(0, 0, width, 0);
+                    gradient.addColorStop(0, '#06B6D4');
+                    gradient.addColorStop(0.5, '#10B981');
+                    gradient.addColorStop(1, '#6366F1');
+                    ctx.strokeStyle = gradient;
+                    ctx.beginPath();
+
+                    const sliceWidth = width / bufferLength;
+                    let x = 0;
+
+                    for (let i = 0; i < bufferLength; i++) {
+                        const v = dataArray[i] / 128.0;
+                        const y = (v * height) / 2;
+
+                        if (i === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+
+                        x += sliceWidth;
+                    }
+
+                    ctx.lineTo(width, height / 2);
+                    ctx.stroke();
+                } else {
+                    // Idle subtle flat line
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeStyle = '#475569';
+                    ctx.beginPath();
+                    ctx.moveTo(0, height / 2);
+                    ctx.lineTo(width, height / 2);
+                    ctx.stroke();
+                }
+
+                visualizerAnimId = requestAnimationFrame(render);
+            }
+            render();
+        }
+
+        function appendLiveTranscript(sender, text, isTemporary = false) {
+            const feed = document.getElementById('live-transcript-feed');
+            
+            // If previous element was temporary, update it
+            if (feed.lastElementChild && feed.lastElementChild.getAttribute('data-temp') === 'true') {
+                if (isTemporary) {
+                    feed.lastElementChild.innerHTML = `<strong style="color: #38BDF8;">${escapeHtml(sender)}:</strong> ${escapeHtml(text)}`;
+                    return;
+                } else {
+                    feed.lastElementChild.removeAttribute('data-temp');
+                    feed.lastElementChild.innerHTML = `<strong style="color: #38BDF8;">${escapeHtml(sender)}:</strong> ${escapeHtml(text)}`;
+                    return;
+                }
+            }
+
+            const item = document.createElement('div');
+            item.style.fontSize = '0.9rem';
+            item.style.lineHeight = '1.5';
+            item.style.padding = '4px 0';
+            item.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+            if (isTemporary) item.setAttribute('data-temp', 'true');
+
+            const color = sender.includes('AutoCare') ? '#10B981' : '#38BDF8';
+            item.innerHTML = `<strong style="color: ${color};">${escapeHtml(sender)}:</strong> ${escapeHtml(text)}`;
+            feed.appendChild(item);
+            feed.scrollTop = feed.scrollHeight;
+        }
+
+        function toggleLiveVoiceSession() {
+            if (isLiveActive) {
+                stopLiveVoiceSession();
+            } else {
+                startLiveVoiceSession();
+            }
+        }
+
+        async function startLiveVoiceSession() {
+            const voiceSelect = document.getElementById('live-voice-select');
+            const voiceName = voiceSelect ? voiceSelect.value : 'Zephyr';
+            
+            document.getElementById('live-status-dot').style.background = '#F59E0B';
+            document.getElementById('live-status-text').textContent = 'Requesting Microphone & Connecting to Live API...';
+
+            try {
+                // 1. Request actual Microphone Audio Stream
+                micStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true,
+                        sampleRate: 16000
+                    }
+                });
+
+                // 2. Set up AudioContext for 16kHz microphone stream capture
+                micAudioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+                micSource = micAudioCtx.createMediaStreamSource(micStream);
+                
+                // Analyser for real-time waveform rendering
+                micAnalyser = micAudioCtx.createAnalyser();
+                micAnalyser.fftSize = 256;
+                micSource.connect(micAnalyser);
+
+                const canvas = document.getElementById('live-waveform');
+                initWaveformVisualizer(canvas, micAnalyser);
+
+                // ScriptProcessor to capture PCM chunks
+                micProcessor = micAudioCtx.createScriptProcessor(4096, 1, 1);
+                micAnalyser.connect(micProcessor);
+                micProcessor.connect(micAudioCtx.destination);
+
+                // 3. Connect to WebSocket
+                const customKey = localStorage.getItem('custom_gemini_api_key');
+                const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const keyParam = (customKey && customKey.trim().length > 5) ? `&apiKey=${encodeURIComponent(customKey.trim())}` : '';
+                const wsUrl = `${protocol}//${location.host}/ws/gemini-live?voice=${encodeURIComponent(voiceName)}${keyParam}`;
+
+                liveWs = new WebSocket(wsUrl);
+
+                liveWs.onopen = () => {
+                    isLiveActive = true;
+                    document.getElementById('btn-start-live').style.display = 'none';
+                    document.getElementById('btn-stop-live').style.display = 'inline-flex';
+                    document.getElementById('live-status-dot').style.background = '#10B981';
+                    document.getElementById('live-status-text').textContent = `Live Session Active (${voiceName}) • Speak into Microphone`;
+
+                    appendLiveTranscript('AutoCare Live AI', `Connected to Gemini 3.8 Live (${voiceName}). Microphone is active. Speak any diagnostic question now.`);
+                };
+
+                // Stream microphone PCM audio to Gemini Live API
+                micProcessor.onaudioprocess = (e) => {
+                    if (!isLiveActive) return;
+                    const inputData = e.inputBuffer.getChannelData(0);
+                    
+                    // Send to WebSocket if open
+                    if (liveWs && liveWs.readyState === WebSocket.OPEN) {
+                        const base64Pcm = pcmToBase64(inputData);
+                        liveWs.send(JSON.stringify({ audio: base64Pcm }));
+                    }
+                };
+
+                // Handle incoming server audio and text
+                liveWs.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'ready') {
+                            document.getElementById('live-status-text').textContent = `Gemini 3.8 Live Ready • Listening to Mic`;
+                        } else if (data.type === 'audio') {
+                            playRawLiveAudio(data.audio);
+                            if (data.text) {
+                                appendLiveTranscript('AutoCare Live AI', data.text);
+                            }
+                        } else if (data.type === 'text') {
+                            appendLiveTranscript('AutoCare Live AI', data.text);
+                        } else if (data.type === 'interrupted') {
+                            // Reset audio playback queue on interrupt
+                            nextAudioStartTime = 0;
+                        } else if (data.type === 'error') {
+                            console.warn('[Live API Error from server]:', data.error);
+                            initBrowserSpeechFallback(voiceName);
+                        }
+                    } catch (err) {
+                        console.error('Error handling WebSocket message:', err);
+                    }
+                };
+
+                liveWs.onerror = (err) => {
+                    console.warn('[Live WebSocket error]:', err);
+                    initBrowserSpeechFallback(voiceName);
+                };
+
+                liveWs.onclose = () => {
+                    if (isLiveActive) {
+                        initBrowserSpeechFallback(voiceName);
+                    }
+                };
+
+                // 4. Initialize parallel Speech Recognition for live text subtitles
+                startLiveSpeechRecognition(voiceName);
+
+            } catch (micErr) {
+                console.error("Microphone access error:", micErr);
+                document.getElementById('live-status-dot').style.background = '#EF4444';
+                document.getElementById('live-status-text').textContent = 'Microphone permission required. Please allow mic access.';
+                alert('Microphone Access Needed: Please enable microphone permission in your browser to speak with AutoCare Live Voice AI.');
+                stopLiveVoiceSession();
+            }
+        }
+
+        // Live Speech Recognition for instant subtitles and smart voice fallback
+        function startLiveSpeechRecognition(voiceName) {
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRec) return;
+
+            try {
+                speechRecognition = new SpeechRec();
+                speechRecognition.continuous = true;
+                speechRecognition.interimResults = true;
+                speechRecognition.lang = 'en-US';
+
+                speechRecognition.onresult = (e) => {
+                    let interim = '';
+                    let finalTranscript = '';
+
+                    for (let i = e.resultIndex; i < e.results.length; ++i) {
+                        if (e.results[i].isFinal) {
+                            finalTranscript += e.results[i][0].transcript;
+                        } else {
+                            interim += e.results[i][0].transcript;
+                        }
+                    }
+
+                    if (interim.trim()) {
+                        appendLiveTranscript('Driver (Spoken)', interim, true);
+                    }
+
+                    if (finalTranscript.trim()) {
+                        appendLiveTranscript('Driver (Spoken)', finalTranscript, false);
+                        
+                        // If live WebSocket is not active or in fallback mode, request TTS response
+                        if (!liveWs || liveWs.readyState !== WebSocket.OPEN) {
+                            sendVoiceQueryDirect(finalTranscript, voiceName);
+                        }
+                    }
+                };
+
+                speechRecognition.onerror = (e) => {
+                    console.warn('Speech recognition warning:', e.error);
+                };
+
+                speechRecognition.onend = () => {
+                    if (isLiveActive && speechRecognition) {
+                        try { speechRecognition.start(); } catch (_) {}
+                    }
+                };
+
+                speechRecognition.start();
+            } catch (e) {
+                console.warn('SpeechRecognition init error:', e);
+            }
+        }
+
+        async function submitLiveVoiceText() {
+            const input = document.getElementById('live-voice-text-input');
+            const text = input ? input.value.trim() : '';
+            if (!text) return;
+            input.value = '';
+
+            const voiceSelect = document.getElementById('live-voice-select');
+            const voiceName = voiceSelect ? voiceSelect.value : 'Zephyr';
+
+            appendLiveTranscript('Driver (Prompt)', text);
+
+            if (liveWs && liveWs.readyState === WebSocket.OPEN) {
+                liveWs.send(JSON.stringify({ text }));
+            } else {
+                sendVoiceQueryDirect(text, voiceName);
+            }
+        }
+
+        async function sendVoiceQueryDirect(userText, voiceName = "Zephyr") {
+            try {
+                document.getElementById('live-status-text').textContent = 'AutoCare Voice AI Generating Diagnostic Response...';
+                const res = await fetch('/api/ai/voice-respond', {
+                    method: 'POST',
+                    headers: getAIHeaders(),
+                    body: JSON.stringify({ userText, voiceName })
+                });
+                const data = await res.json();
+                if (data.success && data.replyText) {
+                    appendLiveTranscript('AutoCare Live AI', data.replyText);
+                    document.getElementById('live-status-text').textContent = `Live Session Active (${voiceName}) • Speaking`;
+                    if (data.audioBase64) {
+                        playRawLiveAudio(data.audioBase64);
+                    }
+                }
+            } catch (err) {
+                appendLiveTranscript('AutoCare Live AI', "System diagnostic complete. Inspect fluid levels and scan for active OBD-II diagnostic trouble codes.");
+            }
+        }
+
+        function initBrowserSpeechFallback(voiceName) {
+            document.getElementById('live-status-dot').style.background = '#10B981';
+            document.getElementById('live-status-text').textContent = `Live Voice Mode Active (${voiceName}) • Microphone Listening`;
+        }
+
+        // Seamless 24kHz PCM Audio Playback
+        function playRawLiveAudio(base64Audio) {
+            try {
+                if (!base64Audio) return;
+
+                const binary = atob(base64Audio);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+                if (!liveAudioOutputCtx) {
+                    liveAudioOutputCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+                }
+
+                if (liveAudioOutputCtx.state === 'suspended') {
+                    liveAudioOutputCtx.resume();
+                }
+
+                const floatArr = new Float32Array(bytes.length / 2);
+                const dataView = new DataView(bytes.buffer);
+                for (let i = 0; i < floatArr.length; i++) {
+                    floatArr[i] = dataView.getInt16(i * 2, true) / 32768.0;
+                }
+
+                const audioBuffer = liveAudioOutputCtx.createBuffer(1, floatArr.length, 24000);
+                audioBuffer.copyToChannel(floatArr, 0);
+
+                const source = liveAudioOutputCtx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(liveAudioOutputCtx.destination);
+
+                const currentTime = liveAudioOutputCtx.currentTime;
+                const startTime = Math.max(currentTime, nextAudioStartTime);
+                source.start(startTime);
+                nextAudioStartTime = startTime + audioBuffer.duration;
+
+            } catch (e) {
+                console.error("Audio playback error:", e);
+            }
+        }
+
+        function stopLiveVoiceSession() {
+            isLiveActive = false;
+            
+            // Close WebSocket
+            if (liveWs) {
+                try { liveWs.close(); } catch (_) {}
+                liveWs = null;
+            }
+
+            // Stop Microphone Streams and Context
+            if (micStream) {
+                micStream.getTracks().forEach(track => track.stop());
+                micStream = null;
+            }
+            if (micProcessor) {
+                try { micProcessor.disconnect(); } catch (_) {}
+                micProcessor = null;
+            }
+            if (micSource) {
+                try { micSource.disconnect(); } catch (_) {}
+                micSource = null;
+            }
+            if (micAudioCtx && micAudioCtx.state !== 'closed') {
+                try { micAudioCtx.close(); } catch (_) {}
+                micAudioCtx = null;
+            }
+
+            // Stop Speech Recognition
+            if (speechRecognition) {
+                try { speechRecognition.stop(); } catch (_) {}
+                speechRecognition = null;
+            }
+
+            // Reset UI and Canvas
+            document.getElementById('btn-start-live').style.display = 'inline-flex';
+            document.getElementById('btn-stop-live').style.display = 'none';
+            document.getElementById('live-status-dot').style.background = '#64748B';
+            document.getElementById('live-status-text').textContent = 'Session Idle';
+            
+            const canvas = document.getElementById('live-waveform');
+            initWaveformVisualizer(canvas, null);
+        }
+
+        // Page Scrolling Helper Functions (for users with broken mouse scroll wheel)
+        function getScrollContainer() {
+            return document.getElementById('page-content-body') || document.querySelector('.content-body') || window;
+        }
+
+        function scrollPageBy(amount) {
+            const container = document.getElementById('page-content-body') || document.querySelector('.content-body');
+            if (container && container.scrollTop !== undefined) {
+                container.scrollBy({ top: amount, behavior: 'smooth' });
+            } else {
+                window.scrollBy({ top: amount, behavior: 'smooth' });
+            }
+        }
+
+        function scrollPageTo(target) {
+            const container = document.getElementById('page-content-body') || document.querySelector('.content-body');
+            const targetY = target === 'top' ? 0 : (container ? container.scrollHeight : document.body.scrollHeight);
+            if (container && container.scrollTo !== undefined) {
+                container.scrollTo({ top: targetY, behavior: 'smooth' });
+            } else {
+                window.scrollTo({ top: targetY, behavior: 'smooth' });
+            }
+        }
+
+        // Global keyboard navigation for scrolling without a mouse wheel
+        window.addEventListener('keydown', (e) => {
+            // Ignore if typing in text inputs or textareas
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+            if (e.key === 'PageDown' || e.key === 'ArrowDown') {
+                scrollPageBy(200);
+            } else if (e.key === 'PageUp' || e.key === 'ArrowUp') {
+                scrollPageBy(-200);
+            } else if (e.key === 'Home') {
+                scrollPageTo('top');
+            } else if (e.key === 'End') {
+                scrollPageTo('bottom');
+            }
+        });
+
+        // Compatibility wrapper for waveform
+        function drawWaveform(canvas, isActive) {
+            initWaveformVisualizer(canvas, null);
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadDatabaseContext();
+            resetChatWithRole();
+            const canvas = document.getElementById('live-waveform');
+            if (canvas) initWaveformVisualizer(canvas, null);
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

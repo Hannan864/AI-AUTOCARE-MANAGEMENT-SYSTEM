@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting to Secure Gateway - AutoCare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #080C1A;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #f8fafc;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .redirect-card {
+            background: rgba(13, 18, 30, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .spinner {
+            border: 3px solid rgba(79, 70, 229, 0.15);
+            border-top: 3px solid #4f46e5;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .btn-redirect {
+            display: inline-block;
+            background: #4f46e5;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+    </style>
+    <script>
+        // Redirect instantly
+        window.location.replace("index.html?tab=register");
+    </script>
+</head>
+<body>
+    <div class="redirect-card">
+        <div class="spinner"></div>
+        <h2 style="margin-top: 0; font-size: 1.3rem;">Redirecting to Secure Gateway</h2>
+        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 0;">We are routing you to the unified AutoCare portal register panel...</p>
+        <a href="index.html?tab=register" class="btn-redirect">Click here if not redirected</a>
+    </div>
+</body>
+</html>

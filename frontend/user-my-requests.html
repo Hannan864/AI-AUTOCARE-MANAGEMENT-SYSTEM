@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Requests - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Timeline Modal Styles */
+        .timeline { position: relative; padding-left: 2rem; margin-top: 1.5rem; }
+        .timeline::before { content: ''; position: absolute; left: 0.5rem; top: 0; bottom: 0; width: 2px; background: var(--border); }
+        .timeline-item { position: relative; margin-bottom: 1.5rem; }
+        .timeline-item:last-child { margin-bottom: 0; }
+        .timeline-dot { position: absolute; left: -2rem; width: 1rem; height: 1rem; border-radius: 50%; background: var(--bg-card); border: 2px solid var(--border); transform: translateX(-50%); }
+        .timeline-item.active .timeline-dot { border-color: var(--primary); background: var(--primary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2); }
+        .timeline-item.completed .timeline-dot { border-color: var(--success); background: var(--success); }
+        .timeline-content h4 { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .timeline-content p { font-size: 0.875rem; color: var(--text-muted); }
+        .timeline-date { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { background: var(--bg-card); border-radius: 8px; width: 100%; max-width: 600px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); transform: scale(0.95); transition: transform 0.3s; max-height: 85vh; overflow-y: auto; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg-card); z-index: 10; }
+        .modal-body { padding: 1.5rem; }
+    </style>
+</head>
+<body>
+    <!-- Role: User -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="wrench" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">AutoCare</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="user-dashboard.html" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="user-vehicles.html" class="nav-item">
+                    <i data-lucide="car"></i> <span class="nav-text">My Vehicles</span>
+                </a>
+                <a href="user-new-request.html" class="nav-item">
+                    <i data-lucide="plus-circle"></i> <span class="nav-text">New Request</span>
+                </a>
+                <a href="user-my-requests.html" class="nav-item active">
+                    <i data-lucide="clipboard-list"></i> <span class="nav-text">My Requests</span>
+                </a>
+                <a href="user-service-history.html" class="nav-item">
+                    <i data-lucide="history"></i> <span class="nav-text">Service History</span>
+                </a>
+                <a href="user-map.html" class="nav-item">
+                    <i data-lucide="map"></i> <span class="nav-text">Live Map & Pins</span>
+                </a>
+                <a href="user-messages.html" class="nav-item">
+                    <i data-lucide="message-square"></i> <span class="nav-text">Messages</span>
+                </a>
+                <a href="user-calendar.html" class="nav-item">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Appointments</span>
+                </a>
+                <a href="user-payments.html" class="nav-item">
+                    <i data-lucide="credit-card"></i> <span class="nav-text">Payments</span>
+                </a>
+                <a href="user-profile.html" class="nav-item">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h2 style="font-size: 1.125rem; font-weight: 600; margin-left: 0.5rem;">My Requests</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Mark all as read</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border); background: rgba(99, 102, 241, 0.05);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">Service Update</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">New job assigned: Honda Civic (ABC-1234).</p>
+                                    <p style="font-size: 0.7rem; color: var(--primary); margin-top: 0.25rem;">Just now</p>
+                                </div>
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">New Message</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">User Name sent you a message.</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">2 hours ago</p>
+                                </div>
+                            </div>
+                            <div style="padding: 0.75rem; border-top: 1px solid var(--border); text-align: center;">
+                                <a href="#" style="font-size: 0.875rem; color: var(--primary); font-weight: 500;">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem;">
+                            <img src="https://ui-avatars.com/api/?name=Ahmed+Khan&background=6366F1&color=fff" alt="User" style="width: 36px; height: 36px; border-radius: 50%;">
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Active & Recent Requests</h2>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <select class="form-control" style="width: 150px; padding: 0.25rem 0.5rem;">
+                                <option value="all">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="progress">In Progress</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-sortable>Request ID <i data-lucide="arrow-up-down" style="width: 12px; height: 12px; display: inline-block;"></i></th>
+                                    <th data-sortable>Vehicle <i data-lucide="arrow-up-down" style="width: 12px; height: 12px; display: inline-block;"></i></th>
+                                    <th data-sortable>Type <i data-lucide="arrow-up-down" style="width: 12px; height: 12px; display: inline-block;"></i></th>
+                                    <th data-sortable>Date <i data-lucide="arrow-up-down" style="width: 12px; height: 12px; display: inline-block;"></i></th>
+                                    <th>Status</th>
+                                    <th style="min-width: 190px;">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: 100%;">
+                                            <span>Action</span>
+                                            <button onclick="triggerClearAllRequests()" class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.725rem; color: var(--danger); border-color: rgba(239, 68, 68, 0.2); display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600;" title="Clear all requests">
+                                                <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i> Clear All
+                                            </button>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" style="text-align: center;"><i data-lucide="loader" class="spin"></i> Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Tracking Modal -->
+    <div class="modal-overlay" id="trackingModal" style="overflow-y: auto;">
+        <div class="modal-content" style="max-width: 600px; margin: 2rem auto;">
+            <div class="modal-header">
+                <div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; color: var(--text-main);" id="modalTitle">Request Tracking</h3>
+                    <p style="font-size: 0.875rem; color: var(--text-muted);" id="modalSubtitle">Details</p>
+                </div>
+                <button class="btn btn-outline" style="padding: 0.25rem; border: none;" onclick="closeModal('trackingModal')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="assigned-mechanic-box" style="display: none; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; align-items: center; gap: 1rem;">
+                    <img id="mechanic-avatar" src="https://ui-avatars.com/api/?name=Mechanic&background=10B981&color=fff" alt="Mechanic" style="width: 48px; height: 48px; border-radius: 50%;">
+                    <div style="flex: 1;">
+                        <h4 style="font-weight: 600; font-size: 0.875rem;">Assigned Professional Mechanic</h4>
+                        <p style="font-size: 1rem; font-weight: 700;" id="mechanic-name">Unknown</p>
+                    </div>
+                </div>
+
+                <!-- Dynamic Progress Tracker Section -->
+                <div id="tracking-progress-section" style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="gauge" style="width: 18px; height: 18px; color: var(--success);"></i>
+                            <span style="font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--success);">Live Repair Progress Tracker</span>
+                        </div>
+                        <span id="tracking-progress-val" style="font-size: 1.1rem; font-weight: 800; color: var(--text-main);">0%</span>
+                    </div>
+                    <div style="width: 100%; height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; margin-bottom: 0.75rem;">
+                        <div id="tracking-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), #10b981); border-radius: 5px; transition: width 0.6s ease;"></div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.85rem; margin-top: 0.5rem; border-top: 1px dashed var(--border); padding-top: 0.5rem;">
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 0.75rem;">Current Work Stage (Kahan pohancha)</span> <br>
+                            <strong id="tracking-stage-val" style="color: var(--text-main); font-size: 0.9rem;">Diagnostic bay</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 0.75rem;">Estimated Completion (Kab tak hoga)</span> <br>
+                            <strong id="tracking-est-val" style="color: var(--text-main); font-size: 0.9rem;">TBD</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 style="font-weight: 700; margin-bottom: 1rem; color: var(--text-main); display: flex; align-items: center; gap: 0.35rem;">
+                    <i data-lucide="history" style="width: 16px; height: 16px; color: var(--primary);"></i> Repair History & Log Timeline
+                </h4>
+                <div class="timeline" id="modalTimeline">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Request Confirmation Modal (Enterprise-Level) -->
+    <div class="modal-overlay" id="deleteRequestModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(239, 68, 68, 0.1);">
+                <h3 style="font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: var(--danger); margin: 0;">
+                    <i data-lucide="alert-triangle" style="color: var(--danger); width: 22px; height: 22px;"></i> Delete Request
+                </h3>
+                <button class="btn btn-outline" style="padding: 0.25rem; border: none;" onclick="closeModal('deleteRequestModal')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem 1.25rem;">
+                <div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.14); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+                    <p style="font-size: 0.85rem; color: #dc2626; margin: 0; font-weight: 600; line-height: 1.4;">
+                        ⚠️ WARNING: This will permanently cancel and delete this service request. Associated history, updates, and messages for this request identifier will be permanently removed.
+                    </p>
+                </div>
+                <p style="font-size: 0.9rem; margin: 0 0 0.5rem; color: var(--text-main);">
+                    Please confirm you want to delete request:
+                </p>
+                <div style="background: rgba(0,0,0,0.02); border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem; margin-bottom: 1.25rem;">
+                    <div id="deleteRequestDisplayId" style="font-weight: 700; font-size: 1.05rem; color: var(--text-main);">REQ-001</div>
+                    <div id="deleteRequestInfo" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">Vehicle: Honda Civic (Maintenance)</div>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Type confirmation code to authorize</label>
+                    <input type="text" id="deleteRequestConfirmInput" class="form-control" placeholder="Type DELETE to proceed" style="font-family: monospace;">
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 1rem 1.25rem; display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--border);">
+                <button type="button" class="btn btn-outline" onclick="closeModal('deleteRequestModal')">Cancel</button>
+                <button id="deleteRequestConfirmBtn" type="button" class="btn" style="background: var(--danger); color: white; border: none; font-weight: 600; padding: 0.5rem 1rem; border-radius: 6px; cursor: not-allowed; opacity: 0.5;" disabled>Authorize Deletion</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear All Requests Confirmation Modal (Enterprise-Level) -->
+    <div class="modal-overlay" id="clearAllRequestsModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(239, 68, 68, 0.1);">
+                <h3 style="font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: var(--danger); margin: 0;">
+                    <i data-lucide="shield-alert" style="color: var(--danger); width: 22px; height: 22px;"></i> Clear All Requests
+                </h3>
+                <button class="btn btn-outline" style="padding: 0.25rem; border: none;" onclick="closeModal('clearAllRequestsModal')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem 1.25rem;">
+                <div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.14); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+                    <p style="font-size: 0.85rem; color: #dc2626; margin: 0; font-weight: 600; line-height: 1.4;">
+                        🚨 HIGHLY DESTRUCTIVE OPERATION: This will wipe out all of your registered service requests, active requests, and roadside recoveries from the registry. This action is absolute and cannot be recovered by administrators.
+                    </p>
+                </div>
+                <p style="font-size: 0.9rem; margin: 0 0 0.5rem; color: var(--text-main);">
+                    To authorize this system block purge:
+                </p>
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Type block purge verification code</label>
+                    <input type="text" id="clearAllRequestsConfirmInput" class="form-control" placeholder="Type PURGE ALL to proceed" style="font-family: monospace;">
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 1rem 1.25rem; display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--border);">
+                <button type="button" class="btn btn-outline" onclick="closeModal('clearAllRequestsModal')">Cancel</button>
+                <button id="clearAllRequestsConfirmBtn" type="button" class="btn" style="background: var(--danger); color: white; border: none; font-weight: 600; padding: 0.5rem 1rem; border-radius: 6px; cursor: not-allowed; opacity: 0.5;" disabled>Authorize System Purge</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        document.getElementById('trackingModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal('trackingModal');
+        });
+        document.getElementById('deleteRequestModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal('deleteRequestModal');
+        });
+        document.getElementById('clearAllRequestsModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal('clearAllRequestsModal');
+        });
+
+        let requestsData = [];
+        let vehiclesMap = {};
+
+        const loadRequests = async () => {
+            const tbody = document.querySelector('tbody');
+            
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                // Fetch user vehicles to map IDs to friendly names
+                const resVeh = await fetch('/api/v1/vehicles', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (resVeh.ok) {
+                    const d = await resVeh.json();
+                    if (d.success && d.data) {
+                        d.data.forEach(v => {
+                            vehiclesMap[v.id] = `${v.make} ${v.model}`;
+                        });
+                    }
+                }
+
+                const [resReqs, resRecs] = await Promise.all([
+                    fetch('/api/service_requests/my_requests', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('/api/service_requests/my_recoveries', { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+                
+                let dataReqs = [];
+                let dataRecs = [];
+                
+                if (resReqs.ok) {
+                    const d = await resReqs.json();
+                    dataReqs = d.data || [];
+                }
+                if (resRecs.ok) {
+                    const d = await resRecs.json();
+                    dataRecs = d.data || [];
+                }
+
+                requestsData = [...dataReqs, ...dataRecs];
+                renderTable();
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--danger);">Error loading requests</td></tr>`;
+            }
+        };
+
+        const getStatusBadge = (status) => {
+            const s = (status || '').toLowerCase();
+            switch(s) {
+                case 'pending': return '<span class="badge badge-pending">Pending</span>';
+                case 'in_progress': return '<span class="badge badge-progress">In Progress</span>';
+                case 'completed': return '<span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">Completed</span>';
+                default: return `<span class="badge badge-pending">${status}</span>`;
+            }
+        };
+
+        const renderTable = () => {
+            const tbody = document.querySelector('tbody');
+            
+            if (requestsData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No requests found.</td></tr>`;
+                return;
+            }
+
+            requestsData.sort((a,b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+
+            tbody.innerHTML = requestsData.map(req => {
+                const idPrefix = req.location_lat !== undefined ? 'REC' : 'REQ';
+                const displayId = `${idPrefix}-${req.id}`;
+                const typeName = req.request_type || 'Recovery';
+                const vehicleName = vehiclesMap[req.vehicle_id] || `Vehicle #${req.vehicle_id}`;
+                
+                return `
+                    <tr>
+                        <td style="font-weight: 500;">${displayId}</td>
+                        <td>${vehicleName}</td>
+                        <td style="text-transform: capitalize;">${typeName}</td>
+                        <td>${new Date(req.created_at).toLocaleDateString()}</td>
+                        <td>${getStatusBadge(req.status)}</td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem; justify-content: flex-start; align-items: center;">
+                                <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.775rem; display: inline-flex; align-items: center; gap: 0.25rem;" onclick="openTrackingModal('${displayId}', ${req.id}, '${idPrefix}')">
+                                    <i data-lucide="eye" style="width: 12px; height: 12px;"></i> Track
+                                </button>
+                                <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.775rem; color: var(--danger); border-color: rgba(239, 68, 68, 0.15); display: inline-flex; align-items: center; gap: 0.25rem;" onclick="triggerDeleteRequest(${req.id}, '${displayId}', '${vehicleName} (${typeName})')">
+                                    <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            lucide.createIcons();
+        };
+
+        window.openTrackingModal = (displayId, id, type) => {
+            document.getElementById('modalTitle').textContent = `Tracking ${displayId}`;
+            const req = requestsData.find(r => r.id === id && (type === 'REC' ? r.location_lat !== undefined : r.location_lat === undefined));
+            if (!req) return;
+            const vehicleName = vehiclesMap[req.vehicle_id] || `Vehicle #${req.vehicle_id}`;
+            
+            document.getElementById('modalSubtitle').textContent = `${vehicleName} - ${req.request_type ? req.request_type.charAt(0).toUpperCase() + req.request_type.slice(1) : 'Emergency Roadside Recovery'}`;
+            
+            const mechanicBox = document.getElementById('assigned-mechanic-box');
+            if (req.mechanic_id) {
+                mechanicBox.style.display = 'flex';
+                document.getElementById('mechanic-name').textContent = 'Professional Mechanic ID #' + req.mechanic_id;
+            } else {
+                mechanicBox.style.display = 'none';
+            }
+
+            // Update Live Progress Section
+            const progress = req.progress_percent !== undefined ? req.progress_percent : (req.status === 'completed' ? 100 : (req.status === 'accepted' ? 10 : 0));
+            const stage = req.current_stage || (req.status === 'completed' ? 'Completed & Finalized' : (req.status === 'accepted' ? 'Accepted & Queued' : 'Pending Status Update'));
+            const estTime = req.estimated_completion ? new Date(req.estimated_completion).toLocaleString() : 'TBD (Awaiting Mechanic Assessment)';
+
+            document.getElementById('tracking-progress-val').textContent = `${progress}%`;
+            document.getElementById('tracking-progress-bar').style.width = `${progress}%`;
+            document.getElementById('tracking-stage-val').textContent = stage;
+            document.getElementById('tracking-est-val').textContent = estTime;
+
+            const timeline = document.getElementById('modalTimeline');
+            let timelineHtml = '';
+
+            if (req.status_history && req.status_history.length > 0) {
+                // Render real-time status log history
+                timelineHtml = req.status_history.map((log, index) => {
+                    const isLast = index === req.status_history.length - 1;
+                    const itemClass = isLast ? 'active' : 'completed';
+                    const dotColor = isLast ? 'var(--primary)' : 'var(--success)';
+                    
+                    return `
+                        <div class="timeline-item ${itemClass}">
+                            <div class="timeline-dot" style="background: ${dotColor}; border-color: ${dotColor};"></div>
+                            <div class="timeline-content">
+                                <h4 style="text-transform: capitalize; color: var(--text-main); font-weight: 700; margin-bottom: 0.15rem;">
+                                    ${log.stage || log.status}
+                                </h4>
+                                <p style="font-size: 0.85rem; color: var(--text-main); font-weight: 500; margin-bottom: 0.25rem;">
+                                    ${log.notes || `Status transitioned to ${log.status}.`}
+                                </p>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
+                                    <span>Progress: ${log.progress}%</span>
+                                    <span>${new Date(log.timestamp).toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                // Fallback to beautiful default step timeline based on status
+                const steps = [
+                    { key: 'assigned', label: 'Request Submitted', desc: 'Your service request was received and logged into the repair queue.' },
+                    { key: 'accepted', label: 'Job Approved', desc: 'A certified mechanic accepted your service and queued repair bay resources.' },
+                    { key: 'in_progress', label: 'In Progress / Servicing', desc: 'Mechanic is actively performing repairs, replacements, or diagnosis.' },
+                    { key: 'completed', label: 'Service Completed', desc: 'Vehicle fully repaired, quality checks validated, and ready for pick-up.' }
+                ];
+                
+                const currentStatus = (req.status || '').toLowerCase();
+                let currentStatusIdx = steps.findIndex(s => s.key === currentStatus);
+                if (currentStatusIdx === -1) {
+                    if (['on_the_way', 'arrived'].includes(currentStatus)) {
+                        currentStatusIdx = 1; // accepted stage
+                    } else {
+                        currentStatusIdx = 0;
+                    }
+                }
+                
+                timelineHtml = steps.map((step, idx) => {
+                    let itemClass = '';
+                    let dotColor = 'var(--border)';
+                    if (idx < currentStatusIdx) {
+                        itemClass = 'completed';
+                        dotColor = 'var(--success)';
+                    } else if (idx === currentStatusIdx) {
+                        itemClass = 'active';
+                        dotColor = 'var(--primary)';
+                    }
+                    
+                    return `
+                        <div class="timeline-item ${itemClass}">
+                            <div class="timeline-dot" style="background: ${itemClass ? dotColor : 'transparent'}; border-color: ${dotColor};"></div>
+                            <div class="timeline-content">
+                                <h4 style="color: var(--text-main); font-weight: 600;">${step.label}</h4>
+                                <p style="font-size: 0.825rem; color: var(--text-muted);">${step.desc}</p>
+                                ${idx === 0 ? `<div class="timeline-date">${new Date(req.created_at).toLocaleString()}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            timeline.innerHTML = timelineHtml;
+            openModal('trackingModal');
+            if (window.lucide) lucide.createIcons();
+        };
+
+        // Secure Deletion for of a single request
+        let requestToDeleteId = null;
+        window.triggerDeleteRequest = (id, displayId, infoText) => {
+            requestToDeleteId = id;
+            document.getElementById('deleteRequestDisplayId').textContent = displayId;
+            document.getElementById('deleteRequestInfo').textContent = infoText;
+            
+            const input = document.getElementById('deleteRequestConfirmInput');
+            input.value = '';
+            
+            const btn = document.getElementById('deleteRequestConfirmBtn');
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            
+            openModal('deleteRequestModal');
+        };
+
+        document.getElementById('deleteRequestConfirmInput').addEventListener('input', function(e) {
+            const typed = e.target.value.trim().toUpperCase();
+            const btn = document.getElementById('deleteRequestConfirmBtn');
+            if (typed === 'DELETE') {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            } else {
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'not-allowed';
+            }
+        });
+
+        document.getElementById('deleteRequestConfirmBtn').addEventListener('click', async function() {
+            if (!requestToDeleteId) return;
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="loading-spinner" style="border-color: #ffffff; border-top-color: transparent;"></span> Deleting...';
+            btn.disabled = true;
+
+            const token = localStorage.getItem('access_token');
+            if (!token) return;
+
+            try {
+                const res = await fetch(`/api/service_requests/${requestToDeleteId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+
+                if (res.ok && result.success) {
+                    window.showToast('Service request successfully removed', 'success');
+                    closeModal('deleteRequestModal');
+                    await loadRequests();
+                } else {
+                    window.showToast(result.message || 'Failure to execute deletion routine.', 'error');
+                }
+            } catch (err) {
+                console.error("Delete request error:", err);
+                window.showToast('Network failure deleting request.', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        // Purge/Clear All requests
+        window.triggerClearAllRequests = () => {
+            const input = document.getElementById('clearAllRequestsConfirmInput');
+            input.value = '';
+            
+            const btn = document.getElementById('clearAllRequestsConfirmBtn');
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            
+            openModal('clearAllRequestsModal');
+        };
+
+        document.getElementById('clearAllRequestsConfirmInput').addEventListener('input', function(e) {
+            const typed = e.target.value.trim().toUpperCase();
+            const btn = document.getElementById('clearAllRequestsConfirmBtn');
+            if (typed === 'PURGE ALL') {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            } else {
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'not-allowed';
+            }
+        });
+
+        document.getElementById('clearAllRequestsConfirmBtn').addEventListener('click', async function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="loading-spinner" style="border-color: #ffffff; border-top-color: transparent;"></span> Purging...';
+            btn.disabled = true;
+
+            const token = localStorage.getItem('access_token');
+            if (!token) return;
+
+            try {
+                const res = await fetch(`/api/service_requests/clear_all`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+
+                if (res.ok && result.success) {
+                    window.showToast('All service requests successfully cleared', 'success');
+                    closeModal('clearAllRequestsModal');
+                    await loadRequests();
+                } else {
+                    window.showToast(result.message || 'Failure to executive block purge.', 'error');
+                }
+            } catch (err) {
+                console.error("Purge requests error:", err);
+                window.showToast('Network failure performing system purge.', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', loadRequests);
+    </script>
+</body>
+</html>

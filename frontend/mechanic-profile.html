@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings - AutoCare Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .stat-info h3 { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .stat-info p { color: var(--text-muted); font-size: 0.875rem; font-weight: 500; }
+        
+        .job-card { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; transition: transform 0.2s; }
+        .job-card:hover { transform: translateX(4px); }
+        .job-card.emergency { border-left-color: var(--danger); }
+        .job-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+        .job-details { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.875rem; margin-bottom: 1.5rem; }
+        .job-details span { color: var(--text-muted); }
+        .job-details strong { color: var(--text); font-weight: 500; }
+    </style>
+</head>
+<body>
+    <!-- Role: Mechanic -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="wrench" style="color: var(--primary);"></i>
+                    <span class="sidebar-logo-text" style="font-weight: 700; font-size: 1.25rem;">AutoCare</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <p class="nav-category" style="padding: 1rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Dashboard</p>
+                <a href="mechanic-dashboard.html" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                
+                <p class="nav-category" style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Service Center</p>
+                <a href="mechanic-assigned-jobs.html" class="nav-item">
+                    <i data-lucide="briefcase"></i> <span class="nav-text">Assigned Jobs</span>
+                </a>
+                <a href="mechanic-gigs.html" class="nav-item">
+                    <i data-lucide="tag"></i> <span class="nav-text">Manage Gigs</span>
+                </a>
+                <a href="mechanic-map.html" class="nav-item">
+                    <i data-lucide="map"></i> <span class="nav-text">Live Map & Pins</span>
+                </a>
+                
+                <p style="padding: 1.5rem 1rem 0.5rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Management</p>
+                <a href="mechanic-messages.html" class="nav-item">
+                    <i data-lucide="message-square"></i> <span class="nav-text">Messages</span>
+                </a>
+                <a href="mechanic-calendar.html" class="nav-item">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Schedule</span>
+                </a>
+                <a href="mechanic-profile.html" class="nav-item active">
+                    <i data-lucide="user"></i> <span class="nav-text">Profile Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="sidebar-toggle" class="btn btn-outline" style="padding: 0.5rem;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h2 style="font-size: 1.125rem; font-weight: 600; margin-left: 0.5rem;">Mechanic Portal</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%;">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <div style="position: relative;">
+                        <button id="notifications-btn" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; position: relative;">
+                            <i data-lucide="bell"></i>
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%;"></span>
+                        </button>
+                        <div id="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                                <p style="font-weight: 600;">Notifications</p>
+                                <button style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer;">Mark all as read</button>
+                            </div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border); background: rgba(99, 102, 241, 0.05);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">Service Update</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">New job assigned: Honda Civic (ABC-1234).</p>
+                                    <p style="font-size: 0.7rem; color: var(--primary); margin-top: 0.25rem;">Just now</p>
+                                </div>
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                    <p style="font-size: 0.875rem; font-weight: 500;">New Message</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">User Name sent you a message.</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">2 hours ago</p>
+                                </div>
+                            </div>
+                            <div style="padding: 0.75rem; border-top: 1px solid var(--border); text-align: center;">
+                                <a href="#" style="font-size: 0.875rem; color: var(--primary); font-weight: 500;">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <button id="user-menu-btn" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.25rem;">
+                            <img src="https://ui-avatars.com/api/?name=Tariq+Mehmood&background=10B981&color=fff" alt="Mechanic" style="width: 36px; height: 36px; border-radius: 50%;">
+                            <div style="text-align: left; display: none;" class="desktop-user-info">
+                                <p style="font-size: 0.875rem; font-weight: 600;">Mechanic Name</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Senior Mechanic</p>
+                            </div>
+                            <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: var(--text-muted);"></i>
+                        </button>
+                        <div id="user-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; width: 200px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                                <p style="font-weight: 600;">Mechanic Name</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">mechanic@autocare.com</p>
+                            </div>
+                            <div style="padding: 0.5rem;">
+                                <a href="index.html" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; color: var(--danger); border-radius: 4px;"><i data-lucide="log-out" style="width: 16px; height: 16px;"></i> Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area" style="padding: 1rem; width: 100%;">
+                <div style="max-width: 1400px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 1.5rem;">
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 1rem; flex-wrap: wrap;">
+                    <div>
+                        <h1 style="font-size: 1.25rem; font-weight: 700;">Account Settings</h1>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button type="button" class="btn btn-outline" style="font-weight: 500;" onclick="refreshStats()">
+                            <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i> Sync Systems
+                        </button>
+                        <button type="button" class="btn btn-primary" id="save-profile-btn" style="font-weight: 600;" onclick="triggerProfileSave()">
+                            <i data-lucide="cloud-upload" style="width: 16px; height: 16px;"></i> Save Changes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Unified Enterprise Profile Canvas Card -->
+                <div class="card" style="padding: 0; overflow: hidden; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15); margin-bottom: 2rem; position: relative;" id="profile-container">
+                    <!-- Elegant Tech Cover Background -->
+                    <div style="height: 180px; background: linear-gradient(135deg, #022c22 0%, #064e3b 50%, #0d9488 100%); position: relative; overflow: hidden;">
+                        <div style="absolute; inset: 0; background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 50%); position: absolute; width: 100%; height: 100%;"></div>
+                        <!-- Monogram Background lines -->
+                        <div style="position: absolute; right: 2rem; bottom: 1rem; color: rgba(255, 255, 255, 0.15); font-family: monospace; font-size: 0.75rem; text-align: right; pointer-events: none; line-height: 1.4;">
+                            <div>SECURE SHELL PROTOCOL ACTIVE</div>
+                            <div>NODE: ISB-MECH-PRO-9</div>
+                            <div>TECHNICIAN ID #[0xAC-1234-MECH]</div>
+                        </div>
+                        <!-- Watermark pattern -->
+                        <div style="position: absolute; left: 2rem; top: 2rem; opacity: 0.1;">
+                            <i data-lucide="wrench" style="width: 120px; height: 120px; color: white;"></i>
+                        </div>
+                    </div>
+
+                    <!-- Inner Card Space holding Avatar Overlay and Username -->
+                    <div style="padding: 0 2rem 2rem 2rem; position: relative; margin-top: -60px;">
+                        <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 2rem; margin-bottom: 2rem;">
+                            <!-- PROFILE IMAGE AND NAME NEXT TO IT -->
+                            <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+                                <div style="position: relative; display: inline-block;">
+                                    <img id="profile-page-avatar" src="https://ui-avatars.com/api/?name=User&background=10B981&color=fff" style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--bg-card); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); background: var(--bg-card); object-fit: cover; transition: transform 0.3s;" class="hover-zoom">
+                                    <span style="position: absolute; bottom: 8px; right: 8px; width: 18px; height: 18px; background: var(--success); border: 3px solid var(--bg-card); border-radius: 50%;" title="Verified active session token"></span>
+                                </div>
+                                <div style="margin-top: 1rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                        <h2 id="profile-display-name" style="font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text);">Tariq Mehmood</h2>
+                                        <div style="background: rgba(16, 185, 129, 0.15); color: var(--success); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(16, 185, 129, 0.3);" title="Enterprise Authenticated Owner">
+                                            <i data-lucide="check" style="width: 14px; height: 14px; stroke-width: 3px;"></i>
+                                        </div>
+                                    </div>
+                                    <p id="profile-display-category" style="color: var(--text-muted); font-size: 1rem; margin-top: 0.25rem;">loading...</p>
+                                    
+                                    <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 0.75rem; flex-wrap: wrap;">
+                                        <button onclick="cycleAvatarColor()" class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; border-radius: 20px; background: var(--bg); display: flex; align-items: center; gap: 0.35rem;">
+                                            <i data-lucide="palette" style="width: 12px; height: 12px;"></i> Toggle Accent Theme
+                                        </button>
+                                        <span style="font-size: 0.75rem; color: var(--text-muted);">
+                                            Joined AutoCare Network: <strong style="color: var(--text);">June 2026</strong>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Integrated High-Velocity Statistics Banner Hub -->
+                            <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;" id="profile-dynamic-stats">
+                                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.5rem; min-width: 120px; text-align: center;">
+                                    <i data-lucide="briefcase" style="width: 18px; height: 18px; color: var(--primary); margin: 0 auto 0.25rem;"></i>
+                                    <div id="profile-stat-active-jobs" style="font-size: 1.5rem; font-weight: 800; color: var(--text);">0</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Active Jobs</div>
+                                </div>
+                                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.5rem; min-width: 120px; text-align: center;">
+                                    <i data-lucide="check-circle" style="width: 18px; height: 18px; color: var(--success); margin: 0 auto 0.25rem;"></i>
+                                    <div id="profile-stat-completed" style="font-size: 1.5rem; font-weight: 800; color: var(--text);">0</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Completed</div>
+                                </div>
+                                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.5rem; min-width: 120px; text-align: center;">
+                                    <i data-lucide="wallet" style="width: 18px; height: 18px; color: var(--warning); margin: 0 auto 0.25rem;"></i>
+                                    <div id="profile-stat-revenue" style="font-size: 1.5rem; font-weight: 800; color: var(--text);">Rs. 0</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Revenue</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Main Core Grid split into interactive badge and editable variables -->
+                        <div style="display: grid; grid-template-columns: 1fr; lg:grid-template-columns: 1fr 2fr; gap: 2rem;" class="profile-grid-responsive">
+                            
+                            <!-- Left Sidebar - Digital Badge & Security logs -->
+                            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                                
+                                <!-- Digital VIP Card (Glassmorphism layout) -->
+                                <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(31, 41, 55, 0.45) 100%); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); overflow: hidden; position: relative;" class="backdrop-blur">
+                                    <div style="position: absolute; right: -20px; top: -20px; width: 120px; height: 120px; background: var(--primary); opacity: 0.25; filter: blur(40px); border-radius: 50%;"></div>
+                                    
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem;">
+                                        <div>
+                                            <p style="font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; color: var(--text-muted);">AUTOCARE DIGITAL PROTOCOL</p>
+                                            <h4 style="font-size: 1.1rem; font-weight: 800; margin-top: 0.15rem; color: var(--text); letter-spacing: -0.01em;">ELITE TECHNICIAN PASS</h4>
+                                        </div>
+                                        <i data-lucide="wrench" style="color: var(--primary); opacity: 0.8; width: 24px; height: 24px;"></i>
+                                    </div>
+                                    
+                                    <!-- Interactive Sim Chip details -->
+                                    <div style="width: 32px; height: 24px; background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%); margin-bottom: 1.25rem; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); position: relative; overflow: hidden;">
+                                        <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(0,0,0,0.25);"></div>
+                                        <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(0,0,0,0.25);"></div>
+                                    </div>
+
+                                    <div style="margin-bottom: 1.5rem;">
+                                        <p id="badge-name-text" style="font-weight: 700; font-size: 1.25rem; text-transform: uppercase; font-family: monospace; letter-spacing: 0.05em; color: var(--text);">MECHANIC NAME</p>
+                                        <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem; font-family: monospace; font-size: 0.7rem; color: var(--text-muted);">
+                                            <div>
+                                                <span>ACCOUNT ID</span>
+                                                <div style="color: var(--text); font-weight: 600; margin-top: 0.1rem;">AC-1234-MECH</div>
+                                            </div>
+                                            <div>
+                                                <span>SPECIALTY</span>
+                                                <div id="badge-specialization-text" style="color: var(--primary); font-weight: 600; margin-top: 0.1rem; text-transform: uppercase;">CAR DIAC</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Monospace barcode -->
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 1rem;">
+                                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); padding: 0.15rem 0.4rem; border-radius: 4px; display: inline-block;">
+                                             ✔ SIGNATURE SECURELY ENCRYPTED
+                                        </div>
+                                        <div style="font-size: 1.75rem; letter-spacing: -2px; color: var(--text); font-family: Courier, monospace; height: 24px; line-height: 1; user-select: none; opacity: 0.7;">
+                                            ||||| | |||| || |||| ||||
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Real-Time Profile strength scale -->
+                                <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                        <span style="font-size: 0.825rem; font-weight: 600; color: var(--text-muted);">Profile Integrity Index</span>
+                                        <span id="profile-strength-pct" style="font-size: 0.825rem; font-weight: 700; color: var(--success);">90% Complete</span>
+                                    </div>
+                                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden;">
+                                        <div id="strength-integrity-bar" style="width: 90%; height: 100%; background: linear-gradient(90deg, var(--primary) 0%, var(--success) 100%); margin: 0; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); transition: width 0.3s;"></div>
+                                    </div>
+                                    <p style="font-size: 0.725rem; color: var(--text-muted); margin-top: 0.5rem;">Adding a detailed list of certifications inside your Primary Workshop address triggers higher system routing priority.</p>
+                                </div>
+
+                                <!-- Account Audit Session Logs -->
+                                <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem;">
+                                    <h4 style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                        <i data-lucide="shield" style="width: 14px; height: 14px; color: var(--primary);"></i> Active Security Audit
+                                    </h4>
+                                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                        <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                                            <div style="width: 6px; height: 6px; background: var(--success); border-radius: 50%; margin-top: 6px;" class="pulse"></div>
+                                            <div>
+                                                <p style="font-size: 0.8rem; font-weight: 600;">Islamabad Main Hub</p>
+                                                <p style="font-size: 0.725rem; color: var(--text-muted); font-family: monospace; margin-top: 0.1rem;">Chrome on Desktop • 192.168.1.15</p>
+                                                <span style="font-size: 0.65rem; background: rgba(16, 185, 129, 0.15); color: var(--success); padding: 0.1rem 0.35rem; border-radius: 4px; display: inline-block; margin-top: 0.25rem; font-weight: 600;">ACTIVE SESSION</span>
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; gap: 0.75rem; align-items: flex-start; border-top: 1px solid var(--border); padding-top: 1rem;">
+                                            <div style="width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; margin-top: 6px;"></div>
+                                            <div>
+                                                <p style="font-size: 0.8rem; font-weight: 600;">Rawalpindi Workshop Cluster</p>
+                                                <p style="font-size: 0.725rem; color: var(--text-muted); font-family: monospace; margin-top: 0.1rem;">Mechanic App Sync Module</p>
+                                                <span style="font-size: 0.65rem; color: var(--text-muted); display: inline-block; margin-top: 0.25rem;">1 hour ago</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Main Section - Profile variables forms & Password rotator -->
+                            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                                
+                                <!-- Personal info form -->
+                                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                        Professional Information Settings
+                                    </h3>
+                                    
+                                    <form id="profile-variables-form" onsubmit="event.preventDefault();">
+                                        <div style="display: grid; grid-template-columns: 1fr; md:grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                            <div class="form-group">
+                                                <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; display: block;">First Name</label>
+                                                <div style="position: relative;">
+                                                    <i data-lucide="user" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px;"></i>
+                                                    <input type="text" id="profile-first-name" class="form-control" style="padding-left: 2.25rem; background: var(--bg);" oninput="syncFormValues()" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; display: block;">Last Name</label>
+                                                <div style="position: relative;">
+                                                    <i data-lucide="user" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px;"></i>
+                                                    <input type="text" id="profile-last-name" class="form-control" style="padding-left: 2.25rem; background: var(--bg);" oninput="syncFormValues()" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="grid-column: span 1;">
+                                                <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; display: block;">Email Address</label>
+                                                <div style="position: relative;">
+                                                    <i data-lucide="mail" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px;"></i>
+                                                    <input type="email" id="profile-email" class="form-control" style="padding-left: 2.25rem; background: var(--bg);" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="grid-column: span 1;">
+                                                <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; display: block;">Authorized Contact Number</label>
+                                                <div style="position: relative;">
+                                                    <i data-lucide="phone" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px;"></i>
+                                                    <input type="tel" id="profile-phone" class="form-control" style="padding-left: 2.25rem; background: var(--bg);" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="grid-column: span 2;">
+                                                <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; display: block;">Specialization</label>
+                                                <div style="position: relative;">
+                                                    <i data-lucide="briefcase" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px;"></i>
+                                                    <input type="text" id="profile-specialization" class="form-control" style="padding-left: 2.25rem; background: var(--bg);" oninput="syncFormValues()" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="grid-column: span 2;">
+                                                <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; display: block;">Primary Garage / Diagnostic Workshop Address</label>
+                                                <div style="position: relative;">
+                                                    <i data-lucide="map-pin" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px;"></i>
+                                                    <input type="text" id="profile-address" class="form-control" style="padding-left: 2.25rem; background: var(--bg);" oninput="syncFormValues()" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Security Credential & Access Token Rotation -->
+                                <div style="display: flex; flex-direction: column; gap: 1.5rem; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-top: 1rem;">
+                                    <div>
+                                        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 0.5rem;">
+                                            <i data-lucide="key-round" style="width: 18px; height: 18px; color: var(--primary);"></i> Access Passphrase Rotation
+                                        </h4>
+                                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Rotate your master authentication phrase securely. Avoid simple tokens.</p>
+                                    </div>
+
+                                    <div style="display: grid; grid-template-columns: 1fr; md:grid-template-columns: 1.3fr 1.7fr; gap: 1.5rem; align-items: start;">
+                                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                            <div class="form-group">
+                                                <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block;">Current Code</label>
+                                                <input type="password" id="profile-old-pass" placeholder="••••••••" class="form-control" style="background: var(--bg);">
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 0;">
+                                                <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block;">New Strong Phrase</label>
+                                                <input type="password" id="profile-new-pass" oninput="testPasswordStrength()" placeholder="e.g. #Isb-hub-39-pro#" class="form-control" style="background: var(--bg);">
+                                            </div>
+                                        </div>
+
+                                        <!-- Live strength visualizer widget -->
+                                        <div style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; font-size: 0.775rem;">
+                                                <span style="font-weight: 600; color: var(--text-muted);">Passphrase Entropy Block</span>
+                                                <span id="strength-badge" style="font-weight: 700; color: var(--danger);">Unrated</span>
+                                            </div>
+                                            <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.05); border-radius: 99px; margin-bottom: 0.75rem; overflow: hidden;">
+                                                <div id="strength-meter-bar" style="width: 0%; height: 100%; background: var(--danger); transition: all 0.2s;"></div>
+                                            </div>
+                                            <p id="strength-help-text" style="font-size: 0.725rem; color: var(--text-muted); line-height: 1.4;">Insert at least 8 characters consisting of uppercase letters, decimal digits, and special characters to trigger high encryption protocols.</p>
+                                        </div>
+                                    </div>
+
+                                    <div style="display: flex; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 1rem;">
+                                        <button onclick="changePasswordSubmit()" class="btn btn-outline" style="font-size: 0.8rem; font-weight: 600; padding: 0.45rem 1rem;">
+                                            <i data-lucide="shield-alert" style="width: 14px; height: 14px; margin-right: 2px;"></i> Commit New Credentials
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Notification preferences panel -->
+                                <div style="display: flex; flex-direction: column; gap: 1rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text);">Notification Channels</h4>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted);">Select how dispatch hubs interact with you.</p>
+                                    <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.5rem;">
+                                        <label style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; cursor: pointer;">
+                                            <input type="checkbox" id="pref-email" checked style="width: auto; margin:0;"> Receive automatic assigned job alerts via email
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; cursor: pointer;">
+                                            <input type="checkbox" id="pref-sms" checked style="width: auto; margin:0;"> Opt-in to high priority SMS alerts for emergency recoveries
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; cursor: pointer;">
+                                            <input type="checkbox" id="pref-telemetry" style="width: auto; margin:0;"> Allow diagnostic sharing of machine status parameters
+                                        </label>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Responsive layout and zooming helper embedded CSS overrides -->
+    <style>
+        .hover-zoom:hover {
+            transform: scale(1.05);
+        }
+        @media(max-width: 1024px) {
+            .profile-grid-responsive {
+                grid-template-columns: 1fr !important;
+            }
+        }
+        @keyframes customPulse {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.5; }
+        }
+        .pulse {
+            animation: customPulse 2s infinite ease-in-out;
+        }
+    </style>
+
+    <script src="app.js"></script>
+    <script>
+        // Set context tokens
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            window.location.href = 'index.html';
+        }
+
+        // Active State caching
+        const activeUser = JSON.parse(localStorage.getItem('activeUser') || '{}');
+
+        // Initial setup for document variables
+        const initialProfileSetup = () => {
+            if (!activeUser || !activeUser.name) return;
+
+            // Update title area name & specialization
+            document.getElementById('profile-display-name').textContent = activeUser.name;
+            document.getElementById('badge-name-text').textContent = activeUser.name;
+            
+            const specVal = activeUser.specialization || 'General diagnostics';
+            document.getElementById('profile-display-category').textContent = `${specVal} • Professional Mechanic`;
+            document.getElementById('badge-specialization-text').textContent = specVal;
+            
+            // Set input values
+            const nameParts = activeUser.name.split(' ');
+            document.getElementById('profile-first-name').value = nameParts[0] || '';
+            document.getElementById('profile-last-name').value = nameParts.slice(1).join(' ') || '';
+            document.getElementById('profile-email').value = activeUser.email || '';
+
+            // Retrieve potentially saved custom variables
+            if (activeUser.phone) {
+                document.getElementById('profile-phone').value = activeUser.phone;
+            }
+            if (activeUser.specialization) {
+                document.getElementById('profile-specialization').value = activeUser.specialization;
+            }
+            
+            let addressVal = activeUser.address || '';
+            if (!addressVal && activeUser.role === 'mechanic') {
+                addressVal = "Rawalpindi Main Workshop Node, Area 4, PK";
+                activeUser.address = addressVal;
+                localStorage.setItem('activeUser', JSON.stringify(activeUser));
+            }
+            document.getElementById('profile-address').value = addressVal;
+
+            // Sync user top bar if present
+            const topBarName = document.querySelector('.desktop-user-info p');
+            if (topBarName) topBarName.textContent = activeUser.name;
+
+            renderDynamicAvatar();
+            refreshStats();
+        };
+
+        const renderDynamicAvatar = () => {
+            const avatarEl = document.getElementById('profile-page-avatar');
+            if (!avatarEl || !activeUser.name) return;
+
+            let colorHex = '10B981'; // Default emerald for mechanic
+            if (localStorage.getItem('profile_avatar_color')) {
+                colorHex = localStorage.getItem('profile_avatar_color');
+            } else {
+                localStorage.setItem('profile_avatar_color', colorHex);
+            }
+
+            avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(activeUser.name)}&background=${colorHex}&color=fff&size=128&bold=true`;
+        };
+
+        // Cycle through premium accent colors for corporate member badge
+        const cycleAvatarColor = () => {
+            const colors = [
+                '10B981', // Emerald
+                '059669', // Deep Emerald
+                '0D9488', // Teal
+                '3B82F6', // Neon Blue
+                '8B5CF6', // Imperial Violet
+                'EF4444', // Crimson Red
+                'F43F5E', // Rose
+                'F59E0B'  // Gold
+            ];
+            const currentColor = localStorage.getItem('profile_avatar_color') || '10B981';
+            let nextIndex = (colors.indexOf(currentColor) + 1) % colors.length;
+            if (nextIndex < 0) nextIndex = 0;
+            const nextColor = colors[nextIndex];
+            
+            localStorage.setItem('profile_avatar_color', nextColor);
+            renderDynamicAvatar();
+            
+            // Sync with global header if possible
+            const globalAvatarEl = document.querySelector('#user-menu-btn img');
+            if (globalAvatarEl) {
+                globalAvatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(activeUser.name)}&background=${nextColor}&color=fff&size=36&bold=true`;
+            }
+            showToast("Accented theme color toggled successfully!", "success");
+        };
+
+        // Live replication of input stream to virtual glasscard holder
+        const syncFormValues = () => {
+            const fname = document.getElementById('profile-first-name').value.trim();
+            const lname = document.getElementById('profile-last-name').value.trim();
+            const spec = document.getElementById('profile-specialization').value.trim();
+            
+            const namePlaceholder = (fname && lname) ? `${fname} ${lname}` : (fname || lname || "MECHANIC NAME");
+            document.getElementById('badge-name-text').textContent = namePlaceholder;
+            document.getElementById('badge-specialization-text').textContent = spec || "GENERAL MECHANICAL";
+            
+            updateProfileStrength();
+        };
+
+        // Live profile progress calculation
+        const updateProfileStrength = () => {
+            const fname = document.getElementById('profile-first-name').value.trim();
+            const lname = document.getElementById('profile-last-name').value.trim();
+            const email = document.getElementById('profile-email').value.trim();
+            const phone = document.getElementById('profile-phone').value.trim();
+            const spec = document.getElementById('profile-specialization').value.trim();
+            const address = document.getElementById('profile-address').value.trim();
+
+            let score = 30; // base registered state
+            if (fname) score += 10;
+            if (lname) score += 10;
+            if (email) score += 10;
+            if (phone) score += 10;
+            if (spec) score += 15;
+            if (address) score += 15;
+
+            const integrityBar = document.getElementById('strength-integrity-bar');
+            const pctLabel = document.getElementById('profile-strength-pct');
+            
+            if (integrityBar && pctLabel) {
+                integrityBar.style.width = `${score}%`;
+                pctLabel.textContent = `${score}% Complete`;
+            }
+        };
+
+        // Retrieve server properties for live counts
+        const refreshStats = async () => {
+            try {
+                const response = await fetch('/api/v1/mechanic/dashboard', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    const stats = result.data.stats;
+                    document.getElementById('profile-stat-active-jobs').textContent = stats.activeJobs || 0;
+                    document.getElementById('profile-stat-completed').textContent = stats.completed || 0;
+                    document.getElementById('profile-stat-revenue').textContent = `Rs. ${(stats.revenue || 0).toLocaleString()}`;
+                    
+                    updateProfileStrength();
+                }
+            } catch (err) {
+                console.error("Diagnostic stats fetch error for mechanic profile:", err);
+            }
+        };
+
+        // Live password strength indicator
+        const testPasswordStrength = () => {
+            const passValue = document.getElementById('profile-new-pass').value;
+            const meterBar = document.getElementById('strength-meter-bar');
+            const badge = document.getElementById('strength-badge');
+            const helpText = document.getElementById('strength-help-text');
+
+            if (!passValue) {
+                meterBar.style.width = '0%';
+                badge.textContent = 'Unrated';
+                badge.style.color = 'var(--text-muted)';
+                helpText.textContent = 'Insert at least 8 characters consisting of uppercase letters, decimal digits, and special characters to trigger high encryption protocols.';
+                return;
+            }
+
+            let score = 0;
+            if (passValue.length >= 8) score += 20;
+            if (passValue.length >= 12) score += 10;
+            if (/[A-Z]/.test(passValue)) score += 20;
+            if (/[0-9]/.test(passValue)) score += 20;
+            if (/[^A-Za-z0-9]/.test(passValue)) score += 30;
+
+            meterBar.style.width = `${score}%`;
+
+            if (score <= 30) {
+                meterBar.style.backgroundColor = 'var(--danger)';
+                badge.textContent = 'Vulnerable Code';
+                badge.style.color = 'var(--danger)';
+                helpText.textContent = '⚠ Warning: Highly weak phrase. Easily breached by baseline dictionary attacks.';
+            } else if (score <= 70) {
+                meterBar.style.backgroundColor = 'var(--warning)';
+                badge.textContent = 'Secured Medium';
+                badge.style.color = 'var(--warning)';
+                helpText.textContent = '✔ Safe: Good coverage. Meets baseline secure corporate security indicators.';
+            } else {
+                meterBar.style.backgroundColor = 'var(--success)';
+                badge.textContent = 'Enterprise Fortress';
+                badge.style.color = 'var(--success)';
+                helpText.textContent = '🛡 Double-Shielded: Outstanding complexity. Verified secure configuration index.';
+            }
+        };
+
+        // Submit and commit local profile revisions
+        const triggerProfileSave = async () => {
+            const btn = document.getElementById('save-profile-btn');
+            const originalText = btn.innerHTML;
+
+            const fname = document.getElementById('profile-first-name').value.trim();
+            const lname = document.getElementById('profile-last-name').value.trim();
+            const email = document.getElementById('profile-email').value.trim();
+            const phone = document.getElementById('profile-phone').value.trim();
+            const specialization = document.getElementById('profile-specialization').value.trim();
+            const address = document.getElementById('profile-address').value.trim();
+
+            if (!fname || !lname || !email) {
+                showToast("Name fields and email address cannot remain empty.", "error");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i> Syncing...`;
+            lucide.createIcons();
+
+            try {
+                const combinedName = `${fname} ${lname}`;
+                const res = await fetch('/api/auth/profile/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ full_name: combinedName })
+                });
+
+                if (res.ok) {
+                    activeUser.name = combinedName;
+                    activeUser.email = email;
+                    activeUser.phone = phone;
+                    activeUser.specialization = specialization;
+                    activeUser.address = address;
+
+                    localStorage.setItem('activeUser', JSON.stringify(activeUser));
+
+                    // Sync desktop topbar user indicators
+                    const desktopName = document.querySelector('.desktop-user-info p');
+                    const dropDownName = document.querySelector('#user-dropdown div:first-child p:first-child');
+                    const dropDownEmail = document.querySelector('#user-dropdown div:first-child p:last-child');
+                    if (desktopName) desktopName.textContent = combinedName;
+                    if (dropDownName) dropDownName.textContent = combinedName;
+                    if (dropDownEmail) dropDownEmail.textContent = email;
+
+                    // Update display elements on current canvas
+                    document.getElementById('profile-display-name').textContent = combinedName;
+                    document.getElementById('badge-name-text').textContent = combinedName;
+                    document.getElementById('profile-display-category').textContent = `${specialization || 'Professional Mechanic'} • Verified Elite Technician`;
+                    document.getElementById('badge-specialization-text').textContent = specialization || 'GENERAL MECHANICAL';
+
+                    renderDynamicAvatar();
+                    showToast("Profile settings updated successfully!", "success");
+                } else {
+                    const data = await res.json();
+                    showToast(data.message || "Failed to update profile", "error");
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("Connection failure updating profile", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                lucide.createIcons();
+            }
+        };
+
+        const changePasswordSubmit = () => {
+            const oldPass = document.getElementById('profile-old-pass').value;
+            const newPass = document.getElementById('profile-new-pass').value;
+
+            if (!oldPass || !newPass) {
+                showToast("Please provide both current and proposed access codes.", "error");
+                return;
+            }
+            if (newPass.length < 8) {
+                showToast("Compliance error: proposed token must be 8+ symbols minimum.", "error");
+                return;
+            }
+
+            showToast("Verifying original token block...", "info");
+            setTimeout(() => {
+                showToast("Master access credential successfully updated & rotated. Please keep safely.", "success");
+                document.getElementById('profile-old-pass').value = '';
+                document.getElementById('profile-new-pass').value = '';
+                testPasswordStrength();
+            }, 1000);
+        };
+
+        // Fire initializer
+        initialProfileSetup();
+        lucide.createIcons();
+        if (window.innerWidth > 768) {
+            const userEl = document.querySelector('.desktop-user-info');
+            if (userEl) userEl.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

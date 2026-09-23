@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Security Gateway - AutoCare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest" crossorigin="anonymous"></script>
+    <style>
+        /* Modern 2026 Cyber-Enterprise Color Palette */
+        :root {
+            --auth-bg-dark: #080C1A; /* Match project's --bg-dark */
+            --auth-bg-grid: rgba(79, 70, 229, 0.04);
+            --auth-card-dark: rgba(13, 18, 30, 0.9); /* Match project's --bg-card-dark */
+            --auth-card-border: rgba(255, 255, 255, 0.08);
+            --auth-text-primary: #f8fafc;
+            --auth-text-secondary: #94a3b8;
+            --accent-pink: #4f46e5; /* Remapped to project's primary Indigo (#4F46E5) */
+            --accent-pink-glow: rgba(79, 70, 229, 0.25);
+            --accent-indigo: #6366f1; /* Secondary active indigo accent */
+            --accent-indigo-glow: rgba(99, 102, 241, 0.25);
+            --glow-color: var(--accent-pink-glow);
+            --primary-accent: var(--accent-pink);
+        }
+
+        body.light-mode {
+            --auth-bg-dark: #f8fafc; /* Match project's --bg-light */
+            --auth-bg-grid: rgba(79, 70, 229, 0.02);
+            --auth-card-dark: rgba(255, 255, 255, 0.95); /* Match project's --bg-card-light */
+            --auth-card-border: rgba(15, 23, 42, 0.08);
+            --auth-text-primary: #0f172a;
+            --auth-text-secondary: #475569;
+            --accent-pink: #4f46e5;
+            --accent-pink-glow: rgba(79, 70, 229, 0.15);
+            --accent-indigo: #4338ca;
+            --accent-indigo-glow: rgba(67, 56, 202, 0.15);
+            --glow-color: var(--accent-pink-glow);
+            --primary-accent: var(--accent-pink);
+        }
+
+        /* Ambient Dynamic Background Grid & Glows */
+        .auth-viewport {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--auth-bg-dark);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 1.5rem 1rem;
+            color: var(--auth-text-primary);
+            transition: background 0.4s ease;
+        }
+
+        .auth-viewport::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(var(--auth-bg-grid) 1px, transparent 1px),
+                               linear-gradient(90deg, var(--auth-bg-grid) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Top Corner Floating Theme Toggle */
+        .auth-theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--auth-card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            color: var(--auth-text-primary);
+        }
+
+        .auth-theme-toggle svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .auth-theme-toggle:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+        }
+
+        body.light-mode .auth-theme-toggle {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        body.light-mode .auth-theme-toggle:hover {
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        /* Outer Double-Card Split Grid - Compact and Sleek */
+        .auth-grid {
+            display: grid;
+            grid-template-columns: 460px 380px;
+            gap: 20px;
+            width: 100%;
+            max-width: 860px;
+            z-index: 2;
+            perspective: 1000px;
+        }
+
+        @media (max-width: 900px) {
+            .auth-grid {
+                grid-template-columns: 1fr;
+                max-width: 460px;
+            }
+        }
+
+        /* Glassmorphic Cards Base Styling - Extremely Dense & Professional */
+        .auth-glass-card {
+            background: var(--auth-card-dark);
+            border: 1px solid var(--auth-card-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        body.light-mode .auth-glass-card {
+            box-shadow: 0 15px 30px rgba(15, 23, 42, 0.04);
+        }
+
+        /* Compact Logo Badge on top of Main Card */
+        .auth-logo-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(79, 70, 229, 0.1);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            color: var(--accent-pink);
+            margin: 0 auto 1rem auto;
+            transition: all 0.4s ease;
+        }
+
+        .register-active .auth-logo-badge {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--accent-indigo);
+        }
+
+        .auth-logo-badge svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .auth-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 4px;
+            background: linear-gradient(135deg, var(--auth-text-primary) 30%, var(--auth-text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .auth-subtitle {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--auth-text-secondary);
+        }
+
+        /* Pill Capsule Info Tag */
+        .auth-capsule-tag {
+            align-self: center;
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            background: rgba(79, 70, 229, 0.06);
+            border: 1px solid rgba(79, 70, 229, 0.15);
+            color: var(--accent-pink);
+            margin-bottom: 16px;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .register-active .auth-capsule-tag {
+            background: rgba(99, 102, 241, 0.06);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            color: var(--accent-indigo);
+        }
+
+        /* Ultra Slick Dual Segment Switcher (Login vs Register) */
+        .auth-toggle-wrapper {
+            display: flex;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--auth-card-border);
+            padding: 3px;
+            border-radius: 12px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        body.light-mode .auth-toggle-wrapper {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .auth-toggle-btn {
+            flex: 1;
+            text-align: center;
+            padding: 9px 0;
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: var(--auth-text-secondary);
+            cursor: pointer;
+            z-index: 2;
+            transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            user-select: none;
+        }
+
+        .auth-toggle-btn.active {
+            color: #ffffff !important;
+        }
+
+        body.light-mode .auth-toggle-btn.active {
+            color: #ffffff !important;
+        }
+
+        .auth-toggle-slider {
+            position: absolute;
+            top: 3px;
+            bottom: 3px;
+            left: 3px;
+            width: calc(50% - 3px);
+            background: var(--accent-pink);
+            border-radius: 9px;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s, box-shadow 0.4s;
+            z-index: 1;
+            box-shadow: 0 4px 12px var(--accent-pink-glow);
+        }
+
+        .register-active .auth-toggle-slider {
+            transform: translateX(100%);
+            background: var(--accent-indigo);
+            box-shadow: 0 4px 12px var(--accent-indigo-glow);
+        }
+
+        /* Interactive Custom Form Fields with Inner Icons - Compact Spacing */
+        .form-group {
+            margin-bottom: 14px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--auth-text-secondary);
+        }
+
+        .input-icon-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-prefix-icon {
+            position: absolute;
+            left: 14px;
+            width: 16px;
+            height: 16px;
+            color: var(--auth-text-secondary);
+            pointer-events: none;
+            transition: color 0.3s;
+        }
+
+        .form-control-cool {
+            width: 100%;
+            padding: 11px 14px 11px 40px;
+            border-radius: 10px;
+            border: 1px solid var(--auth-card-border);
+            background: rgba(0, 0, 0, 0.15);
+            color: var(--auth-text-primary);
+            font-family: inherit;
+            font-size: 0.88rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body.light-mode .form-control-cool {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-control-cool::placeholder {
+            color: rgba(148, 163, 184, 0.4);
+        }
+
+        .form-control-cool:focus {
+            outline: none;
+            border-color: var(--primary-accent);
+            background: rgba(0, 0, 0, 0.25);
+            box-shadow: 0 0 0 3px var(--glow-color);
+        }
+
+        body.light-mode .form-control-cool:focus {
+            background: #ffffff;
+        }
+
+        .form-control-cool:focus + .input-prefix-icon {
+            color: var(--primary-accent);
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 14px;
+            background: none;
+            border: none;
+            color: var(--auth-text-secondary);
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+
+        .password-toggle-btn:hover {
+            color: var(--auth-text-primary);
+        }
+
+        /* 2026 Interactive Role Choice Pill Badges (For Registration) */
+        .cool-role-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .cool-role-card {
+            border: 1px solid var(--auth-card-border);
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 10px;
+            padding: 8px 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        body.light-mode .cool-role-card {
+            background: rgba(0, 0, 0, 0.01);
+        }
+
+        .cool-role-card i {
+            width: 16px;
+            height: 16px;
+            color: var(--auth-text-secondary);
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        .cool-role-card span {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--auth-text-secondary);
+            transition: color 0.3s;
+        }
+
+        .cool-role-card.active {
+            border-color: var(--accent-indigo);
+            background: rgba(99, 102, 241, 0.08);
+            box-shadow: 0 3px 10px rgba(99, 102, 241, 0.1);
+        }
+
+        .cool-role-card.active i {
+            color: var(--accent-indigo);
+            transform: scale(1.05);
+        }
+
+        .cool-role-card.active span {
+            color: var(--auth-text-primary);
+            font-weight: 800;
+        }
+
+        /* Password Strength Indicator */
+        .password-strength-box {
+            margin-top: 6px;
+        }
+
+        .password-strength-meter {
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body.light-mode .password-strength-meter {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            background: #ef4444;
+            transition: all 0.3s ease;
+        }
+
+        .password-strength-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--auth-text-secondary);
+            margin-top: 3px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Beautiful Submit Action Buttons with Neon Highlights - Compact & Professional */
+        .btn-glowing-cool {
+            width: 100%;
+            padding: 11px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border-radius: 10px;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-glowing-cool::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .btn-glowing-cool:hover::before {
+            transform: translateX(100%);
+        }
+
+        .btn-glowing-cool.btn-pink {
+            background: var(--accent-pink);
+            box-shadow: 0 4px 15px var(--accent-pink-glow);
+        }
+
+        .btn-glowing-cool.btn-pink:hover {
+            background: var(--accent-indigo);
+            transform: translateY(-1.5px);
+            box-shadow: 0 5px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-glowing-cool.btn-indigo {
+            background: var(--accent-indigo);
+            box-shadow: 0 4px 15px var(--accent-indigo-glow);
+        }
+
+        .btn-glowing-cool.btn-indigo:hover {
+            background: var(--accent-pink);
+            transform: translateY(-1.5px);
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-glowing-cool:active {
+            transform: translateY(0.5px);
+        }
+
+        /* Form view transition switcher container */
+        .auth-forms-slider-container {
+            overflow: hidden;
+            width: 100%;
+            position: relative;
+        }
+
+        .auth-forms-track {
+            display: flex;
+            width: 200%;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .auth-form-slide {
+            width: 50%;
+            padding: 2px;
+            box-sizing: border-box;
+            transition: opacity 0.4s ease;
+        }
+
+        .register-active .auth-forms-track {
+            transform: translateX(-50%);
+        }
+
+        /* Elegant custom checkbox and links wrapper */
+        .form-row-utils {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            font-size: 0.78rem;
+        }
+
+        .custom-checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            color: var(--auth-text-secondary);
+            user-select: none;
+        }
+
+        .custom-checkbox {
+            width: 16px;
+            height: 16px;
+            border-radius: 5px;
+            border: 1px solid var(--auth-card-border);
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .custom-checkbox i {
+            color: #ffffff;
+            width: 10px;
+            height: 10px;
+            transform: scale(0);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        input[type="checkbox"]:checked + .custom-checkbox {
+            background: var(--primary-accent);
+            border-color: var(--primary-accent);
+        }
+
+        input[type="checkbox"]:checked + .custom-checkbox i {
+            transform: scale(1);
+        }
+
+        .cool-link {
+            color: var(--primary-accent);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s;
+        }
+
+        .cool-link:hover {
+            text-decoration: underline;
+        }
+
+        /* TESTER LAB CARD STYLING (Right Panel) - Streamlined, Sleek & Compact */
+        .tester-lab-badge {
+            align-self: center;
+            font-size: 0.6rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 3px 8px;
+            border-radius: 5px;
+            background: var(--accent-pink);
+            color: #ffffff;
+            margin-bottom: 8px;
+            box-shadow: 0 0 10px var(--accent-pink-glow);
+        }
+
+        .tester-lab-title {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 2px;
+        }
+
+        .tester-lab-subtitle {
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--auth-text-secondary);
+            margin-bottom: 18px;
+            line-height: 1.3;
+        }
+
+        /* Quick-Access Test Profile Button Row - Compact Spacing */
+        .tester-profile-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--auth-card-border);
+            background: rgba(255, 255, 255, 0.01);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none !important;
+        }
+
+        body.light-mode .tester-profile-row {
+            background: rgba(0, 0, 0, 0.01);
+        }
+
+        .tester-profile-row:hover {
+            transform: translateY(-1.5px);
+            border-color: var(--accent-pink);
+            background: rgba(79, 70, 229, 0.04);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-mode .tester-profile-row:hover {
+            background: rgba(79, 70, 229, 0.02);
+            box-shadow: 0 8px 16px rgba(79, 70, 229, 0.04);
+        }
+
+        .tester-profile-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--auth-card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-pink);
+            margin-right: 12px;
+            transition: all 0.3s;
+        }
+
+        body.light-mode .tester-profile-icon {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .tester-profile-row:hover .tester-profile-icon {
+            background: rgba(79, 70, 229, 0.1);
+            border-color: rgba(79, 70, 229, 0.2);
+            color: var(--accent-pink);
+            transform: scale(1.05);
+        }
+
+        .tester-profile-details {
+            flex: 1;
+        }
+
+        .tester-profile-name {
+            font-size: 0.88rem;
+            font-weight: 800;
+            margin-bottom: 1px;
+            color: var(--auth-text-primary);
+        }
+
+        .tester-profile-desc {
+            font-size: 0.7rem;
+            color: var(--auth-text-secondary);
+        }
+
+        .tester-profile-action {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--accent-pink);
+            letter-spacing: 0.05em;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .tester-profile-row:hover .tester-profile-action {
+            transform: translateX(3px);
+        }
+
+        .tester-divider {
+            height: 1px;
+            border: none;
+            border-top: 1px dashed var(--auth-card-border);
+            margin: 16px 0;
+        }
+
+        .tester-sandbox-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--auth-text-secondary);
+            text-transform: uppercase;
+        }
+
+        .tester-led {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse-led 2s infinite;
+        }
+
+        @keyframes pulse-led {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 12px #10b981; }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+
+        /* Error/Info Box */
+        .auth-error-box {
+            display: none;
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #ef4444;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* High-End Enterprise Layout Grid */
+        .auth-container-unified {
+            display: grid;
+            grid-template-columns: 400px 450px;
+            width: 850px;
+            height: auto;
+            min-height: 570px;
+            background: var(--auth-card-dark);
+            border: 1px solid var(--auth-card-border);
+            border-radius: 20px;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+            overflow: hidden;
+            z-index: 2;
+            position: relative;
+        }
+
+        body.light-mode .auth-container-unified {
+            box-shadow: 0 25px 50px rgba(15, 23, 42, 0.08);
+        }
+
+        @media (max-width: 880px) {
+            .auth-container-unified {
+                grid-template-columns: 1fr;
+                width: 100%;
+                max-width: 440px;
+                min-height: 520px;
+            }
+            .auth-brand-panel {
+                display: none !important;
+            }
+        }
+
+        /* LEFT SIDE: Brand presentation panel */
+        .auth-brand-panel {
+            position: relative;
+            background: linear-gradient(135deg, rgba(8, 12, 26, 0.98) 0%, rgba(79, 70, 229, 0.45) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 36px;
+            overflow: hidden;
+            border-right: 1px solid var(--auth-card-border);
+        }
+
+        /* Interactive futuristic SVG rim graphic inside Brand Panel */
+        .brand-graphic-overlay {
+            position: absolute;
+            top: -40px;
+            left: -40px;
+            right: -40px;
+            bottom: -40px;
+            opacity: 0.15;
+            background-image: radial-gradient(circle at 70% 30%, transparent 40%, rgba(99, 102, 241, 0.3) 70%, transparent 90%);
+            z-index: 1;
+        }
+
+        .brand-svg-container {
+            position: absolute;
+            top: 15%;
+            right: -10%;
+            width: 280px;
+            height: 280px;
+            opacity: 0.25;
+            transform: rotate(-15deg);
+            z-index: 2;
+            color: var(--accent-indigo);
+            pointer-events: none;
+            animation: slow-spin 45s linear infinite;
+        }
+
+        @keyframes slow-spin {
+            100% { transform: rotate(345deg); }
+        }
+
+        .brand-glow-blob {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%);
+            filter: blur(40px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .brand-glow-1 {
+            top: -50px;
+            left: -50px;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.25) 0%, transparent 75%);
+        }
+
+        .brand-glow-2 {
+            bottom: -100px;
+            right: -100px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 75%);
+        }
+
+        .brand-content {
+            position: relative;
+            z-index: 3;
+        }
+
+        .brand-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            margin: 0 0 12px 0;
+            background: linear-gradient(135deg, #ffffff 40%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        body.light-mode .brand-title {
+            background: linear-gradient(135deg, #0f172a 40%, #4338ca 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-subtitle {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: rgba(248, 250, 252, 0.85);
+            margin: 0;
+            font-weight: 500;
+        }
+
+        body.light-mode .brand-subtitle {
+            color: rgba(15, 23, 42, 0.85);
+        }
+
+        /* RIGHT SIDE: Action panel */
+        .auth-card-panel {
+            padding: 32px 36px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            z-index: 3;
+            background: var(--auth-card-dark);
+        }
+
+        /* Top badge wrench */
+        .auth-badge-screw {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(79, 70, 229, 0.12);
+            border: 1px solid rgba(79, 70, 229, 0.25);
+            color: var(--accent-pink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px auto;
+            transition: all 0.4s ease;
+        }
+
+        .auth-badge-screw svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Three Segment Tab Switcher (Matches screenshot beautifully) */
+        .auth-role-switcher {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--auth-card-border);
+            padding: 3px;
+            border-radius: 10px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        body.light-mode .auth-role-switcher {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .role-switch-btn {
+            text-align: center;
+            padding: 7px 2px;
+            font-weight: 700;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--auth-text-secondary);
+            cursor: pointer;
+            z-index: 2;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            user-select: none;
+            border-radius: 7px;
+        }
+
+        .role-switch-btn.active {
+            color: #ffffff !important;
+            background: var(--accent-pink);
+            box-shadow: 0 3px 8px var(--accent-pink-glow);
+        }
+
+        /* Compact Demo Quick Sign-in section (Tester Lab at the bottom) */
+        .tester-compact-container {
+            margin-top: 18px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--auth-card-border);
+        }
+
+        .tester-compact-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .tester-compact-label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--auth-text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tester-compact-pulse {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 6px #10b981;
+        }
+
+        .tester-pill-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .tester-pill-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--auth-card-border);
+            border-radius: 8px;
+            padding: 6px 4px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--auth-text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+        }
+
+        body.light-mode .tester-pill-btn {
+            background: rgba(0, 0, 0, 0.01);
+        }
+
+        .tester-pill-btn:hover {
+            border-color: var(--accent-pink);
+            background: rgba(79, 70, 229, 0.06);
+            color: var(--auth-text-primary);
+            transform: translateY(-1px);
+        }
+
+        .tester-pill-btn svg {
+            width: 11px;
+            height: 11px;
+            color: var(--accent-pink);
+        }
+
+        /* Toggle Link for Login vs Register mode */
+        .auth-toggle-link-container {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 0.78rem;
+            color: var(--auth-text-secondary);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-viewport">
+        <!-- Floating Theme Switcher -->
+        <div class="auth-theme-toggle" id="auth-theme-button" title="Toggle Theme">
+            <i data-lucide="sun"></i>
+        </div>
+
+        <div class="auth-container-unified" id="auth-container-wrapper">
+            <!-- LEFT BRAND PANEL (Sleek display mimicking the image) -->
+            <div class="auth-brand-panel">
+                <div class="brand-graphic-overlay"></div>
+                <div class="brand-glow-blob brand-glow-1"></div>
+                <div class="brand-glow-blob brand-glow-2"></div>
+                <!-- Premium visual gear/wheel SVG -->
+                <svg class="brand-svg-container" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2" />
+                    <circle cx="50" cy="50" r="38" stroke="currentColor" stroke-width="1" />
+                    <circle cx="50" cy="50" r="28" stroke="currentColor" stroke-width="2" />
+                    <!-- Spokes -->
+                    <line x1="50" y1="5" x2="50" y2="95" stroke="currentColor" stroke-width="1" />
+                    <line x1="5" y1="50" x2="95" y2="50" stroke="currentColor" stroke-width="1" />
+                    <line x1="18.2" y1="18.2" x2="81.8" y2="81.8" stroke="currentColor" stroke-width="0.75" />
+                    <line x1="18.2" y1="81.8" x2="81.8" y2="18.2" stroke="currentColor" stroke-width="0.75" />
+                    <!-- Center core -->
+                    <circle cx="50" cy="50" r="14" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-width="2" />
+                    <circle cx="50" cy="50" r="6" fill="currentColor" />
+                </svg>
+                <div class="brand-content">
+                    <h1 class="brand-title">AutoCare</h1>
+                    <p class="brand-subtitle">Enterprise Vehicle Maintenance, Recovery, and Repair Management System.</p>
+                </div>
+            </div>
+
+            <!-- RIGHT FORM PANEL -->
+            <div class="auth-card-panel">
+                <div>
+                    <!-- Top Icon badge -->
+                    <div class="auth-badge-screw" id="auth-main-badge">
+                        <i data-lucide="wrench"></i>
+                    </div>
+
+                    <!-- Custom segment switch tab (Exactly like reference image) -->
+                    <div class="auth-role-switcher" id="unified-role-selector">
+                        <div class="role-switch-btn active" data-role="user">Vehicle Owner</div>
+                        <div class="role-switch-btn" data-role="mechanic">Mechanic</div>
+                        <div class="role-switch-btn" data-role="admin">Admin</div>
+                    </div>
+
+                    <!-- Errors messages container -->
+                    <div class="auth-error-box" id="auth-general-error">
+                        <i data-lucide="alert-circle" style="width: 16px; height: 16px; flex-shrink:0;"></i>
+                        <span id="error-text">An error occurred</span>
+                    </div>
+
+                    <!-- Form sliding window -->
+                    <div class="auth-forms-slider-container">
+                        <div class="auth-forms-track" id="auth-forms-track-element">
+                            
+                            <!-- SLIDE 1: LOGIN -->
+                            <div class="auth-form-slide" id="login-slide-form">
+                                <form id="loginFormCool">
+                                    <!-- Legacy role group selectors kept hidden for safety -->
+                                    <div class="cool-role-group" id="login-role-group" style="display: none !important;">
+                                        <div class="cool-role-card active" data-role="user"></div>
+                                        <div class="cool-role-card" data-role="mechanic"></div>
+                                        <div class="cool-role-card" data-role="admin"></div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="login-email">Email Address</label>
+                                        <div class="input-icon-wrapper">
+                                            <input type="email" id="login-email" class="form-control-cool" placeholder="name@example.com" required>
+                                            <i data-lucide="mail" class="input-prefix-icon"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" style="margin-bottom: 12px;">
+                                        <label class="form-label" for="login-password">Password</label>
+                                        <div class="input-icon-wrapper">
+                                            <input type="password" id="login-password" class="form-control-cool" placeholder="••••••••" required>
+                                            <i data-lucide="lock" class="input-prefix-icon"></i>
+                                            <button type="button" class="password-toggle-btn" id="toggle-login-password">
+                                                <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row-utils">
+                                        <label class="custom-checkbox-container">
+                                            <input type="checkbox" id="login-remember" style="display: none;">
+                                            <div class="custom-checkbox">
+                                                <i data-lucide="check"></i>
+                                            </div>
+                                            <span>Remember me</span>
+                                        </label>
+                                        <a href="#" class="cool-link" id="forgot-password-trigger" style="font-size: 0.75rem;">Forgot Password?</a>
+                                    </div>
+
+                                    <button type="submit" class="btn-glowing-cool btn-pink" id="login-submit-button" style="padding: 10px; font-size: 0.82rem;">
+                                        <span>Sign In &rarr;</span>
+                                    </button>
+
+                                    <div class="auth-toggle-link-container">
+                                        Don't have an account? <a href="#" id="tab-register-btn" class="cool-link" style="font-weight: 700;">Sign Up</a>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- SLIDE 2: REGISTER -->
+                            <div class="auth-form-slide" id="register-slide-form">
+                                <form id="registerFormCool">
+                                    <!-- Legacy role group selectors kept hidden for safety -->
+                                    <div class="cool-role-group" id="register-role-group" style="display: none !important;">
+                                        <div class="cool-role-card active" data-role="user"></div>
+                                        <div class="cool-role-card" data-role="mechanic"></div>
+                                        <div class="cool-role-card" data-role="admin"></div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="reg-fullname">Full Name</label>
+                                        <div class="input-icon-wrapper">
+                                            <input type="text" id="reg-fullname" class="form-control-cool" placeholder="Ahmed Khan" required style="padding: 9px 12px 9px 40px;">
+                                            <i data-lucide="user" class="input-prefix-icon"></i>
+                                        </div>
+                                    </div>
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                        <div class="form-group">
+                                            <label class="form-label" for="reg-email">Email Address</label>
+                                            <div class="input-icon-wrapper">
+                                                <input type="email" id="reg-email" class="form-control-cool" placeholder="user@domain.com" required style="padding: 9px 12px 9px 36px; font-size: 0.8rem;">
+                                                <i data-lucide="mail" class="input-prefix-icon" style="left: 12px;"></i>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="reg-phone">Phone Number</label>
+                                            <div class="input-icon-wrapper">
+                                                <input type="tel" id="reg-phone" class="form-control-cool" placeholder="0300 1234567" required style="padding: 9px 12px 9px 36px; font-size: 0.8rem;">
+                                                <i data-lucide="phone" class="input-prefix-icon" style="left: 12px;"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label class="form-label" for="reg-password">Password</label>
+                                            <div class="input-icon-wrapper">
+                                                <input type="password" id="reg-password" class="form-control-cool" placeholder="••••••••" required style="padding: 9px 28px 9px 36px; font-size: 0.8rem;">
+                                                <i data-lucide="lock" class="input-prefix-icon" style="left: 12px;"></i>
+                                                <button type="button" class="password-toggle-btn" id="toggle-reg-password" style="right: 8px;">
+                                                    <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label class="form-label" for="reg-confirm">Confirm</label>
+                                            <div class="input-icon-wrapper">
+                                                <input type="password" id="reg-confirm" class="form-control-cool" placeholder="••••••••" required style="padding: 9px 28px 9px 36px; font-size: 0.8rem;">
+                                                <i data-lucide="lock" class="input-prefix-icon" style="left: 12px;"></i>
+                                                <button type="button" class="password-toggle-btn" id="toggle-reg-confirm" style="right: 8px;">
+                                                    <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="password-strength-box" style="margin-bottom: 8px;">
+                                        <div class="password-strength-meter">
+                                            <div class="password-strength-bar" id="reg-strength-bar"></div>
+                                        </div>
+                                        <div class="password-strength-label" style="font-size: 0.6rem;">
+                                            <span>Strength</span>
+                                            <span id="reg-strength-text">Empty</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row-utils" style="margin-bottom: 12px;">
+                                        <label class="custom-checkbox-container" style="gap: 6px;">
+                                            <input type="checkbox" id="reg-terms" required style="display: none;">
+                                            <div class="custom-checkbox">
+                                                <i data-lucide="check"></i>
+                                            </div>
+                                            <span style="font-size:0.7rem;">I agree to Terms & Privacy</span>
+                                        </label>
+                                    </div>
+
+                                    <button type="submit" class="btn-glowing-cool btn-indigo" id="register-submit-button" style="padding: 10px; font-size: 0.82rem;">
+                                        <span>Create Account &rarr;</span>
+                                    </button>
+
+                                    <div class="auth-toggle-link-container">
+                                        Already have an account? <a href="#" id="tab-login-btn" class="cool-link" style="font-weight: 700;">Sign In</a>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOTTOM COMPACT TESTER LAB (Small, elegant Fast Sandbox access pill buttons) -->
+                <div class="tester-compact-container">
+                    <div class="tester-compact-header">
+                        <div class="tester-compact-label">
+                            <i data-lucide="shield-check" style="width: 12px; height: 12px; color: #10b981;"></i>
+                            <span>Sandbox Fast Sign-In</span>
+                        </div>
+                        <div class="tester-compact-pulse"></div>
+                    </div>
+                    <div class="tester-pill-group">
+                        <button class="tester-pill-btn tester-profile-row" data-role="user" data-email="ahmed@example.com" title="Login as Ahmed Khan (Vehicle Owner)">
+                            <i data-lucide="car"></i> Owner
+                        </button>
+                        <button class="tester-pill-btn tester-profile-row" data-role="mechanic" data-email="mechanic@gmail.com" title="Login as Zahid Ali (Specialist Mechanic)">
+                            <i data-lucide="wrench"></i> Mechanic
+                        </button>
+                        <button class="tester-pill-btn tester-profile-row" data-role="admin" data-email="hangg@gmail.com" title="Login as Hangg Admin (Full Administrator)">
+                            <i data-lucide="shield"></i> Admin
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Integrate app logic -->
+    <script src="app.js"></script>
+    <script>
+        // Init Lucide Icons
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+        // Color Variables & Theme Swapper integration
+        const themeBtn = document.getElementById('auth-theme-button');
+        const body = document.body;
+
+        const updateThemeIcon = () => {
+            const isLight = body.classList.contains('light-mode');
+            const icon = themeBtn.querySelector('i');
+            if (icon && window.lucide) {
+                icon.setAttribute('data-lucide', isLight ? 'moon' : 'sun');
+                lucide.createIcons();
+            }
+        };
+
+        // Theme preference loader
+        if (localStorage.getItem('theme') === 'light') {
+            body.classList.add('light-mode');
+        } else {
+            body.classList.remove('light-mode');
+        }
+        updateThemeIcon();
+
+        themeBtn.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+            const isLight = body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            updateThemeIcon();
+        });
+
+        // Toggle Login & Register slides
+        const wrapper = document.getElementById('auth-container-wrapper');
+        const tabLogin = document.getElementById('tab-login-btn');
+        const tabRegister = document.getElementById('tab-register-btn');
+        const badge = document.getElementById('auth-main-badge');
+
+        const selectTab = (tab) => {
+            if (tab === 'register') {
+                wrapper.classList.add('register-active');
+                tabLogin.classList.remove('active');
+                tabRegister.classList.add('active');
+                badge.innerHTML = '<i data-lucide="user-plus"></i>';
+                document.documentElement.style.setProperty('--primary-accent', 'var(--accent-indigo)');
+                document.documentElement.style.setProperty('--glow-color', 'var(--accent-indigo-glow)');
+            } else {
+                wrapper.classList.remove('register-active');
+                tabLogin.classList.add('active');
+                tabRegister.classList.remove('active');
+                badge.innerHTML = '<i data-lucide="wrench"></i>';
+                document.documentElement.style.setProperty('--primary-accent', 'var(--accent-pink)');
+                document.documentElement.style.setProperty('--glow-color', 'var(--accent-pink-glow)');
+            }
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+            // Clear general error
+            document.getElementById('auth-general-error').style.display = 'none';
+        };
+
+        tabLogin.addEventListener('click', () => selectTab('login'));
+        tabRegister.addEventListener('click', () => selectTab('register'));
+
+        // Check if query params tell us to default to register tab
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('tab') === 'register' || urlParams.get('view') === 'register') {
+            selectTab('register');
+        }
+
+        // Custom checkbox toggle helper for safety
+        document.querySelectorAll('.custom-checkbox-container').forEach(container => {
+            container.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'INPUT') {
+                    const checkbox = container.querySelector('input[type="checkbox"]');
+                    if (checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                }
+            });
+        });
+
+        // Password Show/Hide Buttons
+        const wirePasswordToggle = (btnId, inputId) => {
+            const btn = document.getElementById(btnId);
+            const input = document.getElementById(inputId);
+            if (btn && input) {
+                btn.addEventListener('click', () => {
+                    const isPass = input.getAttribute('type') === 'password';
+                    input.setAttribute('type', isPass ? 'text' : 'password');
+                    btn.innerHTML = isPass ? '<i data-lucide="eye-off" style="width: 18px; height: 18px;"></i>' : '<i data-lucide="eye" style="width: 18px; height: 18px;"></i>';
+                    if (window.lucide) lucide.createIcons();
+                });
+            }
+        };
+        wirePasswordToggle('toggle-login-password', 'login-password');
+        wirePasswordToggle('toggle-reg-password', 'reg-password');
+        wirePasswordToggle('toggle-reg-confirm', 'reg-confirm');
+
+        // Login Role Pill Badge Selector
+        const setupRoleSelector = (groupId) => {
+            const group = document.getElementById(groupId);
+            if (group) {
+                const cards = group.querySelectorAll('.cool-role-card');
+                cards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        cards.forEach(c => c.classList.remove('active'));
+                        card.classList.add('active');
+                    });
+                });
+            }
+        };
+        setupRoleSelector('login-role-group');
+        setupRoleSelector('register-role-group');
+
+        // Password strength meter validator
+        const regPasswordInput = document.getElementById('reg-password');
+        const strengthBar = document.getElementById('reg-strength-bar');
+        const strengthText = document.getElementById('reg-strength-text');
+
+        if (regPasswordInput) {
+            regPasswordInput.addEventListener('input', () => {
+                const val = regPasswordInput.value;
+                let score = 0;
+                if (val.length >= 6) score += 20;
+                if (val.length >= 10) score += 20;
+                if (/[A-Z]/.test(val)) score += 20;
+                if (/[0-9]/.test(val)) score += 20;
+                if (/[^A-Za-z0-9]/.test(val)) score += 20;
+
+                strengthBar.style.width = score + '%';
+                if (score === 0) {
+                    strengthBar.style.backgroundColor = 'transparent';
+                    strengthText.textContent = 'Empty';
+                    strengthText.style.color = 'var(--auth-text-secondary)';
+                } else if (score <= 40) {
+                    strengthBar.style.backgroundColor = '#ef4444';
+                    strengthText.textContent = 'Weak';
+                    strengthText.style.color = '#ef4444';
+                } else if (score <= 80) {
+                    strengthBar.style.backgroundColor = '#f59e0b';
+                    strengthText.textContent = 'Medium';
+                    strengthText.style.color = '#f59e0b';
+                } else {
+                    strengthBar.style.backgroundColor = '#10b981';
+                    strengthText.textContent = 'Strong';
+                    strengthText.style.color = '#10b981';
+                }
+            });
+        }
+
+        // Direct Login Helper for Tester Lab rows
+        const executeDirectLogin = async (email, role, originElement) => {
+            const originalHTML = originElement.innerHTML;
+            originElement.innerHTML = `
+                <i data-lucide="loader" class="spin" style="width: 12px; height: 12px;"></i> Saving...
+            `;
+            if (window.lucide) lucide.createIcons();
+
+            // Sync top role selector segment
+            const targetBtn = document.querySelector(`#unified-role-selector .role-switch-btn[data-role="${role}"]`);
+            if (targetBtn) {
+                document.querySelectorAll('#unified-role-selector .role-switch-btn').forEach(b => b.classList.remove('active'));
+                targetBtn.classList.add('active');
+                
+                // Legacy Selector 1 (Login Role)
+                const loginCard = document.querySelector(`#login-role-group .cool-role-card[data-role="${role}"]`);
+                if (loginCard) {
+                    document.querySelectorAll('#login-role-group .cool-role-card').forEach(c => c.classList.remove('active'));
+                    loginCard.classList.add('active');
+                }
+            }
+
+            try {
+                const res = await fetch('/api/auth/login-direct', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, role })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    localStorage.setItem('access_token', data.data.access_token);
+                    const user = data.data.user;
+                    const userRole = user.role.toLowerCase();
+                    localStorage.setItem('activeUser', JSON.stringify({
+                        name: user.full_name,
+                        email: user.email,
+                        role: userRole
+                    }));
+
+                    window.showToast('Login successful! Welcome to the workspace.', 'success');
+                    setTimeout(() => {
+                        if (userRole === 'admin') window.location.href = 'admin-dashboard.html';
+                        else if (userRole === 'mechanic') window.location.href = 'mechanic-dashboard.html';
+                        else window.location.href = 'user-dashboard.html';
+                    }, 800);
+                } else {
+                    window.showToast(data.message || 'Direct login failed', 'error');
+                    originElement.innerHTML = originalHTML;
+                    if (window.lucide) lucide.createIcons();
+                }
+            } catch (err) {
+                console.error("Direct Login error:", err);
+                window.showToast('Server access error during direct sandbox sign in.', 'error');
+                originElement.innerHTML = originalHTML;
+                if (window.lucide) lucide.createIcons();
+            }
+        };
+
+        // Wire up tester profile row events
+        document.querySelectorAll('.tester-profile-row').forEach(row => {
+            row.addEventListener('click', function(e) {
+                e.preventDefault();
+                const role = this.dataset.role;
+                const email = this.dataset.email;
+                executeDirectLogin(email, role, this);
+            });
+        });
+
+        // Wire normal Sign-In Form Submit
+        const loginForm = document.getElementById('loginFormCool');
+        const generalError = document.getElementById('auth-general-error');
+        const errorText = document.getElementById('error-text');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            generalError.style.display = 'none';
+
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const activeRoleCard = document.querySelector('#login-role-group .cool-role-card.active');
+            let role = activeRoleCard ? activeRoleCard.dataset.role : 'user';
+
+            const btn = document.getElementById('login-submit-button');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader" class="spin" style="width: 18px; height: 18px;"></i><span>Verifying credentials...</span>';
+            if (window.lucide) lucide.createIcons();
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, role })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    localStorage.setItem('access_token', data.data.access_token);
+                    const user = data.data.user;
+                    const userRole = user.role.toLowerCase();
+                    localStorage.setItem('activeUser', JSON.stringify({
+                        name: user.full_name,
+                        email: user.email,
+                        role: userRole
+                    }));
+
+                    window.showToast('Authenticated successfully! Entering console...', 'success');
+                    setTimeout(() => {
+                        if (userRole === 'admin') window.location.href = 'admin-dashboard.html';
+                        else if (userRole === 'mechanic') window.location.href = 'mechanic-dashboard.html';
+                        else window.location.href = 'user-dashboard.html';
+                    }, 800);
+                } else {
+                    errorText.textContent = data.message || 'Incorrect email, password, or security context.';
+                    generalError.style.display = 'flex';
+                    window.showToast(data.message || 'Login rejected', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = originalHTML;
+                    if (window.lucide) lucide.createIcons();
+                }
+            } catch (err) {
+                console.error("Login failure:", err);
+                errorText.textContent = 'Internal gateway timeout. Please retry shortly.';
+                generalError.style.display = 'flex';
+                window.showToast('Gateway connection failure', 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+                if (window.lucide) lucide.createIcons();
+            }
+        });
+
+        // Wire normal Register Form Submit
+        const registerForm = document.getElementById('registerFormCool');
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            generalError.style.display = 'none';
+
+            const fullname = document.getElementById('reg-fullname').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const confirm = document.getElementById('reg-confirm').value;
+
+            const activeRoleCard = document.querySelector('#register-role-group .cool-role-card.active');
+            let role = activeRoleCard ? activeRoleCard.dataset.role : 'user';
+
+            // Local validations
+            if (password !== confirm) {
+                errorText.textContent = 'Verification error: Passwords do not match.';
+                generalError.style.display = 'flex';
+                window.showToast('Passwords do not match', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                errorText.textContent = 'Verification error: Password must be at least 6 characters.';
+                generalError.style.display = 'flex';
+                window.showToast('Password too short', 'error');
+                return;
+            }
+
+            // Map frontend role context to backend db expectation
+            if (role === 'user') {
+                role = 'vehicle_owner';
+            }
+
+            const btn = document.getElementById('register-submit-button');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader" class="spin" style="width: 18px; height: 18px;"></i><span>Deploying Profile Registry...</span>';
+            if (window.lucide) lucide.createIcons();
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        full_name: fullname,
+                        email: email,
+                        password: password,
+                        role: role,
+                        phone_number: phone
+                    })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    window.showToast('Account registered successfully! Switching to Login...', 'success');
+                    // Reset fields
+                    registerForm.reset();
+                    strengthBar.style.width = '0%';
+                    strengthText.textContent = 'Empty';
+                    
+                    setTimeout(() => {
+                        selectTab('login');
+                        btn.disabled = false;
+                        btn.innerHTML = originalHTML;
+                        if (window.lucide) lucide.createIcons();
+                        // Populate email
+                        document.getElementById('login-email').value = email;
+                    }, 1200);
+                } else {
+                    errorText.textContent = data.message || 'Registration rejected by security firewall.';
+                    generalError.style.display = 'flex';
+                    window.showToast(data.message || 'Registration failed', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = originalHTML;
+                    if (window.lucide) lucide.createIcons();
+                }
+            } catch (err) {
+                console.error("Register failure:", err);
+                errorText.textContent = 'Internal gateway timeout during enrollment.';
+                generalError.style.display = 'flex';
+                window.showToast('Gateway connection failure', 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+                if (window.lucide) lucide.createIcons();
+            }
+        });
+
+        // Forgot password utility larping / notification
+        document.getElementById('forgot-password-trigger').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.showToast('For security reasons, password recovery in sandbox environment should be simulated. Preloaded credentials can be accessed via Tester Lab.', 'info');
+        });
+
+        // Setup the compact unified top segment switcher
+        const setupUnifiedRoleSelector = () => {
+            const buttons = document.querySelectorAll('#unified-role-selector .role-switch-btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    buttons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const role = btn.getAttribute('data-role');
+
+                    // Synchronize the hidden legacy role form structures
+                    const loginCard = document.querySelector(`#login-role-group .cool-role-card[data-role="${role}"]`);
+                    if (loginCard) {
+                        document.querySelectorAll('#login-role-group .cool-role-card').forEach(c => c.classList.remove('active'));
+                        loginCard.classList.add('active');
+                    }
+                    const regCard = document.querySelector(`#register-role-group .cool-role-card[data-role="${role}"]`);
+                    if (regCard) {
+                        document.querySelectorAll('#register-role-group .cool-role-card').forEach(c => c.classList.remove('active'));
+                        regCard.classList.add('active');
+                    }
+                });
+            });
+        };
+        setupUnifiedRoleSelector();
+
+        // Register tab link trigger in the login slide view
+        document.querySelectorAll('#tab-register-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                selectTab('register');
+            });
+        });
+        document.querySelectorAll('#tab-login-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                selectTab('login');
+            });
+        });
+    </script>
+</body>
+</html>
