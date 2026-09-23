@@ -225,15 +225,15 @@ http://localhost:3000/frontend/ai-automation.html
 
 ---
 
-## 🎯 Interviewer Cheat Sheet (How to Discuss This Project)
+## 🎯 QNA (About This Project)
 
-#### *1. How did you design the real-time voice assistant to ensure low latency without UI freezes?*
+#### *1. How i design the real-time voice assistant to ensure low latency without UI freezes?*
 > *"I utilized the browser's native Web Audio API with a `ScriptProcessorNode` to capture microphone audio directly as raw Float32 arrays, downsampling them to 16kHz 16-bit mono PCM buffers in memory. Instead of polling REST endpoints with heavy WAV encodings, I stream these chunks over a lightweight bidirectional WebSocket (`ws`) connection to the backend, rendering a 60 FPS HTML5 Canvas visualizer asynchronously on the animation frame thread."*
 
 #### *2. How does the autonomous triage pipeline avoid hallucinations during vehicle diagnosis?*
 > *"I implemented a multi-stage validation architecture. First, the problem is parsed through a specialized automotive diagnostic prompt. Concurrently, the engine invokes Google Search Grounding to cross-reference the exact vehicle make, model, and year against live Technical Service Bulletins (TSB) and NHTSA recall databases. The final report explicitly cites external OEM URLs so technicians can verify all recommended labor and parts costs."*
 
-#### *3. How did you guarantee that user API keys are secure against credential theft?*
+#### *3. How did i guarantee that user API keys are secure against credential theft?*
 > *"I enforced a strict zero-leakage architecture. The codebase contains zero hardcoded API keys. When a user provides a custom key in the settings panel, it is stored strictly inside their browser's private `localStorage` and passed dynamically via request headers (`x-gemini-api-key`) directly to our proxy layer. If no custom key is provided, the server falls back to its own environment variables, ensuring no tokens are ever leaked into version control or client bundle source code."*
 
 #### *4. How does the system handle database consistency without a heavy SQL server?*
