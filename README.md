@@ -248,7 +248,7 @@ I am actively seeking full-time roles in **Full-Stack Software Engineering, AI E
 - **Name:** Abdul Hannan
 - **Email:** [iamhannanshahid@gmail.com](mailto:iamhannanshahid@gmail.com)
 - **GitHub:** [github.com/Hannan864](https://github.com/Hannan864)
-- **LinkedIn:** [linkedin.com/in/your-profile](https://linkedin.com/in/your-profile)
+- **LinkedIn:** [linkedin.com/in/hanstudio](https://linkedin.com/in/hanstudio)
 
 ---
 
